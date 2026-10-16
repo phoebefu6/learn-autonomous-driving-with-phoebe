@@ -1,3 +1,8 @@
+<!-- learn-with-phoebe hub banner -->
+> ### 📚 Part of [**Learn with Phoebe**](https://phoebefu6.github.io/learn-with-phoebe/)
+> The shelf of 168 free, hands-on courses on AI, data, and the craft around them. **[Browse every course ↗](https://phoebefu6.github.io/learn-with-phoebe/)**
+<!-- /learn-with-phoebe hub banner -->
+
 # Learn Autonomous Driving with Phoebe
 
 Autonomous driving as a data problem, for data people moving into the field and the leaders who fund the work.
