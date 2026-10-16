@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- social:start -->
+<meta name="description" content="Leader session 5 of 6. Five mechanisms where warehouse habits fail on driving data: the source, the identity, the ground truth, the feedback loop and the cost of being wrong, each drawn as a before-and-after. Lanehart is a constructed fleet.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Learn with Phoebe">
+<meta property="og:title" content="Why the warehouse playbook breaks here - learn autonomous driving with phoebe">
+<meta property="og:description" content="Leader session 5 of 6. A row someone meant against a frame from many clocks, a customer id against a track id, and a refund against a safety case.">
+<meta property="og:url" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/courses/a5-why-the-warehouse-playbook-breaks-here.html">
+<meta property="og:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Why the warehouse playbook breaks here - learn autonomous driving with phoebe">
+<meta name="twitter:description" content="Five mechanisms, five before-and-after drawings: where the habits of a data team stop being safe on drive logs.">
+<meta name="twitter:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<!-- social:end -->
+<title>Leader session 5 · Why the warehouse playbook breaks here - learn autonomous driving with phoebe</title>
+<link rel="stylesheet" href="../assets/style.css?v=2">
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="wrap">
+    <span class="crumb"><a href="../index.html">learn-autonomous-driving-with-phoebe</a> / Leader session 5 of 6</span>
+    <button class="btn" id="toggle-all" type="button">Expand all</button>
+    <button class="btn primary" id="zoom-toggle" type="button">Projector zoom: off</button>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Learn Autonomous Driving with Phoebe · Leader session 5 of 6</div>
+    <h1>Why the warehouse playbook <span class="accent">breaks here</span></h1>
+    <p class="sub">A good data team arrives with habits that have never failed it: trust the row, join on the key, count the outcome, refresh the dashboard, fix it next run. On drive logs each habit meets a mechanism that quietly turns it against you. Tonight is five of them, drawn one at a time as a before and an after: the source, the identity, the ground truth, the feedback loop and the cost of being wrong. Lanehart, a constructed robotaxi pilot fleet in a fictional city, supplies the fleet numbers; every one of them is generated, not observed. The human rates are NHTSA's.</p>
+    <div class="chip-row">
+      <span class="chip level">🟠 Advanced</span>
+      <span class="chip audience">Leaders who fund or sign off autonomous-driving data work</span>
+      <span class="chip audience">Data people arriving from the warehouse</span>
+      <span class="chip time">45 min</span>
+    </div>
+    <div class="agenda">
+      <span class="a1" style="flex:1">0-3 · Welcome</span>
+      <span class="a2" style="flex:4">3-16 · Source and identity</span>
+      <span class="a3" style="flex:4">16-28 · Truth, loop, cost</span>
+      <span class="a4" style="flex:6">28-45 · Build-along and Q&amp;A</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ INTRO ============ -->
+  <section class="section" id="intro">
+    <div class="section-kicker">
+      <span class="klabel">Part 0</span>
+      <h2>Lanehart's analyst opens her old playbook</h2>
+    </div>
+    <p class="lede">Lanehart's data analyst, the one who came from a retail warehouse, has spent four sessions learning the vocabulary. This week she is asked to "port the safety dashboard to the standard stack": the same star schema, the same nightly refresh, the same KPI cards she built for sales. Lanehart is constructed, so we can watch what happens to each of her habits with the truth known. None of them is stupid. Each one was right for a row someone meant, and each one has a specific mechanism that makes it wrong for a frame a sensor took.</p>
+
+    <div class="legend">
+      <span class="pill">Live = presented in the 45 minutes</span>
+      <span class="pill">Self-study = the full depth, after class</span>
+      <span class="pill">🔍 Every diagram zooms</span>
+    </div>
+
+    <div class="callout win">
+      <p><strong>★ What you walk out with tonight.</strong> Five before-and-after drawings you can redraw on a whiteboard: a row against a moment assembled from sensors on their own clocks; a customer id against a scene, a track and a context; a label that arrives with the sale against a label bought by the frame and a death that arrives once in 75.2 million miles; a dashboard that reads the world against a fleet whose own takeover policy decides what gets logged; and a refund against a safety case with a missing leaf. Then one warehouse KPI, rewritten through all five gates.</p>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Five habits, five mechanisms<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>"Trust the row."</strong> Breaks on the source: no one meant a lidar sweep; it is a measurement on its own clock.</li>
+          <li><strong>"Join on the key."</strong> Breaks on the identity: the keys that matter are inferred by the pipeline and can split or swap.</li>
+          <li><strong>"Count the outcome."</strong> Breaks on the ground truth: labels are bought, and the outcome that matters almost never happens.</li>
+          <li><strong>"Refresh the dashboard."</strong> Breaks on the feedback loop: the fleet's policy changes which miles become data.</li>
+          <li><strong>"Fix it next run."</strong> Breaks on the cost of being wrong: a missed case is not refunded, it is argued about in a safety case.</li>
+        </ul>
+        <p>None of these is a slogan to repeat. Each is a drawing of what physically happens to the data, and a question to ask that the warehouse never needed.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>What carries over untouched<span class="mini">2 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Plenty, and leader session 6 maps it column by column. Rates with a denominator, slicing a metric by segment, reproducible pipelines and the refusal to accept a count with no exposure behind it all transfer and become more valuable here. Tonight is deliberately about the opposite list: the habits that look like they transfer and do not.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="section" id="part-1">
+    <div class="section-kicker">
+      <span class="klabel">Part 1 · covers the source and the identity</span>
+      <h2>No one meant this row, and no one owns this key</h2>
+      <span class="tag concept">13 min live</span>
+    </div>
+    <p class="lede">In the warehouse, a row has an author and a moment: a till recorded a sale at 09:14:07 because a person bought something. A drive log has no author. A lidar spins and stamps each sweep when the turn completes; each camera fires when the sweep passes its view; radars sample on a third schedule. "The scene at 10:02:03.400" does not exist until the pipeline assembles it, and the assembly is a choice.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 356" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Before and after. Before, a warehouse row: order 10442, customer C-2291, placed at 09:14:07, with one author, one clock, one row per event. After, 150 milliseconds of one drive log: three lidar sweeps stamped at 50, 100 and 150 milliseconds when each turn completes, three camera exposures fired mid-sweep, two radar samples on a third schedule. One camera exposure, highlighted in yellow, fired at about 62 milliseconds; a nearest-time join snaps it to the sweep stamped at 50 milliseconds rather than the sweep that was passing it. On one constructed second, a nearest-time join matched 28 of 72 camera frames to the right scan.">
+        <defs>
+          <filter id="lha5aSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="51" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha5aHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha5aAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha5aH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha5aL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha5aS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha5aB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lha5aA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lha5aN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha5aH" x="30" y="36">BEFORE: A WAREHOUSE ROW</text>
+        <text class="lha5aH" x="330" y="36">AFTER: 150 MS OF ONE DRIVE LOG</text>
+
+        <g filter="url(#lha5aSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="50" width="270" height="220" rx="10" transform="rotate(-0.4 165 160)" fill="#FFFFFF"/>
+          <rect x="330" y="50" width="520" height="220" rx="10" transform="rotate(0.3 590 160)" fill="#FFFFFF"/>
+          <rect x="46" y="72" width="238" height="32" rx="4" fill="#F1F3F4"/>
+          <rect x="46" y="104" width="238" height="34" rx="4" fill="#FFFFFF"/>
+          <!-- lidar sweeps -->
+          <rect x="440" y="78" width="130" height="24" rx="3" transform="rotate(-0.5 505 90)" fill="url(#lha5aHc)"/>
+          <rect x="570" y="78" width="130" height="24" rx="3" transform="rotate(0.4 635 90)" fill="url(#lha5aHc)"/>
+          <rect x="700" y="78" width="130" height="24" rx="3" transform="rotate(-0.3 765 90)" fill="url(#lha5aHc)"/>
+          <!-- camera exposures -->
+          <rect x="493" y="128" width="9" height="24" rx="2" transform="rotate(2 497 140)" fill="#F1F3F4"/>
+          <rect x="597" y="128" width="9" height="24" rx="2" transform="rotate(-3 601 140)" fill="#F2C230"/>
+          <rect x="743" y="128" width="9" height="24" rx="2" transform="rotate(2 747 140)" fill="#F1F3F4"/>
+          <!-- radar samples -->
+          <rect x="463" y="170" width="6" height="22" rx="2" fill="#CED4D9"/>
+          <rect x="663" y="170" width="6" height="22" rx="2" fill="#CED4D9"/>
+          <!-- the wrong snap -->
+          <path d="M598 126 L574 106" stroke-dasharray="4 4" marker-end="url(#lha5aAr)"/>
+          <!-- time axis -->
+          <path d="M440 226 L836 226"/>
+          <path d="M440 220 L440 232 M570 220 L570 232 M700 220 L700 232 M830 220 L830 232"/>
+          <!-- doodle: a lane line -->
+          <path d="M760 36 L784 36 M798 36 L822 36 M836 36 L850 36" stroke="#8C979F" stroke-width="3"/>
+        </g>
+
+        <text class="lha5aS" x="56" y="93">order_id · customer · placed_at</text>
+        <text class="lha5aL" x="56" y="126">10442 · C-2291 · 09:14:07</text>
+        <text class="lha5aS" x="46" y="170">one author: a person who meant it</text>
+        <text class="lha5aS" x="46" y="190">one clock: the till's</text>
+        <text class="lha5aS" x="46" y="210">one row per event</text>
+        <text class="lha5aL" x="46" y="236">the row is the fact</text>
+
+        <text class="lha5aL" x="346" y="94">lidar 20 Hz</text>
+        <text class="lha5aL" x="346" y="144">camera 12 Hz</text>
+        <text class="lha5aL" x="346" y="186">radar 13 Hz</text>
+        <text class="lha5aA" x="440" y="250" text-anchor="middle">0 ms</text>
+        <text class="lha5aA" x="570" y="250" text-anchor="middle">50</text>
+        <text class="lha5aA" x="700" y="250" text-anchor="middle">100</text>
+        <text class="lha5aA" x="830" y="250" text-anchor="middle">150</text>
+
+        <text class="lha5aB" x="30" y="294">Yellow exposure fired mid-sweep: a nearest-time join snaps it to the 50 ms stamp, not the sweep it rode on.</text>
+        <text class="lha5aN" x="30" y="318">Timing is illustrative, after a public dataset's design: lidar stamped at the end of each turn.</text>
+        <text class="lha5aN" x="30" y="338">On one constructed second, a nearest-time join matched 28 of 72 camera frames to the right scan.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the warehouse row arrives as a fact; the drive-log moment is assembled, and the yellow frame is where the default assembly gets it wrong.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>The source: a measurement on its own clock<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>A warehouse analyst's first instinct is to trust that a row is what it says. That instinct rests on intent: someone placed the order. A sensor has no intent. It reports what it measured at the instant its own schedule fired, and every sensor keeps a different schedule.</p>
+        <p>So the analyst's second instinct, "join on the nearest timestamp", inherits a bug from the first. Each timestamp means something different. A lidar stamp marks the end of a turn; a camera stamp marks an exposure triggered partway through one. The nearest stamp is often the wrong sweep. On Lanehart's constructed one-second sync toy, nearest-timestamp matching put 28 of 72 camera frames on the right scan and 44 on the wrong one; a forward join that respects what the stamps mean put 72 of 72 right. Practitioner session 1 builds that join by hand.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>The paper for a public multi-sensor research dataset describes six cameras at 12 Hz, one spinning lidar at 20 Hz and five radars at 13 Hz. A camera's exposure is triggered when the lidar sweeps across the centre of that camera's view; the image timestamp is the trigger time and the lidar timestamp is when the full rotation completes. The authors add that the 12 exposures are spread across the 20 lidar scans, so not every scan has a matching camera frame. The design is careful, and it still means a moment is something you assemble.</p>
+        </div>
+      </div>
+    </details>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Before and after. Before, a customer key: C-2291 appears on January, February and March rows, the same key every month, a person you can ask, so joins never guess. After, a scene of about 20 seconds in an urban night-time rain context. A tracked child is track 17 for four frames, disappears behind a parked van, and reappears as track 41, highlighted in yellow: one person, two ids. Frames, tracks and contexts are keys the pipeline inferred, and the tracker can split, merge or swap them.">
+        <defs>
+          <filter id="lha5bSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="52" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha5bHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha5bAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha5bH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha5bL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha5bS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha5bB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lha5bN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha5bH" x="30" y="36">BEFORE: A CUSTOMER KEY</text>
+        <text class="lha5bH" x="330" y="36">AFTER: A SCENE, A TRACK, A CONTEXT</text>
+
+        <g filter="url(#lha5bSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="50" width="270" height="220" rx="10" transform="rotate(0.4 165 160)" fill="#FFFFFF"/>
+          <rect x="330" y="50" width="520" height="220" rx="10" transform="rotate(-0.3 590 160)" fill="#FFFFFF"/>
+          <rect x="46" y="68" width="238" height="28" rx="4" transform="rotate(-0.6 165 82)" fill="#F1F3F4"/>
+          <rect x="46" y="104" width="238" height="28" rx="4" transform="rotate(0.5 165 118)" fill="#F1F3F4"/>
+          <rect x="46" y="140" width="238" height="28" rx="4" transform="rotate(-0.4 165 154)" fill="#F1F3F4"/>
+          <!-- the scene -->
+          <rect x="346" y="64" width="488" height="124" rx="8" stroke-dasharray="6 5" fill="#FFFFFF"/>
+          <!-- parked van -->
+          <rect x="548" y="100" width="62" height="48" rx="6" transform="rotate(-1.5 579 124)" fill="url(#lha5bHc)"/>
+          <!-- track 17 -->
+          <circle cx="396" cy="134" r="6" fill="#CED4D9"/>
+          <circle cx="434" cy="130" r="6" fill="#CED4D9"/>
+          <circle cx="472" cy="127" r="6" fill="#CED4D9"/>
+          <circle cx="510" cy="125" r="6" fill="#CED4D9"/>
+          <path d="M402 133 L428 131 M440 129 L466 128 M478 126 L504 125" stroke-width="1.6"/>
+          <!-- track 41 -->
+          <circle cx="644" cy="124" r="7" fill="#F2C230"/>
+          <circle cx="684" cy="126" r="7" fill="#F2C230"/>
+          <circle cx="724" cy="129" r="7" fill="#F2C230"/>
+          <path d="M651 124 L677 126 M691 126 L717 129" stroke-width="1.6"/>
+        </g>
+
+        <text class="lha5bL" x="58" y="87">Jan · C-2291 · 3 orders</text>
+        <text class="lha5bL" x="58" y="123">Feb · C-2291 · 1 order</text>
+        <text class="lha5bL" x="58" y="159">Mar · C-2291 · 2 orders</text>
+        <text class="lha5bS" x="46" y="200">the same key every month</text>
+        <text class="lha5bS" x="46" y="220">a person you can ask</text>
+        <text class="lha5bL" x="46" y="244">joins never guess</text>
+
+        <text class="lha5bL" x="358" y="84">scene: about 20 s</text>
+        <text class="lha5bL" x="386" y="112">track 17</text>
+        <text class="lha5bS" x="550" y="166">parked van</text>
+        <text class="lha5bB" x="632" y="108">track 41: same child</text>
+        <text class="lha5bS" x="358" y="180">context: urban, night, rain</text>
+        <text class="lha5bS" x="346" y="214">Frames, tracks and contexts are keys the pipeline inferred,</text>
+        <text class="lha5bS" x="346" y="234">and the tracker can split, merge or swap them.</text>
+
+        <text class="lha5bB" x="30" y="296">Yellow: one person, two ids. Count actors per scene and you count the tracker's breaks, not the people.</text>
+        <text class="lha5bN" x="30" y="318">A customer id is given; a track id is a guess that holds only while the object stays in view.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the left key was handed to you; every key on the right was inferred, and the yellow track is what an inferred key does under occlusion.</figcaption>
+    </figure>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>The identity: keys the pipeline made up<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>A customer id is assigned once and means one person for years. You can join a refund to an order to a support ticket and the join never guesses. The units of a drive log are different in kind. A <strong>scene</strong> is a slice of driving someone chose to cut, about 20 seconds in the public dataset. An <strong>actor track</strong> is an id a tracker gives an object while it can follow it. A <strong>context</strong> (urban, night, rain) is a tag attached afterwards, by a rule or a model.</p>
+        <p>Each is an inference, and inferences fail in patterned ways. A child who walks behind a parked van and out again can come back as a new track. Count "pedestrians per scene" and the number moves when the tracker improves, with no change on the road. Count "rain miles" and the number moves when the weather tagger changes. The warehouse question "is the key unique?" becomes "who made this key, how, and what happens to it when they change their mind?"</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Why the occluded case is exactly the one that matters<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>The track break in the figure is not a cosmetic nuisance. Lanehart's constructed rare classes include "a pedestrian steps out from behind a parked van": 4,000 encounters per 100 million miles, each failing with probability 0.003, for 12 failures per 100 million. The moment the identity layer is weakest is the moment the safety claim most depends on.</p>
+        <p>In the constructed canon, plain Monte Carlo sampling of that class at a budget of 2,000 encounters saw 1 failure; importance sampling saw 743 at the same budget. Leader session 2 and practitioner session 8 explain why. For tonight, hold the shape: identity errors and rare events live in the same frames.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="section" id="part-2">
+    <div class="section-kicker">
+      <span class="klabel">Part 2 · covers the ground truth</span>
+      <h2>A label you buy, and an outcome you wait for</h2>
+      <span class="tag concept">6 min live</span>
+    </div>
+    <p class="lede">The warehouse is labelled by the business itself. Whether an order was returned arrives as another row, free, within weeks, for every order. Driving data has two ground truths and neither works that way. What was in the frame is bought from annotators, keyframe by keyframe. Whether the car is safe is decided by events so rare that they arrive on the road's schedule, not yours.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 336" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Before and after. Before, a transaction whose label arrives with it: order 10442, paid, returned no; every row is labelled by the business and outcomes arrive weekly. After, two ground truths. One second of lidar is 20 sweeps, of which 2 are keyframes bought for labels, about one in ten. And outcomes over miles on US roads in 2022: one police-reported crash per 538,938 miles, derived; one death per 75.2 million miles, highlighted in yellow; and Lanehart's constructed zero deaths in 150 million miles, whose 95 percent bound is still 2.00 per 100 million.">
+        <defs>
+          <filter id="lha5cSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="53" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha5cHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha5cAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha5cH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha5cL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha5cS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha5cA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lha5cK { font: 400 11px Inter, sans-serif; fill: #1A1F23; }
+          .lha5cB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lha5cV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lha5cN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha5cH" x="30" y="36">BEFORE: LABEL COMES WITH THE SALE</text>
+        <text class="lha5cH" x="330" y="36">AFTER: LABELS BOUGHT, OUTCOMES AWAITED</text>
+
+        <g filter="url(#lha5cSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="50" width="270" height="220" rx="10" transform="rotate(-0.3 165 160)" fill="#FFFFFF"/>
+          <rect x="330" y="50" width="520" height="220" rx="10" transform="rotate(0.3 590 160)" fill="#FFFFFF"/>
+          <rect x="46" y="72" width="238" height="34" rx="4" transform="rotate(0.6 165 89)" fill="#F1F3F4"/>
+          <!-- 20 lidar sweeps, 2 keyframes -->
+          <rect x="346" y="76" width="20" height="26" rx="2" fill="#FFFFFF"/>
+          <rect x="370" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <rect x="394" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <rect x="418" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <rect x="442" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <rect x="466" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <rect x="490" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <rect x="514" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <rect x="538" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <rect x="562" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <rect x="586" y="76" width="20" height="26" rx="2" fill="#FFFFFF"/>
+          <rect x="610" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <rect x="634" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <rect x="658" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <rect x="682" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <rect x="706" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <rect x="730" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <rect x="754" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <rect x="778" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <rect x="802" y="76" width="20" height="26" rx="2" fill="url(#lha5cHc)"/>
+          <path d="M351 89 L355 94 L362 83 M591 89 L595 94 L602 83" stroke-width="1.8"/>
+          <!-- the outcome row -->
+          <rect x="342" y="196" width="496" height="28" rx="5" transform="rotate(-0.3 590 210)" fill="#F2C230"/>
+          <!-- doodle: a cone -->
+          <path d="M818 40 L828 20 L838 40 Z M814 40 L842 40" fill="#FFFFFF"/>
+        </g>
+
+        <text class="lha5cL" x="56" y="94">10442 · paid · returned: no</text>
+        <text class="lha5cS" x="46" y="140">the label arrives with the event</text>
+        <text class="lha5cS" x="46" y="160">every row is labelled by the business</text>
+        <text class="lha5cS" x="46" y="180">outcomes arrive weekly: returns, churn</text>
+        <text class="lha5cL" x="46" y="236">truth is free and plentiful</text>
+
+        <text class="lha5cS" x="346" y="68">one second of lidar: 20 sweeps, 2 keyframes bought for labels</text>
+        <text class="lha5cS" x="346" y="122">about one sweep in ten is labelled (derived); the rest is interpolated</text>
+        <text class="lha5cA" x="346" y="152">OUTCOMES OVER MILES</text>
+        <text class="lha5cV" x="352" y="186">1 per 538,938 mi</text>
+        <text class="lha5cS" x="540" y="185">a police-reported crash, US 2022, derived</text>
+        <text class="lha5cV" x="352" y="216">1 per 75.2 million</text>
+        <text class="lha5cK" x="540" y="215">a death, US roads 2022</text>
+        <text class="lha5cV" x="352" y="252">0 in 150 million</text>
+        <text class="lha5cS" x="540" y="251">Lanehart deaths, constructed; bound 2.00</text>
+
+        <text class="lha5cB" x="30" y="296">Yellow: the outcome that decides safety arrives about once in 75 million miles, and never on request.</text>
+        <text class="lha5cN" x="30" y="318">Labels are bought by the frame; crashes are not bought at all, they are waited for.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - on the left, truth is a free column; on the right, one truth is purchased a keyframe at a time and the other, the yellow row, has to be waited for.</figcaption>
+    </figure>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Two ground truths, neither of them free<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>What was in the frame.</strong> In the public dataset, keyframes are annotated at 2 Hz with 3D boxes, classes and attributes, and the authors found 2 Hz labels robust to interpolation up to 10 to 20 Hz. Against a 20 Hz lidar, that is about one sweep in ten carrying a label someone paid for. The warehouse question "what share of rows are labelled?" has the answer "all of them" there; here the answer is a budget decision, and the frames you most need are the hardest to find. Practitioner session 2 prices it.</p>
+        <p><strong>Whether the car is safe.</strong> NHTSA's 2022 summary gives 1.33 deaths per 100 million vehicle miles: one per 75.2 million. Police-reported crashes come out at 185.55 per 100 million (derived), about one per 538,938 miles. Lanehart's 150 million constructed miles with no deaths still bound its fatal rate at 2.00 per 100 million, above the human 1.33. The outcome exists; you cannot accelerate its arrival by driving harder.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>Kalra and Paddock (2016), in RAND's "Driving to Safety", calculate that showing a fatality rate at or below the 2013 human rate of 1.09 per 100 million, at 95% confidence, takes 275 million failure-free miles; estimating the rate to within 20% takes about 8.8 billion miles. Their conclusion is that developers cannot simply drive their way to the answer: test driving alone cannot provide sufficient evidence for fatalities and injuries.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Where serious people disagree: is the crash count comparable?<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Even the plentiful outcome, crashes, has a ground-truth problem a warehouse never meets. The human baseline counts police-reported crashes, which undercount all crashes; RAND keeps separate "reported" and "estimated total" rates for that reason. A fleet with full telemetry records its minor bumps whether or not anyone calls the police.</p>
+        <p>One side argues that comparing a telemetry-complete fleet count with a police-reported human count makes the fleet look worse than it is. The other argues that minor crashes are exactly what a pilot should be judged on, and that adjusting the fleet's count downward invites flattering choices. Both are serious. The data team's job is to say which comparison a number makes, not to settle it.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 3 ============ -->
+  <section class="section" id="part-3">
+    <div class="section-kicker">
+      <span class="klabel">Part 3 · covers the feedback loop and the cost of being wrong</span>
+      <h2>A fleet that writes its own data, and a mistake you cannot refund</h2>
+      <span class="tag concept">6 min live</span>
+    </div>
+    <p class="lede">A sales dashboard reads the world without changing it: refreshing it does not change what the till records. A fleet is not like that. Its takeover policy, its upload triggers and its next model decide which miles become data, so the data it learns from is partly a record of its own choices. And when the analysis is wrong, the cost is not a refund and a corrected rerun. It is a gap in a safety argument.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 336" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Before and after. Before, a dashboard loop: sales happen, a warehouse table records them, a dashboard refreshes, and people read it; the refresh reads the world and does not change what gets recorded. After, a fleet loop: the takeover policy, highlighted in yellow, decides what gets logged, which becomes training and evaluation data, which shapes the next model and policy. Below, constructed disengagements per 100,000 miles for three policies: cautious 0.987, standard 0.193, loose 0.027 with 21 extra crashes.">
+        <defs>
+          <filter id="lha5dSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="54" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha5dHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha5dAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha5dH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha5dL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha5dS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha5dB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lha5dA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lha5dN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha5dH" x="30" y="36">BEFORE: A DASHBOARD THAT READS</text>
+        <text class="lha5dH" x="330" y="36">AFTER: A FLEET THAT WRITES ITS OWN DATA</text>
+
+        <g filter="url(#lha5dSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="50" width="270" height="220" rx="10" transform="rotate(0.3 165 160)" fill="#FFFFFF"/>
+          <rect x="330" y="50" width="520" height="220" rx="10" transform="rotate(-0.3 590 160)" fill="#FFFFFF"/>
+          <rect x="56" y="66" width="200" height="32" rx="6" transform="rotate(-0.8 156 82)" fill="#F1F3F4"/>
+          <rect x="56" y="118" width="200" height="32" rx="6" transform="rotate(0.6 156 134)" fill="url(#lha5dHc)"/>
+          <rect x="56" y="170" width="200" height="32" rx="6" transform="rotate(-0.5 156 186)" fill="#FFFFFF"/>
+          <path d="M156 100 L156 114" marker-end="url(#lha5dAr)"/>
+          <path d="M156 152 L156 166" marker-end="url(#lha5dAr)"/>
+          <path d="M258 186 C284 186 284 82 262 82" stroke-dasharray="5 4" marker-end="url(#lha5dAr)"/>
+          <!-- fleet loop -->
+          <rect x="350" y="64" width="220" height="38" rx="6" transform="rotate(-0.7 460 83)" fill="#F2C230"/>
+          <rect x="610" y="64" width="220" height="38" rx="6" transform="rotate(0.6 720 83)" fill="#FFFFFF"/>
+          <rect x="610" y="134" width="220" height="38" rx="6" transform="rotate(-0.5 720 153)" fill="url(#lha5dHc)"/>
+          <rect x="350" y="134" width="220" height="38" rx="6" transform="rotate(0.5 460 153)" fill="#F1F3F4"/>
+          <path d="M573 83 L606 83" marker-end="url(#lha5dAr)"/>
+          <path d="M720 105 L720 130" marker-end="url(#lha5dAr)"/>
+          <path d="M607 153 L574 153" marker-end="url(#lha5dAr)"/>
+          <path d="M460 131 L460 106" marker-end="url(#lha5dAr)"/>
+          <!-- disengagement bars -->
+          <rect x="420" y="202" width="300" height="12" rx="2" fill="#CED4D9"/>
+          <rect x="420" y="222" width="59" height="12" rx="2" fill="#CED4D9"/>
+          <rect x="420" y="242" width="8" height="12" rx="2" fill="#CED4D9"/>
+        </g>
+
+        <text class="lha5dL" x="70" y="87">sales happen</text>
+        <text class="lha5dL" x="70" y="139">warehouse table</text>
+        <text class="lha5dL" x="70" y="191">dashboard refreshes</text>
+        <text class="lha5dS" x="46" y="232">the refresh reads the world;</text>
+        <text class="lha5dS" x="46" y="250">it does not change what is recorded</text>
+
+        <text class="lha5dL" x="364" y="88">takeover policy</text>
+        <text class="lha5dL" x="624" y="88">what gets logged</text>
+        <text class="lha5dL" x="624" y="158">training and eval data</text>
+        <text class="lha5dL" x="364" y="158">next model and policy</text>
+        <text class="lha5dA" x="346" y="194">DISENGAGEMENTS PER 100,000 MILES, CONSTRUCTED</text>
+        <text class="lha5dS" x="346" y="212">cautious</text>
+        <text class="lha5dS" x="346" y="232">standard</text>
+        <text class="lha5dS" x="346" y="252">loose</text>
+        <text class="lha5dL" x="728" y="212">0.987</text>
+        <text class="lha5dL" x="487" y="232">0.193</text>
+        <text class="lha5dL" x="436" y="252">0.027 · 21 extra crashes</text>
+
+        <text class="lha5dB" x="30" y="296">Yellow: the policy decides which miles become data. The loose one logs least and crashes 21 more times.</text>
+        <text class="lha5dN" x="30" y="318">Cautious against standard: 5x the disengagements, identical true crash rate of 192.24 per 100M (constructed).</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the left loop only reads; the right loop writes, and the yellow box is the one choice that changes both the data and the score.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>The feedback loop: the fleet's policy is in the data<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>A warehouse metric can drift because the business changes, but recording a sale does not depend on last month's dashboard. On a fleet, it does. The takeover policy decides when a safety driver steps in, the upload triggers decide which moments are kept, and both are set by people reading last month's numbers. Change either and the data changes, with the road unchanged.</p>
+        <p>Lanehart's constructed anti-lever makes it concrete. Three takeover policies drive the same supervised miles. The cautious one logs 0.987 disengagements per 100,000 miles, the standard 0.193, the loose 0.027. Rank by "fewest disengagements" and you pick loose, which lets 21 more conflicts become crashes and raises the true rate from 192.24 to 206.24 per 100 million. Cautious and standard have identical true safety and a 5x difference in the score. The metric measured the policy.</p>
+        <p>Shadow mode is the honest version of the loop: the new software runs alongside without driving, and the team compares what it would have done with what happened. Even then, which moments get uploaded for comparison is a trigger someone chose. Practitioner session 9 builds the loop.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>California's regulation, Title 13, section 227.50, defines a disengagement as a deactivation of the autonomous mode when a failure of the technology is detected or when safe operation requires the test driver to take manual control, and requires the annual report to say who initiated it. Who decides that safe operation requires a takeover is the operator's policy. NHTSA's Standing General Order shows the same mechanism at a different edge: an ADS crash is reportable if the system was in use at any time within 30 seconds of it, so the window is a rule about which events enter the record.</p>
+        </div>
+      </div>
+    </details>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 336" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Before and after. Before, a wrong warehouse row leads to a refund and is fixed in the next run; the cost is bounded and the customer tells you. After, a safety case tree: the claim safer than human drivers rests on an argument, matched rate plus the tail, which rests on three pieces of evidence: an exact bound, fatal upper 2.00; an exposure match, 147.74 per 100 million; and the tail via sampling, plus 44.50 per 100 million, highlighted in yellow. Drop the yellow leaf and the case reads 147.74, falsely proven; with it the rate is 192.24, worse than the human 185.55. All fleet numbers constructed.">
+        <defs>
+          <filter id="lha5eSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="55" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha5eHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha5eAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha5eH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha5eL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha5eS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha5eB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lha5eV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lha5eN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha5eH" x="30" y="36">BEFORE: A WRONG ROW</text>
+        <text class="lha5eH" x="330" y="36">AFTER: A SAFETY CASE WITH A MISSING LEAF</text>
+
+        <g filter="url(#lha5eSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="50" width="270" height="220" rx="10" transform="rotate(-0.4 165 160)" fill="#FFFFFF"/>
+          <rect x="330" y="50" width="520" height="220" rx="10" transform="rotate(0.3 590 160)" fill="#FFFFFF"/>
+          <rect x="56" y="66" width="200" height="32" rx="6" transform="rotate(0.8 156 82)" fill="url(#lha5eHc)"/>
+          <rect x="56" y="118" width="200" height="32" rx="6" transform="rotate(-0.6 156 134)" fill="#F1F3F4"/>
+          <rect x="56" y="170" width="200" height="32" rx="6" transform="rotate(0.5 156 186)" fill="#FFFFFF"/>
+          <path d="M156 100 L156 114" marker-end="url(#lha5eAr)"/>
+          <path d="M156 152 L156 166" marker-end="url(#lha5eAr)"/>
+          <!-- safety case tree -->
+          <rect x="446" y="62" width="300" height="34" rx="6" transform="rotate(-0.5 596 79)" fill="#FFFFFF"/>
+          <rect x="446" y="120" width="300" height="34" rx="6" transform="rotate(0.5 596 137)" fill="#F1F3F4"/>
+          <path d="M596 98 L596 116" marker-end="url(#lha5eAr)"/>
+          <rect x="346" y="190" width="150" height="34" rx="6" transform="rotate(-1.2 421 207)" fill="#FFFFFF"/>
+          <rect x="512" y="190" width="150" height="34" rx="6" transform="rotate(0.9 587 207)" fill="#FFFFFF"/>
+          <rect x="678" y="190" width="156" height="34" rx="6" transform="rotate(-0.8 756 207)" stroke-dasharray="6 4" fill="#F2C230"/>
+          <path d="M560 156 L428 187 M596 156 L590 187 M632 156 L752 187"/>
+        </g>
+
+        <text class="lha5eL" x="70" y="87">a wrong row ships</text>
+        <text class="lha5eL" x="70" y="139">refund and apology</text>
+        <text class="lha5eL" x="70" y="191">fixed in the next run</text>
+        <text class="lha5eS" x="46" y="232">the cost is bounded and visible;</text>
+        <text class="lha5eS" x="46" y="250">the customer tells you</text>
+
+        <text class="lha5eL" x="462" y="84">claim: safer than human drivers</text>
+        <text class="lha5eL" x="462" y="142">argument: matched rate plus the tail</text>
+        <text class="lha5eL" x="358" y="212">exact bound</text>
+        <text class="lha5eL" x="524" y="212">exposure match</text>
+        <text class="lha5eL" x="690" y="212">tail via sampling</text>
+        <text class="lha5eS" x="350" y="246">fatal upper 2.00</text>
+        <text class="lha5eS" x="516" y="246">147.74 per 100M</text>
+        <text class="lha5eS" x="682" y="246">+44.50 per 100M</text>
+
+        <text class="lha5eB" x="30" y="296">Drop the yellow leaf and the case reads 147.74, falsely proven; with it, 192.24, worse than 185.55.</text>
+        <text class="lha5eN" x="30" y="318">Structure after UL 4600's claims, argument and evidence (reported); all fleet numbers constructed.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - a wrong row costs a refund; a missing leaf, the yellow one, turns a fleet that is worse than human drivers into one that looks proven better.</figcaption>
+    </figure>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>The cost of being wrong: a refund against a safety case<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>A warehouse error has a ceiling and a messenger. The wrong price ships, a customer complains, finance refunds, the next run is right. The error is visible because the person harmed reports it, and it is bounded by the order value.</p>
+        <p>A driving-data error has neither. If the tail slices fall out of evaluation, nothing complains: the dashboard gets greener. Lanehart's constructed canon shows the size. With the four rare-scenario classes evaluated, the crash rate is 192.24 per 100 million (upper bound 215.71), worse than the human 185.55. Drop them and the same fleet reads 147.74 (upper 169.04): "proven" better, falsely. The analysis did not get slightly worse; it reversed the verdict.</p>
+        <p>That is why the industry frames the output as a safety case rather than a report. UL 4600 (reported) describes a safety case as structured claims, argument and evidence across the lifecycle, using safety performance indicators. The data team owns the evidence leaves, and a missing leaf is a hole in the argument, not a footnote.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Failures with no fault in them<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Warehouse quality work hunts for faults: a broken feed, a null, a duplicate. Two safety standards split the problem differently, both at the reported tier and concept level only here. ISO 26262 covers hazards from malfunctions of electrical and electronic systems. ISO 21448, safety of the intended functionality, covers hazards with no fault at all: a sensor that works exactly as designed and still misses, because the specification or the performance limit did not anticipate the situation.</p>
+        <p>The second kind is the one the data team is uniquely placed to find, and the one a fault-hunting playbook will never flag. Every component is green; the child behind the van is still missed. The evidence for it lives in scenario slices, not in pipeline health checks.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 4 ============ -->
+  <section class="section" id="part-4">
+    <div class="section-kicker">
+      <span class="klabel">Part 4 · build-along</span>
+      <h2>Put one warehouse KPI through the five gates</h2>
+      <span class="tag build">17 min hands on</span>
+    </div>
+    <p class="lede">No code. Lanehart's analyst was asked to port "crashes this month, by city" to the fleet. Take that KPI, or one from your own team, and pass it through the five mechanisms in order. Each gate either adds a requirement to the definition or tells you the KPI cannot be built as stated. The answers below are a constructed worked example; your answers will differ.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 284" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A warehouse KPI card, crashes this month by city, passes through five gates in turn: source, which clock and which sensor; identity, scene, track or person; ground truth, who labelled and how rare; feedback loop, did policy shift logging; cost, what does a miss cost. It comes out as a rewritten definition, highlighted in yellow: crashes per 100 million miles, matched to the human mix, with a 95 percent bound, the tail counted and the policy held fixed.">
+        <defs>
+          <filter id="lha5fSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="56" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha5fHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha5fAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha5fH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha5fL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha5fS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha5fK { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha5fN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha5fH" x="30" y="36">ONE WAREHOUSE KPI THROUGH FIVE GATES</text>
+
+        <g filter="url(#lha5fSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="56" width="150" height="100" rx="8" transform="rotate(-1.2 105 106)" fill="#F1F3F4"/>
+          <rect x="196" y="56" width="112" height="100" rx="8" transform="rotate(0.6 252 106)" fill="#FFFFFF"/>
+          <rect x="316" y="56" width="112" height="100" rx="8" transform="rotate(-0.5 372 106)" fill="#FFFFFF"/>
+          <rect x="436" y="56" width="112" height="100" rx="8" transform="rotate(0.5 492 106)" fill="#FFFFFF"/>
+          <rect x="556" y="56" width="112" height="100" rx="8" transform="rotate(-0.6 612 106)" fill="#FFFFFF"/>
+          <rect x="676" y="56" width="112" height="100" rx="8" transform="rotate(0.4 732 106)" fill="#FFFFFF"/>
+          <path d="M182 106 L193 106" marker-end="url(#lha5fAr)"/>
+          <path d="M732 158 L732 186" marker-end="url(#lha5fAr)"/>
+          <rect x="30" y="190" width="820" height="44" rx="8" transform="rotate(-0.2 440 212)" fill="#F2C230"/>
+          <!-- doodle: a wheel -->
+          <circle cx="826" cy="40" r="14" fill="#FFFFFF"/>
+          <circle cx="826" cy="40" r="4" fill="#CED4D9"/>
+        </g>
+
+                <text class="lha5fL" x="46" y="96">crashes this month</text>
+        <text class="lha5fS" x="46" y="114">by city</text>
+        <text class="lha5fS" x="46" y="130">a warehouse KPI</text>
+
+        <text class="lha5fL" x="208" y="84">1 source</text>
+        <text class="lha5fS" x="208" y="108">which clock,</text>
+        <text class="lha5fS" x="208" y="124">which sensor?</text>
+        <text class="lha5fL" x="328" y="84">2 identity</text>
+        <text class="lha5fS" x="328" y="108">scene, track</text>
+        <text class="lha5fS" x="328" y="124">or person?</text>
+        <text class="lha5fL" x="448" y="84">3 truth</text>
+        <text class="lha5fS" x="448" y="108">who labelled,</text>
+        <text class="lha5fS" x="448" y="124">how rare?</text>
+        <text class="lha5fL" x="568" y="84">4 loop</text>
+        <text class="lha5fS" x="568" y="108">did policy</text>
+        <text class="lha5fS" x="568" y="124">shift logging?</text>
+        <text class="lha5fL" x="688" y="84">5 cost</text>
+        <text class="lha5fS" x="688" y="108">what does</text>
+        <text class="lha5fS" x="688" y="124">a miss cost?</text>
+
+        <text class="lha5fK" x="46" y="217">crashes per 100M miles · matched to the human mix · 95% bound · tail counted · policy fixed</text>
+        <text class="lha5fN" x="30" y="262">Constructed exercise: the yellow line is one possible rewrite; your answers will differ.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the KPI goes in as a count; the yellow line that comes out is a rate with exposure, a bound, the tail and the policy pinned down.</figcaption>
+    </figure>
+
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Gate 1, the source: name the clock</h4>
+        <p>Write which system decides that a crash happened and when: a collision sensor, a safety driver's report, a police report. If two of them disagree by a few seconds, which wins? For "crashes by city", also ask which positioning stamp places the crash in a city.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Gate 2, the identity: name the unit</h4>
+        <p>Is the KPI counting crashes, vehicles involved, or actors struck? Each comes from a different inferred key. Write down what happens to the count if the tracker or the context tagger is updated next month.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Gate 3, the ground truth: name the denominator and the rarity</h4>
+        <p>A monthly count has no miles behind it. Rewrite it as a rate per 100 million miles with a bound, and note how few events a month will contain. If the expected count is near zero, say the KPI cannot rank cities at all.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Gate 4, the loop: pin the policy</h4>
+        <p>List the takeover policy, upload triggers and reporting window in force for the month. If any changed, write "not comparable with last month" next to the chart. Never rank teams or cities by disengagements.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Gate 5, the cost: name the missing leaf</h4>
+        <p>Which rare situations does the KPI leave out, and would the verdict flip if they were added? On Lanehart's constructed numbers it does: 147.74 without the tail, 192.24 with it, against a human 185.55.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Write the rewritten definition in one line</h4>
+        <p>Compare yours with the yellow line in the figure. Differences are fine; a definition that skipped a gate is not.</p>
+      </div></div>
+    </div>
+
+    <div class="callout tip">
+      <p><strong>The habit to keep.</strong> Before porting any warehouse metric to driving data, ask five questions in order: whose clock, whose key, whose label and how rare, whose policy shaped the log, and what a miss costs. If a gate has no answer, the metric is not ready, however familiar it looks.</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="section" id="quiz">
+    <div class="section-kicker">
+      <span class="klabel">Check yourself</span>
+      <h2>Three questions</h2>
+    </div>
+
+    <div class="quiz-q" data-answer="1">
+      <p class="qtext">An analyst joins every camera frame to the lidar sweep with the nearest timestamp, as she would join two event tables. Why is that risky on a drive log?</p>
+      <button class="qopt" type="button">A · It is not risky; nearest-timestamp joins are always correct when clocks are synchronised</button>
+      <button class="qopt" type="button">B · Each timestamp means something different: a lidar stamp marks the end of a turn and a camera stamp an exposure mid-sweep, so the nearest stamp is often the wrong sweep; on one constructed second it was right for 28 of 72 frames</button>
+      <button class="qopt" type="button">C · It is only risky because cameras run faster than lidar</button>
+      <p class="qwhy">Synchronised clocks are not enough when the stamps mark different events. C has the rates backwards: the cameras run at 12 Hz and the lidar at 20 Hz. The fix is a join that respects what each stamp means; practitioner session 1 builds it.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="0">
+      <p class="qtext">Lanehart (constructed) compares three takeover policies. Which reading of "fewest disengagements per 100,000 miles" is right?</p>
+      <button class="qopt" type="button">A · It measures the policy as much as the car: the loose policy scores best at 0.027 and lets 21 more conflicts become crashes, while cautious and standard differ 5x in the score with identical true safety</button>
+      <button class="qopt" type="button">B · Fewer disengagements always means a safer car</button>
+      <button class="qopt" type="button">C · It is a fine metric as long as it is refreshed nightly</button>
+      <p class="qwhy">The fleet's own policy decides what gets logged, so ranking by the score rewards the policy that intervenes least. Refreshing it more often, as in C, only repeats the mistake faster.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="2">
+      <p class="qtext">The four rare-scenario slices are dropped from Lanehart's evaluation (constructed). What happens to the safety case?</p>
+      <button class="qopt" type="button">A · Very little; the rare slices are a small share of miles</button>
+      <button class="qopt" type="button">B · It becomes more conservative, because less evidence is used</button>
+      <button class="qopt" type="button">C · The verdict reverses: 147.74 per 100 million reads as proven better than 185.55, while the true rate with the tail is 192.24, worse</button>
+      <p class="qwhy">Rare in miles is not small in risk: the tail adds 44.50 per 100 million in the canon run. Removing evidence did not make the case cautious, it made it wrong, and nothing in the dashboard complains.</p>
+    </div>
+
+    <div class="quiz-score"></div>
+  </section>
+
+  <!-- ============ HOMEWORK ============ -->
+  <section class="section" id="homework">
+    <div class="section-kicker">
+      <span class="klabel">Before session 6</span>
+      <h2>Homework</h2>
+    </div>
+    <p class="lede">Twenty minutes, on your own team's metrics.</p>
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Run one of your KPIs through the five gates</h4>
+        <p>Pick a metric your team already reports, in any domain. For each gate write one line: the answer, or "no answer". Mark the first gate where it breaks.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Redraw one figure from memory</h4>
+        <p>Choose the mechanism that surprised you most and redraw its before and after on paper, without looking. Explain it to a colleague in under two minutes.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Sort your habits</h4>
+        <p>List five things you do by reflex on warehouse data. Leader session 6 sorts them into carries over, must learn and must unlearn; bring your list.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ OFFICIAL ============ -->
+  <section class="section" id="official">
+    <div class="section-kicker">
+      <span class="klabel">Covered tonight</span>
+      <h2>What this session covers</h2>
+    </div>
+    <div class="covered">
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The source</span><span class="note">Caesar et al. (2020), a public multi-sensor research dataset paper: sensor rates and exposure-trigger sync. Read at source. Constructed sync toy: nearest join right for 28 of 72.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The identity</span><span class="note">Scenes, actor tracks and contexts as inferred keys; the occluded-pedestrian class from the constructed canon.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The ground truth</span><span class="note">NHTSA DOT HS 813 643 (read at source): 1.33 deaths and 185.55 police-reported crashes (derived) per 100 million VMT. Kalra and Paddock (2016), RAND RR-1478, read at source. 2 Hz keyframes from Caesar et al. (2020).</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The feedback loop</span><span class="note">California Code of Regulations, Title 13, section 227.50 (2024 text, read at source); NHTSA Standing General Order 30-second window (read at source); constructed anti-lever.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The cost of being wrong</span><span class="note">UL 4600 Edition 3 (2023), reported; ISO 26262 and ISO 21448, reported, concepts only. Constructed break button: 147.74 against 192.24.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Shadow mode and upload triggers</span><span class="note">Named tonight. Practitioner session 9 builds the loop.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Label cost per frame</span><span class="note">Named tonight. Practitioner session 2 prices it.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">The transfer map</span><span class="note">Tonight is what breaks; leader session 6 is what carries over, what to learn and what to unlearn.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">General label noise and cleaning</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-data-centric-ai-with-phoebe/courses/02-when-labellers-disagree.html">learn data-centric AI, when labellers disagree</a>.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">A/B tests for shadow-mode comparisons</span><span class="note">Not taught here; see <a href="https://phoebefu6.github.io/learn-experimentation-with-phoebe/courses/b2-power-and-sample-size.html">learn experimentation, power and sample size</a>.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Full text of the safety standards</span><span class="note">UL 4600, ISO 26262 and ISO 21448 are paid standards; only their concepts appear here.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section class="section" id="cheatsheet">
+    <div class="section-kicker">
+      <span class="klabel">Take this with you</span>
+      <h2>Cheat sheet</h2>
+    </div>
+    <div class="cheat">
+      <div class="cheat-item"><strong>The one sentence.</strong> Warehouse habits were built for rows someone meant; drive logs are measurements, inferences and rare outcomes shaped by the fleet's own policy.</div>
+      <div class="cheat-item"><strong>The source.</strong> Every sensor on its own clock; each timestamp means a different event. Nearest-time join: 28 of 72 right (constructed).</div>
+      <div class="cheat-item"><strong>The identity.</strong> Scene, track and context are inferred keys. One child behind a van can become two tracks.</div>
+      <div class="cheat-item"><strong>The ground truth.</strong> Labels bought by the keyframe (2 Hz); deaths arrive once per 75.2 million miles (US 2022).</div>
+      <div class="cheat-item"><strong>The feedback loop.</strong> Policy decides what is logged. Fewest disengagements picked the policy with 21 extra crashes (constructed).</div>
+      <div class="cheat-item"><strong>The cost of being wrong.</strong> Drop the tail and 192.24 becomes a falsely proven 147.74, against 185.55 (constructed vs NHTSA-derived).</div>
+      <div class="cheat-item"><strong>No fault, still a hazard.</strong> ISO 21448's territory: a sensor working as designed that still misses (reported).</div>
+      <div class="cheat-item"><strong>Five gates.</strong> Whose clock? Whose key? Whose label, how rare? Whose policy? What does a miss cost?</div>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    <div class="wrap">
+      <p>Leader session 5 of 6 · learn-autonomous-driving-with-phoebe · by Phoebe Fu</p>
+      <nav class="pagenav">
+        <a href="a4-reading-a-safety-claim.html">← Leader session 4 · Reading a safety claim</a>
+        <a href="a6-from-warehouse-to-autonomous-driving.html">Leader session 6 · From warehouse to autonomous driving: the transfer map →</a>
+      </nav>
+    </div>
+  </footer>
+
+</main>
+
+<script src="../assets/app.js?v=1"></script>
+</body>
+</html>

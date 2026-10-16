@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- social:start -->
+<meta name="description" content="Leader session 1 of 6. A self-driving car is a pipeline: sense, perceive, predict, plan, act, and the data team owns the evidence about every stage. SAE levels read honestly, and why one death per 75.2 million miles makes safety a rare-event claim. Lanehart is a constructed fleet. Not investment advice.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Learn with Phoebe">
+<meta property="og:title" content="The car is a data pipeline on wheels - learn autonomous driving with phoebe">
+<meta property="og:description" content="Leader session 1 of 6. Five stages, five places the data team sits, and a level that belongs to a feature, not to a car.">
+<meta property="og:url" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/courses/a1-the-car-is-a-data-pipeline.html">
+<meta property="og:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The car is a data pipeline on wheels - learn autonomous driving with phoebe">
+<meta name="twitter:description" content="A row someone meant against a frame from many sensors. Where the data team sits in a self-driving stack.">
+<meta name="twitter:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<!-- social:end -->
+<title>Leader session 1 · The car is a data pipeline on wheels - learn autonomous driving with phoebe</title>
+<link rel="stylesheet" href="../assets/style.css?v=2">
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="wrap">
+    <span class="crumb"><a href="../index.html">learn-autonomous-driving-with-phoebe</a> / Leader session 1 of 6</span>
+    <button class="btn" id="toggle-all" type="button">Expand all</button>
+    <button class="btn primary" id="zoom-toggle" type="button">Projector zoom: off</button>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Learn Autonomous Driving with Phoebe · Leader session 1 of 6</div>
+    <h1>The car is a data pipeline <span class="accent">on wheels</span></h1>
+    <p class="sub">A warehouse row is a business event someone meant. A self-driving car writes something else: frames from cameras, lidar and radar, each on its own clock, turned into guesses about what is out there, where it will go and what to do about it. Those frames are cheap to collect and expensive to label, and the moments that matter are the ones you almost never see. Lanehart, a constructed robotaxi pilot fleet in a fictional city, is the case for all sixteen sessions; every Lanehart number is generated, not observed. Tonight is the pipeline, where the data team sits in it, and what an SAE level does and does not tell you. Nothing here is investment advice.</p>
+    <div class="chip-row">
+      <span class="chip level">🟢 Foundations</span>
+      <span class="chip audience">Leaders who fund or sign off autonomous-driving data work</span>
+      <span class="chip audience">Data people arriving from the warehouse</span>
+      <span class="chip time">45 min</span>
+    </div>
+    <div class="agenda">
+      <span class="a1" style="flex:1">0-3 · Welcome</span>
+      <span class="a2" style="flex:3">3-18 · Five stages, five seats</span>
+      <span class="a3" style="flex:3">18-28 · What a level means</span>
+      <span class="a4" style="flex:4">28-45 · Build-along and Q&amp;A</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ INTRO ============ -->
+  <section class="section" id="intro">
+    <div class="section-kicker">
+      <span class="klabel">Part 0</span>
+      <h2>Lanehart, on the morning the first drive logs land</h2>
+    </div>
+    <p class="lede">Lanehart is a constructed robotaxi pilot: a small fleet driving a fictional city, a safety lead, a perception team, and a data analyst who came from a retail warehouse. Her first ticket says "build the safety dashboard". The logs that arrive are not a fact table. They are hours of sensor recordings, a few labelled moments, and a fleet that has never once done the thing everyone most wants to know about. The six leader sessions are about reading that pile as a decision-maker; the ten practitioner sessions are about building on it.</p>
+
+    <div class="legend">
+      <span class="pill">Live = presented in the 45 minutes</span>
+      <span class="pill">Self-study = the full depth, after class</span>
+      <span class="pill">🔍 Every diagram zooms</span>
+    </div>
+
+    <div class="callout win">
+      <p><strong>★ What you walk out with tonight.</strong> A picture of the car as five stages that each hand the next a guess, and the five places a data team owns the evidence about those guesses. What the SAE levels actually say, read from the chart itself: a level describes a feature while it is engaged, and Levels 3 and up are the ones where the person in the seat is not driving. Why safety here is a rare-event claim: on US roads in 2022 there was one death for every 75.2 million vehicle miles. And five questions to put to any autonomous-driving data claim before anyone shows you a model. Nothing here is investment advice or a view on any company.</p>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Why the warehouse instinct misfires here<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>A warehouse analyst trusts three things without naming them. A row has an author: an order was placed, an invoice raised. A row has an identity: a customer id somebody can be asked about. And the events that matter are common enough to count every week: orders, returns, churn.</p>
+        <p>A drive log has none of the three. Its authors are sensors with no intent, each sampling on its own schedule. Its identity is a scene, a moment and a set of tracked objects, none of which is a person you can phone. And the event that matters most, a serious crash, is so rare that a large fleet can drive for years without one, which tells you less than it seems to. Each absence alone is a caveat; together they change what counts as evidence.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>NHTSA's summary of 2022 US traffic counts 42,514 people killed over 3,196,191 million vehicle miles, a rate of 1.33 deaths per 100 million miles. Read the other way round, that is one death for every 75.2 million miles driven by people. Any fleet that wants to say it beats that number is making a claim about events it will almost never see. Leader session 3 does the arithmetic.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>The words that keep coming back<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Frame.</strong> One capture from one sensor at one instant: an image, a lidar sweep, a radar return set.</li>
+          <li><strong>Drive log.</strong> Every frame from every sensor on one vehicle for one drive, plus the vehicle's own state. The raw material for everything else.</li>
+          <li><strong>Keyframe.</strong> A frame chosen for labelling. Labelling every frame is unaffordable, so teams label a sample and interpolate.</li>
+          <li><strong>Scenario.</strong> A short piece of driving with a meaning: a cut-in, a pedestrian stepping out, a merge in rain.</li>
+          <li><strong>Exposure.</strong> How much driving the evidence covers, usually in miles, and of which kind: highway, city, night, rain.</li>
+          <li><strong>Operational design domain (ODD).</strong> The conditions a feature is designed to work in. Outside them it should not operate.</li>
+          <li><strong>Disengagement.</strong> The automated mode switching off, because the system failed or a safety driver took over. A count of them measures the takeover policy as much as the car (leader session 4).</li>
+          <li><strong>Constructed.</strong> Lanehart and every fleet number about it are invented so that the truth is knowable. The human baselines are real and cited.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="section" id="part-1">
+    <div class="section-kicker">
+      <span class="klabel">Part 1 · covers the pipeline and the data team's seats</span>
+      <h2>Five stages, each handing the next a guess</h2>
+      <span class="tag concept">15 min live</span>
+    </div>
+    <p class="lede">The clearest way to see the car as a data problem is to draw what each stage passes on. Sensors produce frames. Perception turns frames into objects and lanes. Prediction turns objects into where each one will be in a few seconds. Planning picks a path through those futures. Control turns the path into steering and braking. Each stage is right most of the time and wrong in ways the next stage inherits. Under every stage sits a piece of data work.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn pipeline of a self-driving car, left to right: sense with cameras, lidar and radar on their own clocks; perceive, boxes and lanes as a guess per frame; predict, where each actor goes in the next seconds; plan, one path re-chosen often; act, steer and brake. Under each stage, the data team's seat: drive logs, highlighted in yellow, raw frames synced; labels bought by the frame; evaluation slices by distance and scenario; simulation by replay and synthetic scenarios; the safety claim, a rate over miles. An arrow runs from the safety claim back to the drive logs, labelled the fleet feedback loop.">
+        <defs>
+          <filter id="lha1aSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="11" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha1aHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha1aAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha1aH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha1aL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha1aS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha1aB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lha1aA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lha1aN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha1aH" x="30" y="36">THE CAR, LEFT TO RIGHT</text>
+        <text class="lha1aH" x="30" y="190">WHERE THE DATA TEAM SITS</text>
+
+        <g filter="url(#lha1aSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="52" width="150" height="84" rx="8" transform="rotate(-0.6 105 94)" fill="#FFFFFF"/>
+          <rect x="200" y="52" width="150" height="84" rx="8" transform="rotate(0.5 275 94)" fill="#FFFFFF"/>
+          <rect x="370" y="52" width="150" height="84" rx="8" transform="rotate(-0.4 445 94)" fill="#FFFFFF"/>
+          <rect x="540" y="52" width="150" height="84" rx="8" transform="rotate(0.6 615 94)" fill="#FFFFFF"/>
+          <rect x="710" y="52" width="150" height="84" rx="8" transform="rotate(-0.5 785 94)" fill="#FFFFFF"/>
+          <path d="M182 94 L197 94" marker-end="url(#lha1aAr)"/>
+          <path d="M352 94 L367 94" marker-end="url(#lha1aAr)"/>
+          <path d="M522 94 L537 94" marker-end="url(#lha1aAr)"/>
+          <path d="M692 94 L707 94" marker-end="url(#lha1aAr)"/>
+          <path d="M105 138 L105 160 M275 138 L275 160 M445 138 L445 160 M615 138 L615 160 M785 138 L785 160" stroke-dasharray="4 4"/>
+          <path d="M105 202 L105 216 M275 202 L275 216 M445 202 L445 216 M615 202 L615 216 M785 202 L785 216" stroke-dasharray="4 4"/>
+          <rect x="30" y="218" width="150" height="70" rx="8" transform="rotate(0.7 105 253)" fill="#F2C230"/>
+          <rect x="200" y="218" width="150" height="70" rx="8" transform="rotate(-0.5 275 253)" fill="#F1F3F4"/>
+          <rect x="370" y="218" width="150" height="70" rx="8" transform="rotate(0.4 445 253)" fill="#F1F3F4"/>
+          <rect x="540" y="218" width="150" height="70" rx="8" transform="rotate(-0.6 615 253)" fill="#F1F3F4"/>
+          <rect x="710" y="218" width="150" height="70" rx="8" transform="rotate(0.5 785 253)" fill="url(#lha1aHc)"/>
+          <path d="M785 292 L785 318 L105 318 L105 294" marker-end="url(#lha1aAr)"/>
+          <!-- doodle: a lane line -->
+          <path d="M600 36 L630 36 M646 36 L676 36 M692 36 L722 36" stroke="#8C979F" stroke-width="3"/>
+        </g>
+
+        <text class="lha1aL" x="46" y="78">Sense</text>
+        <text class="lha1aS" x="46" y="100">cameras, lidar,</text>
+        <text class="lha1aS" x="46" y="116">radar, own clocks</text>
+        <text class="lha1aL" x="216" y="78">Perceive</text>
+        <text class="lha1aS" x="216" y="100">boxes, lanes, lights:</text>
+        <text class="lha1aS" x="216" y="116">a guess per frame</text>
+        <text class="lha1aL" x="386" y="78">Predict</text>
+        <text class="lha1aS" x="386" y="100">where each actor</text>
+        <text class="lha1aS" x="386" y="116">goes in seconds</text>
+        <text class="lha1aL" x="556" y="78">Plan</text>
+        <text class="lha1aS" x="556" y="100">one path through</text>
+        <text class="lha1aS" x="556" y="116">those futures</text>
+        <text class="lha1aL" x="726" y="78">Act</text>
+        <text class="lha1aS" x="726" y="100">steer, brake,</text>
+        <text class="lha1aS" x="726" y="116">accelerate</text>
+
+        <text class="lha1aL" x="46" y="244">Drive logs</text>
+        <text class="lha1aS" x="46" y="264" style="fill:#1A1F23">raw frames, synced</text>
+        <text class="lha1aL" x="216" y="244">Labels</text>
+        <text class="lha1aS" x="216" y="264">bought by the frame</text>
+        <text class="lha1aL" x="386" y="244">Evaluation slices</text>
+        <text class="lha1aS" x="386" y="264">by distance, scenario</text>
+        <text class="lha1aL" x="556" y="244">Simulation</text>
+        <text class="lha1aS" x="556" y="264">replay and synthetic</text>
+        <text class="lha1aL" x="726" y="244">Safety claim</text>
+        <text class="lha1aS" x="726" y="264">a rate over miles</text>
+
+        <text class="lha1aA" x="445" y="340" text-anchor="middle">the fleet feedback loop: what the claim lacks, the fleet is asked to log next</text>
+        <text class="lha1aN" x="30" y="374">Every stage hands the next a guess. The data team owns the evidence about each guess, and none of it is a row someone typed.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow box is where every other seat starts: a claim about safety is, in the end, a query over drive logs.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>What each stage hands on, and how it goes wrong<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>Sense.</strong> Cameras see colour and texture but not distance; lidar measures distance but is sparse far away; radar reaches furthest and measures speed but sees little shape. In a widely used public multi-sensor research dataset, the lidar range is typically 50 to 150 metres and radar reaches about 200. Each sensor samples at its own rate, so "the scene at 10:02:03.400" has to be assembled. Practitioner session 1 is that assembly.</p>
+        <p><strong>Perceive.</strong> A detector turns frames into boxes with classes and confidences. It is a guess per frame, and its errors are not spread evenly: a pedestrian far away, half hidden, at night, is where it misses. Practitioner session 5 shows how one headline score hides that.</p>
+        <p><strong>Predict and plan.</strong> Prediction gives each tracked object a few possible futures; planning chooses a path that is safe against them. A wrong guess upstream becomes a confident decision downstream. That is why the data team cannot evaluate one stage in isolation and call the car evaluated.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>The five seats, as five questions<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Drive logs:</strong> can we reassemble any moment from every sensor, on one clock? If not, nothing downstream can be trusted.</li>
+          <li><strong>Labels:</strong> which frames did we pay to label, and were the rare ones among them? A label is bought by the frame; leader session 2 and practitioner session 2 price it.</li>
+          <li><strong>Evaluation slices:</strong> is a score reported only as one number, or by distance band and scenario, where the failures live?</li>
+          <li><strong>Simulation:</strong> for the situations the fleet almost never meets, how are they tested, and how is the result weighted back to real-world rates?</li>
+          <li><strong>Safety claim:</strong> a rate needs a numerator and a denominator. Which events, over how many miles, of which kind?</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>A frame is not a row<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>The public dataset's paper describes six cameras at 12 Hz, one spinning lidar at 20 Hz and five radars at 13 Hz. A camera's exposure is triggered when the lidar sweeps across the centre of that camera's view, and the paper notes that, because 12 exposures are spread across 20 lidar scans, not every lidar scan has a matching camera frame. Labels are applied to keyframes sampled at 2 Hz.</p>
+        <p>So the smallest unit the data team works with is not a row but a synchronised bundle, most of which was never labelled. Warehouse habits about primary keys and one row per event have to be rebuilt around time.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="section" id="part-2">
+    <div class="section-kicker">
+      <span class="klabel">Part 2 · covers the SAE levels, read from the chart</span>
+      <h2>A level belongs to a feature, not to a car</h2>
+      <span class="tag concept">10 min live</span>
+    </div>
+    <p class="lede">The SAE J3016 levels are the most quoted vocabulary in the industry and the most misread. The chart SAE publishes free with the 2021 revision says plainly who is driving. At Levels 0 to 2 "you are driving whenever these driver support features are engaged", even with your feet off the pedals. At Levels 3 to 5 "you are not driving" while the feature is engaged. The line that matters most for data work sits at Level 3.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn chart of the six SAE levels in columns. Level 0, warnings and momentary help such as emergency braking. Level 1, steering or speed support such as adaptive cruise. Level 2, steering and speed support at once. Level 3, highlighted in yellow, drives in limited conditions but you take over when it asks. Level 4 drives in limited conditions and never asks you, for example a local driverless taxi. Level 5 drives in all conditions. Under Levels 0 to 2 a bar says you are driving, even feet off. Under 3 to 5 a bar says you are not driving while engaged.">
+        <defs>
+          <filter id="lha1bSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="23" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha1bHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha1bAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha1bH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha1bS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha1bK { font: 400 11px Inter, sans-serif; fill: #1A1F23; }
+          .lha1bB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lha1bV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lha1bW { font: 800 11px Inter, sans-serif; fill: #1A1F23; }
+          .lha1bN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha1bH" x="30" y="32">SAE J3016 LEVELS OF DRIVING AUTOMATION, AS THE 2021 CHART PUTS THEM</text>
+
+        <g filter="url(#lha1bSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="50" width="128" height="150" rx="8" transform="rotate(-0.5 94 125)" fill="#FFFFFF"/>
+          <rect x="168" y="50" width="128" height="150" rx="8" transform="rotate(0.4 232 125)" fill="#FFFFFF"/>
+          <rect x="306" y="50" width="128" height="150" rx="8" transform="rotate(-0.4 370 125)" fill="#FFFFFF"/>
+          <rect x="444" y="50" width="128" height="150" rx="8" transform="rotate(0.5 508 125)" fill="#F2C230"/>
+          <rect x="582" y="50" width="128" height="150" rx="8" transform="rotate(-0.4 646 125)" fill="#F1F3F4"/>
+          <rect x="720" y="50" width="128" height="150" rx="8" transform="rotate(0.4 784 125)" fill="#F1F3F4"/>
+          <rect x="30" y="214" width="404" height="36" rx="8" transform="rotate(-0.2 232 232)" fill="url(#lha1bHc)"/>
+          <rect x="444" y="214" width="404" height="36" rx="8" transform="rotate(0.2 646 232)" fill="#FFFFFF"/>
+        </g>
+
+        <text class="lha1bV" x="46" y="80">Level 0</text>
+        <text class="lha1bS" x="46" y="104">warnings and</text>
+        <text class="lha1bS" x="46" y="120">momentary help</text>
+        <text class="lha1bS" x="46" y="150">e.g. emergency</text>
+        <text class="lha1bS" x="46" y="166">braking</text>
+        <text class="lha1bV" x="184" y="80">Level 1</text>
+        <text class="lha1bS" x="184" y="104">steering OR</text>
+        <text class="lha1bS" x="184" y="120">speed support</text>
+        <text class="lha1bS" x="184" y="150">e.g. adaptive</text>
+        <text class="lha1bS" x="184" y="166">cruise control</text>
+        <text class="lha1bV" x="322" y="80">Level 2</text>
+        <text class="lha1bS" x="322" y="104">steering AND</text>
+        <text class="lha1bS" x="322" y="120">speed support</text>
+        <text class="lha1bS" x="322" y="150">both at once;</text>
+        <text class="lha1bS" x="322" y="166">you supervise</text>
+        <text class="lha1bV" x="460" y="80">Level 3</text>
+        <text class="lha1bK" x="460" y="104">drives in limited</text>
+        <text class="lha1bK" x="460" y="120">conditions</text>
+        <text class="lha1bW" x="460" y="150">you must drive</text>
+        <text class="lha1bW" x="460" y="166">when it asks</text>
+        <text class="lha1bV" x="598" y="80">Level 4</text>
+        <text class="lha1bS" x="598" y="104">drives in limited</text>
+        <text class="lha1bS" x="598" y="120">conditions</text>
+        <text class="lha1bS" x="598" y="150">never asks you;</text>
+        <text class="lha1bS" x="598" y="166">e.g. local taxi</text>
+        <text class="lha1bV" x="736" y="80">Level 5</text>
+        <text class="lha1bS" x="736" y="104">drives in all</text>
+        <text class="lha1bS" x="736" y="120">conditions</text>
+        <text class="lha1bS" x="736" y="150">same as 4,</text>
+        <text class="lha1bS" x="736" y="166">everywhere</text>
+
+        <text class="lha1bW" x="232" y="236" text-anchor="middle">YOU ARE DRIVING, EVEN FEET OFF</text>
+        <text class="lha1bW" x="646" y="236" text-anchor="middle">YOU ARE NOT DRIVING WHILE ENGAGED</text>
+
+        <text class="lha1bB" x="30" y="282">Level 3 is the one handover: the log must show who was in control at every instant, and when the request came.</text>
+        <text class="lha1bN" x="30" y="310">A level is a property of a feature while it is engaged, not of a car or a company. Source: SAE J3016 visual chart, 2021.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow column is where responsibility changes hands mid-drive, so it is where the data has to prove who was driving.</figcaption>
+    </figure>
+
+    <div class="wk" id="lha1-level">
+      <div class="wk-head">
+        <b>Live</b>
+        <span class="wk-hint">Pick a level. The left column quotes the SAE chart; the right column is the data consequence, written for this page.</span>
+      </div>
+      <div class="wk-body">
+        <label class="sql-label" for="lha1-pick">SAE level</label>
+        <select class="sql-code" id="lha1-pick"></select>
+        <div id="lha1-out"></div>
+        <p class="sql-note" id="lha1-verdict">...</p>
+      </div>
+      <div class="wk-foot" id="lha1-self">Chart wording from SAE J3016 (2021), read at source. The data consequence column is guidance, not part of the standard.</div>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Three misreadings to stop on sight<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>"This is a Level 4 car."</strong> The chart classifies features. A vehicle can carry a Level 2 feature on the highway and nothing else in town. Ask which feature, engaged where.</p>
+        <p><strong>"Level 2 is nearly self-driving."</strong> The chart says that at Level 2 you must constantly supervise and steer, brake or accelerate as needed. The person is the safety system. Data from Level 2 driving is data about a human and a machine together.</p>
+        <p><strong>"Level 4 means it drives anywhere."</strong> The chart says Level 4 features drive "under limited conditions and will not operate unless all required conditions are met". Those conditions are the operational design domain. Every rate a Level 4 fleet reports is a rate inside its domain, which is why leader session 4 asks about exposure before anything else.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Who reports a crash, and what the count leaves out<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>NHTSA's Standing General Order, first issued in 2021 and amended in 2021, 2023 and 2025, requires named manufacturers and operators to report certain crashes when an automated driving system (Levels 3 to 5) or a Level 2 system was in use within 30 seconds of the crash. The page is candid about what that data is not: the counts "have not" been "normalized or adjusted by any measure of exposure, including operational design domains or vehicle miles traveled".</p>
+        <p>A count with no miles behind it cannot be compared with anything. That sentence, from the regulator itself, is the first thing a leader should know about public crash numbers. Leader session 4 builds on it.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Where serious people disagree<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>When features at Level 4 will be broadly available, in how many places, and whether Level 5 is reachable at all, are open questions. Forecasts have been made and missed in both directions, and the people closest to the work disagree. No page here gives a date.</p>
+        <p>What is not contested is the arithmetic of proof. Kalra and Paddock (2016), in RAND's "Driving to Safety", show that driving alone would take hundreds of millions of miles, and for some questions billions, to demonstrate safety against human rates, and conclude that test driving alone cannot provide sufficient evidence. That conclusion is where the long tail, simulation and importance sampling come in.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 3 ============ -->
+  <section class="section" id="part-3">
+    <div class="section-kicker">
+      <span class="klabel">Part 3 · build-along</span>
+      <h2>Five questions to put to any driving-data claim</h2>
+      <span class="tag build">17 min hands on</span>
+    </div>
+    <p class="lede">No code. Take one claim you have seen or will be asked to sign off, about a fleet, a feature or a dataset, and run it through five questions in order. The figure is why the order matters: the events that decide safety are so rare that intuition about "a lot of miles" fails.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 290" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn bar chart in millions of miles. One human death on US roads happens every 75.2 million miles on average, from 1.33 deaths per 100 million miles in 2022. Lanehart's constructed pilot has driven 150 million miles with zero deaths. The miles needed with zero deaths to show a rate below 1.33 at 95 percent confidence are 225.2 million, highlighted in yellow.">
+        <defs>
+          <filter id="lha1cSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="31" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha1cHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha1cAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha1cH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha1cL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha1cS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha1cV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lha1cN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha1cH" x="30" y="32">MILLIONS OF MILES</text>
+
+        <g filter="url(#lha1cSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M256 54 L256 214"/>
+          <rect x="260" y="62" width="160" height="30" rx="4" transform="rotate(-0.4 340 77)" fill="url(#lha1cHc)"/>
+          <rect x="260" y="114" width="320" height="30" rx="4" transform="rotate(0.3 420 129)" fill="#F1F3F4"/>
+          <rect x="260" y="166" width="480" height="30" rx="4" transform="rotate(-0.2 500 181)" fill="#F2C230"/>
+          <!-- doodle: a wheel -->
+          <circle cx="826" cy="40" r="14" fill="#FFFFFF"/>
+          <circle cx="826" cy="40" r="4" fill="#CED4D9"/>
+        </g>
+
+        <text class="lha1cL" x="240" y="78" text-anchor="end">One human death</text>
+        <text class="lha1cS" x="240" y="94" text-anchor="end">on average, US 2022</text>
+        <text class="lha1cL" x="240" y="130" text-anchor="end">Lanehart pilot so far</text>
+        <text class="lha1cS" x="240" y="146" text-anchor="end">constructed, 0 deaths</text>
+        <text class="lha1cL" x="240" y="182" text-anchor="end">Needed with 0 deaths</text>
+        <text class="lha1cS" x="240" y="198" text-anchor="end">to beat 1.33, at 95%</text>
+
+        <text class="lha1cV" x="432" y="84">75.2</text>
+        <text class="lha1cV" x="592" y="136">150</text>
+        <text class="lha1cV" x="752" y="188">225.2</text>
+
+        <text class="lha1cN" x="30" y="246">Derived from NHTSA 2022: 1.33 deaths per 100 million miles is one per 75.2 million. With zero deaths, the 95% bound</text>
+        <text class="lha1cN" x="30" y="264">falls below 1.33 only after -ln(0.05) / 1.33 per 100 million = 225.2 million miles. Leader session 3 does it step by step.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - 150 million miles with no deaths sounds like proof; the yellow bar is how far proof actually is.</figcaption>
+    </figure>
+
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Write the claim down in one sentence</h4>
+        <p>Exactly as it was made: "our feature is safer than human drivers", "the new detector is 98 percent accurate", "the fleet drove 150 million miles without a fatality". Underline the number and the comparison word.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Ask which stage it is about</h4>
+        <p>Perception, prediction, planning, or the whole car? A perception score says nothing about the car. Put the claim on the pipeline in the first figure.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Ask which feature, at which level, inside which domain</h4>
+        <p>Name the feature, its level from the chart, and the conditions it was operating in. If the claim is about a Level 2 feature, write "a person was supervising" next to it.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Ask for the numerator and the denominator</h4>
+        <p>Which events were counted (all crashes, reported crashes, injuries, deaths) and over how many miles of which kind. If there is no denominator, write "not comparable" and stop there; the regulator's own crash page says exactly that about raw counts.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Ask what was never seen</h4>
+        <p>Which rare situations did the evidence not include, and how were they tested instead? A blank here is the most important answer on the page. Leader session 2 is about it.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Commit to a guess about Lanehart</h4>
+        <p>Lanehart's pilot reports zero fatal crashes in 150 million constructed miles. Write down whether you think that proves it beats the human rate of 1.33 per 100 million. Leader session 3 checks the guess.</p>
+      </div></div>
+    </div>
+
+    <div class="callout tip">
+      <p><strong>The habit to keep.</strong> When someone shows you a driving-data number, do not ask whether it is good. Ask which stage, which feature in which domain, what was counted over how many miles, and what was never seen. A claim with no denominator is not a small claim; it is no claim.</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="section" id="quiz">
+    <div class="section-kicker">
+      <span class="klabel">Check yourself</span>
+      <h2>Three questions</h2>
+    </div>
+
+    <div class="quiz-q" data-answer="1">
+      <p class="qtext">Lanehart's pilot (constructed) reports zero fatal crashes over 150 million miles. US drivers had 1.33 deaths per 100 million miles in 2022. What is the right reading?</p>
+      <button class="qopt" type="button">A · It is proven safer than human drivers, since zero is below 1.33</button>
+      <button class="qopt" type="button">B · Not yet proven: with zero events the 95% upper bound is about 2.00 per 100 million, still above 1.33; zero deaths only clears 1.33 after about 225.2 million miles</button>
+      <button class="qopt" type="button">C · Nothing at all can be said until there is at least one fatal crash</button>
+      <p class="qwhy">Zero events still carry information, which is why C is wrong: the bound is about 3 divided by the miles. But 150 million miles is not enough for that bound to drop below the human rate. Leader session 3 does the arithmetic.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="2">
+      <p class="qtext">A feature is described as Level 3 and is engaged. What does the SAE chart say the person in the driver's seat must do?</p>
+      <button class="qopt" type="button">A · Constantly supervise and steer or brake as needed</button>
+      <button class="qopt" type="button">B · Nothing, ever; the feature will never ask</button>
+      <button class="qopt" type="button">C · They are not driving while it is engaged, but when the feature requests, they must drive</button>
+      <p class="qwhy">A describes Levels 0 to 2. B describes Levels 4 and 5. Level 3 is the only level with a planned handover, which is why its logs must record who was in control and when the request came.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="0">
+      <p class="qtext">A public dashboard lists crash reports by company under the federal crash-reporting order. What can a leader conclude from one company having more reports than another?</p>
+      <button class="qopt" type="button">A · Nothing about relative safety on its own: the regulator states the counts are not normalized by miles or by operating domain, so a larger fleet driving more miles can report more crashes</button>
+      <button class="qopt" type="button">B · The company with more reports is less safe</button>
+      <button class="qopt" type="button">C · The company with fewer reports is under-reporting</button>
+      <p class="qwhy">A rate needs a denominator. NHTSA's own page says reporting entities need not report vehicles operated or miles traveled. Both B and C read a numerator as if it were a rate.</p>
+    </div>
+
+    <div class="quiz-score"></div>
+  </section>
+
+  <!-- ============ HOMEWORK ============ -->
+  <section class="section" id="homework">
+    <div class="section-kicker">
+      <span class="klabel">Before session 2</span>
+      <h2>Homework</h2>
+    </div>
+    <p class="lede">Twenty minutes, on one claim and on your guess about Lanehart.</p>
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Run the five questions on one real claim</h4>
+        <p>Pick a public statement about driving automation, from any source, and write one line per question. Do not judge the claim; mark which questions it leaves unanswered.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>List the situations you think are rare and dangerous</h4>
+        <p>Ten of them, in your own words: a child running out between parked cars, a mattress on the highway. Leader session 2 asks what it costs to find each one in a fleet's logs.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ OFFICIAL ============ -->
+  <section class="section" id="official">
+    <div class="section-kicker">
+      <span class="klabel">Covered tonight</span>
+      <h2>What this session covers</h2>
+    </div>
+    <div class="covered">
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The car as a pipeline</span><span class="note">Sense, perceive, predict, plan, act; each stage hands the next a guess.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Where the data team sits</span><span class="note">Drive logs, labels, evaluation slices, simulation, the safety claim, and the loop back.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">A frame is not a row</span><span class="note">Caesar et al. (2020), a public multi-sensor research dataset paper: 12 Hz cameras, 20 Hz lidar, 13 Hz radar, 2 Hz keyframes. Read at source.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The SAE levels</span><span class="note">SAE J3016 visual chart and 2021 revision note, read at source. A level belongs to a feature while engaged.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The human baseline</span><span class="note">NHTSA DOT HS 813 643: 42,514 deaths, 1.33 per 100 million VMT in 2022. Read at source.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Counts without miles</span><span class="note">NHTSA Standing General Order page: reports are not normalized by exposure. Read at source.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">How many miles prove safety</span><span class="note">Named tonight (225.2 million with zero deaths). Leader session 3, practitioner session 7.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">The long tail</span><span class="note">Named tonight. Leader session 2, practitioner sessions 3, 4 and 8.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Sensor drift and time series in general</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-iot-data-with-phoebe/courses/a1-the-sensor-is-the-source-of-truth.html">learn IoT data, leader session 1</a>.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Real fleets, companies or incidents</span><span class="note">Out of scope by design. Lanehart is constructed; nothing here is investment advice or a view on any company.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section class="section" id="cheatsheet">
+    <div class="section-kicker">
+      <span class="klabel">Take this with you</span>
+      <h2>Cheat sheet</h2>
+    </div>
+    <div class="cheat">
+      <div class="cheat-item"><strong>The one sentence.</strong> A self-driving car is a pipeline of guesses, and the data team owns the evidence about each one.</div>
+      <div class="cheat-item"><strong>Five stages.</strong> Sense, perceive, predict, plan, act.</div>
+      <div class="cheat-item"><strong>Five seats.</strong> Drive logs, labels, evaluation slices, simulation, the safety claim.</div>
+      <div class="cheat-item"><strong>A frame is not a row.</strong> Many sensors, own clocks, most frames never labelled.</div>
+      <div class="cheat-item"><strong>Levels.</strong> 0 to 2: you are driving. 3 to 5: you are not, while engaged. 3: you drive when it asks.</div>
+      <div class="cheat-item"><strong>Domain.</strong> Level 4 works only inside its conditions; every rate it reports is a rate inside them.</div>
+      <div class="cheat-item"><strong>The baseline.</strong> 1.33 deaths per 100 million miles (US, 2022): one per 75.2 million.</div>
+      <div class="cheat-item"><strong>Five questions.</strong> Which stage? Which feature, level, domain? Counted what? Over which miles? What was never seen?</div>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    <div class="wrap">
+      <p>Leader session 1 of 6 · learn-autonomous-driving-with-phoebe · by Phoebe Fu</p>
+      <nav class="pagenav">
+        <a href="../index.html">← All sessions</a>
+        <a href="a2-the-long-tail.html">Leader session 2 · The long tail: where the work actually is →</a>
+      </nav>
+    </div>
+  </footer>
+
+</main>
+
+<script src="../assets/app.js?v=1"></script>
+<script>
+(function () {
+  var LEVELS = [{"level": 0, "does": "Warnings and momentary assistance, such as automatic emergency braking or blind spot warning.", "human": "You are driving, and must constantly supervise.", "data": "The driver's inputs and the warning or brief intervention, with timestamps.", "claim": "A claim is about warnings and interventions, never about automated driving."}, {"level": 1, "does": "Steering OR brake and acceleration support, such as adaptive cruise control.", "human": "You are driving, and must steer, brake or accelerate as needed.", "data": "Which axis the feature controlled, and every driver input on the other.", "claim": "Any safety number describes a person and a machine together."}, {"level": 2, "does": "Steering AND brake and acceleration support at the same time.", "human": "You are driving, even with feet off the pedals and hands not steering.", "data": "Whether the driver was attentive and when they intervened.", "claim": "Crash reporting covers this level only for serious outcomes; a person was supervising."}, {"level": 3, "does": "Drives the vehicle under limited conditions; will not operate unless they are met.", "human": "You are not driving while engaged, but when the feature requests, you must drive.", "data": "Who was in control at every instant, when the request came, and how long the handover took.", "claim": "The handover is part of the safety case; a rate must say what happened around each request."}, {"level": 4, "does": "Drives under limited conditions, such as a local driverless taxi; may have no pedals or steering wheel.", "human": "You are not driving and will not be asked to take over.", "data": "The operating domain at every moment, and every time the feature reached its edge.", "claim": "Every rate is a rate inside the domain; compare it only with driving in the same conditions."}, {"level": 5, "does": "Same as Level 4, but can drive everywhere in all conditions.", "human": "You are not driving and will not be asked to take over.", "data": "Exposure across every condition, including the rare ones.", "claim": "No domain to hide behind: the long tail is the whole claim."}];
+  var sel = document.getElementById("lha1-pick");
+  var out = document.getElementById("lha1-out");
+  var verdict = document.getElementById("lha1-verdict");
+  if (!sel || !out) return;
+  LEVELS.forEach(function (L, i) {
+    var o = document.createElement("option");
+    o.value = String(i);
+    o.textContent = "Level " + L.level;
+    if (L.level === 3) o.selected = true;
+    sel.appendChild(o);
+  });
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function render() {
+    var L = LEVELS[Number(sel.value)];
+    out.innerHTML = '<table class="sql-table"><thead><tr><th>The chart says</th><th>What the data must show</th></tr></thead><tbody>' +
+      "<tr><td>" + esc(L.does) + "</td><td>" + esc(L.data) + "</td></tr>" +
+      "<tr><td>" + esc(L.human) + "</td><td>" + esc(L.claim) + "</td></tr></tbody></table>";
+    verdict.textContent = "Level " + L.level + ": " + (L.level <= 2 ? "the person in the seat is driving, so any safety number is about a person and a machine together." : "the person in the seat is not driving while the feature is engaged, so the feature's own record is the evidence.");
+  }
+  sel.addEventListener("change", render);
+  render();
+})();
+</script>
+<style>
+  #lha1-level .sql-code { border: 1px solid var(--hairline); border-radius: 8px; max-width: 24rem; }
+  #lha1-level table.sql-table { margin: .6rem 0 .2rem; font-size: .85rem; }
+</style>
+</body>
+</html>

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- social:start -->
+<meta name="description" content="Leader session 2 of 6. The long tail is a rate: how often a fleet meets a rare situation times how often it fails it. Why logged miles under-sample those situations, why simulation and skewed sampling exist, and why RAND concludes test driving alone cannot provide the evidence. Lanehart is a constructed fleet.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Learn with Phoebe">
+<meta property="og:title" content="The long tail: where the work actually is - learn autonomous driving with phoebe">
+<meta property="og:description" content="Leader session 2 of 6. Encounter rate times failure probability, and why a fleet's own logs almost never show the failures that decide its safety.">
+<meta property="og:url" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/courses/a2-the-long-tail.html">
+<meta property="og:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The long tail: where the work actually is - learn autonomous driving with phoebe">
+<meta name="twitter:description" content="Meet it less, or fail it less. The long tail of self-driving as a rate you can rank, and why logs under-sample it.">
+<meta name="twitter:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<!-- social:end -->
+<title>Leader session 2 · The long tail: where the work actually is - learn autonomous driving with phoebe</title>
+<link rel="stylesheet" href="../assets/style.css?v=2">
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="wrap">
+    <span class="crumb"><a href="../index.html">learn-autonomous-driving-with-phoebe</a> / Leader session 2 of 6</span>
+    <button class="btn" id="toggle-all" type="button">Expand all</button>
+    <button class="btn primary" id="zoom-toggle" type="button">Projector zoom: off</button>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Learn Autonomous Driving with Phoebe · Leader session 2 of 6</div>
+    <h1>The long tail: where the work <span class="accent">actually is</span></h1>
+    <p class="sub">Most driving is easy, and a fleet gets very good at it very fast. What decides whether a self-driving car is safe is a list of situations it meets rarely and sometimes fails: a pedestrian stepping out from behind a parked van, a car coming the wrong way, debris at highway speed. Each one is a rate, how often you meet it times how often you fail it, and the fleet's own logs almost never contain enough of the failures to read that rate. Lanehart, a constructed robotaxi pilot fleet in a fictional city, carries four such situations; every Lanehart number is generated, not observed.</p>
+    <div class="chip-row">
+      <span class="chip level">🟡 Working depth</span>
+      <span class="chip audience">Leaders who fund or sign off autonomous-driving data work</span>
+      <span class="chip audience">Data people arriving from the warehouse</span>
+      <span class="chip time">45 min</span>
+    </div>
+    <div class="agenda">
+      <span class="a1" style="flex:1">0-3 · Welcome</span>
+      <span class="a2" style="flex:3">3-18 · The tail is a product</span>
+      <span class="a3" style="flex:2">18-28 · Why logs miss it</span>
+      <span class="a4" style="flex:3">28-45 · Build-along and Q&amp;A</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ INTRO ============ -->
+  <section class="section" id="intro">
+    <div class="section-kicker">
+      <span class="klabel">Part 0</span>
+      <h2>Lanehart, the week the dashboard went green</h2>
+    </div>
+    <p class="lede">Lanehart's analyst shipped the safety dashboard from session 1. On the fleet's own crash count, matched to the mix of roads people drive, Lanehart comes out at 147.74 crashes per 100 million miles with an upper bound of 169.04, under the derived human baseline of 185.55. The safety lead does not celebrate. She asks one question: "What about the things we almost never see?" Add four rare situations, estimated properly, and the total becomes 192.24, worse than the human baseline. All of it is constructed; the shape of the surprise is not.</p>
+
+    <div class="legend">
+      <span class="pill">Live = presented in the 45 minutes</span>
+      <span class="pill">Self-study = the full depth, after class</span>
+      <span class="pill">🔍 Every diagram zooms</span>
+    </div>
+
+    <div class="callout win">
+      <p><strong>★ What you walk out with tonight.</strong> A way to write any rare danger as two numbers multiplied: how often the fleet meets it per 100 million miles, and how often it fails when it does. Why that product, not how alarming a situation sounds, is what to rank by. Why a fleet's logged miles hold too few failures to estimate those rates, and what researchers do instead. And a tail ledger you build for your own list of rare situations, which tells you how many miles you would have to drive to see each one fail once.</p>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Why the green dashboard was not wrong, just incomplete<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>The crash count on the dashboard is honest. It counts what happened on 150 million constructed miles. The problem is what those miles were made of: hour after hour of ordinary driving, where the car is good, and only a thin sprinkle of the rare situations, where it is not. A rate built on that mix measures the ordinary miles very precisely and the rare ones barely at all.</p>
+        <p>In the constructed run, the four rare situations add 44.50 crashes per 100 million miles when estimated with a method built for rare events (true value 46, known because Lanehart is constructed). Estimated the plain way, from the miles as driven, the same four add 34.95. Leave them out of the evaluation entirely and the dashboard says "proven better" when the truth is worse. Practitioner session 4 calls that the break button.</p>
+        <p>One caution on the baseline itself: whether a telemetry-rich fleet's crash count can be compared like for like with police-reported human crashes is contested, because a fleet records minor bumps that people never report. The 185.55 is used here as the benchmark the constructed bench uses, not as a settled comparison.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>The words that keep coming back<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Long tail.</strong> The many situations that are each rare but together decide safety. No single one is common; their sum is not small.</li>
+          <li><strong>Encounter rate.</strong> How often the fleet meets a situation, per 100 million miles of the driving it actually does.</li>
+          <li><strong>Failure probability.</strong> Given an encounter, the chance it ends in a crash. A property of the car's perception, prediction and planning.</li>
+          <li><strong>Tail rate.</strong> Encounter rate times failure probability: failures per 100 million miles from that situation.</li>
+          <li><strong>Plain sampling (Monte Carlo).</strong> Testing situations in the proportions the road serves them. Fair on average, thin on rare failures.</li>
+          <li><strong>Importance sampling.</strong> Testing the hard versions more often on purpose, then weighting each result back to how often it happens on the road. Practitioner session 8.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="section" id="part-1">
+    <div class="section-kicker">
+      <span class="klabel">Part 1 · covers the tail as encounter rate times failure probability</span>
+      <h2>The tail is a product, not a list of scary stories</h2>
+      <span class="tag concept">15 min live</span>
+    </div>
+    <p class="lede">Every rare danger has two parts. The first is exposure: how often the fleet drives into it. The second is weakness: given that it does, how often the car gets it wrong. Multiply them and you get failures per 100 million miles, the same unit as the crash rate on the dashboard. That shared unit is what lets a leader add the tail to the rest of the safety picture, and rank where the work should go.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 410" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn table of four constructed Lanehart rare scenario classes, each written as encounters per 100 million miles times failure probability per encounter equals failures per 100 million miles. Pedestrian stepping out behind a parked van: 4,000 times 0.003 equals 12. Wrong-way vehicle on a divided road: 300 times 0.02 equals 6. Debris in lane at highway speed: 2,500 times 0.004 equals 10. Emergency vehicle crossing a junction: 1,200 times 0.015 equals 18. The four results sum to a tail total of 46 per 100 million miles, highlighted in yellow.">
+        <defs>
+          <filter id="lha2aSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="41" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha2aHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha2aAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha2aH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha2aL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha2aS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha2aV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lha2aA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lha2aN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha2aH" x="30" y="32">TAIL RATE = HOW OFTEN YOU MEET IT x HOW OFTEN YOU FAIL IT</text>
+        <text class="lha2aA" x="30" y="64">SCENARIO CLASS (CONSTRUCTED)</text>
+        <text class="lha2aA" x="300" y="64">ENCOUNTERS PER 100M MILES</text>
+        <text class="lha2aA" x="580" y="64">FAILURE / ENCOUNTER</text>
+        <text class="lha2aA" x="715" y="64">RATE PER 100M</text>
+
+        <g filter="url(#lha2aSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="300" y="90" width="200" height="24" rx="4" transform="rotate(-0.4 400 102)" fill="url(#lha2aHc)"/>
+          <rect x="300" y="148" width="15" height="24" rx="3" transform="rotate(0.6 307 160)" fill="url(#lha2aHc)"/>
+          <rect x="300" y="206" width="125" height="24" rx="4" transform="rotate(0.4 362 218)" fill="url(#lha2aHc)"/>
+          <rect x="300" y="264" width="60" height="24" rx="4" transform="rotate(-0.5 330 276)" fill="url(#lha2aHc)"/>
+          <rect x="580" y="87" width="100" height="30" rx="6" transform="rotate(0.5 630 102)" fill="#FFFFFF"/>
+          <rect x="580" y="145" width="100" height="30" rx="6" transform="rotate(-0.4 630 160)" fill="#FFFFFF"/>
+          <rect x="580" y="203" width="100" height="30" rx="6" transform="rotate(0.4 630 218)" fill="#FFFFFF"/>
+          <rect x="580" y="261" width="100" height="30" rx="6" transform="rotate(-0.5 630 276)" fill="#FFFFFF"/>
+          <rect x="715" y="87" width="135" height="30" rx="6" transform="rotate(-0.4 782 102)" fill="#F1F3F4"/>
+          <rect x="715" y="145" width="135" height="30" rx="6" transform="rotate(0.5 782 160)" fill="#F1F3F4"/>
+          <rect x="715" y="203" width="135" height="30" rx="6" transform="rotate(-0.3 782 218)" fill="#F1F3F4"/>
+          <rect x="715" y="261" width="135" height="30" rx="6" transform="rotate(0.4 782 276)" fill="#F1F3F4"/>
+          <path d="M715 304 L850 304"/>
+          <rect x="715" y="312" width="135" height="40" rx="8" transform="rotate(-0.6 782 332)" fill="#F2C230"/>
+          <!-- doodle: a traffic cone -->
+          <path d="M832 44 L842 18 L852 44 Z M828 46 L856 46 M836 34 L848 34" fill="#FFFFFF"/>
+        </g>
+
+        <text class="lha2aL" x="30" y="98">Pedestrian behind a parked van</text>
+        <text class="lha2aS" x="30" y="114">met often, rarely failed</text>
+        <text class="lha2aL" x="30" y="156">Wrong-way vehicle, divided road</text>
+        <text class="lha2aS" x="30" y="172">met rarely, failed most often</text>
+        <text class="lha2aL" x="30" y="214">Debris in lane at highway speed</text>
+        <text class="lha2aS" x="30" y="230">met often, rarely failed</text>
+        <text class="lha2aL" x="30" y="272">Emergency vehicle at a junction</text>
+        <text class="lha2aS" x="30" y="288">middling on both, largest product</text>
+
+        <text class="lha2aL" x="508" y="106">4,000</text>
+        <text class="lha2aL" x="323" y="164">300</text>
+        <text class="lha2aL" x="433" y="222">2,500</text>
+        <text class="lha2aL" x="368" y="280">1,200</text>
+
+        <text class="lha2aH" x="560" y="106">x</text>
+        <text class="lha2aH" x="560" y="164">x</text>
+        <text class="lha2aH" x="560" y="222">x</text>
+        <text class="lha2aH" x="560" y="280">x</text>
+        <text class="lha2aL" x="630" y="106" text-anchor="middle">0.003</text>
+        <text class="lha2aL" x="630" y="164" text-anchor="middle">0.02</text>
+        <text class="lha2aL" x="630" y="222" text-anchor="middle">0.004</text>
+        <text class="lha2aL" x="630" y="280" text-anchor="middle">0.015</text>
+        <text class="lha2aH" x="694" y="106">=</text>
+        <text class="lha2aH" x="694" y="164">=</text>
+        <text class="lha2aH" x="694" y="222">=</text>
+        <text class="lha2aH" x="694" y="280">=</text>
+        <text class="lha2aV" x="782" y="108" text-anchor="middle">12</text>
+        <text class="lha2aV" x="782" y="166" text-anchor="middle">6</text>
+        <text class="lha2aV" x="782" y="224" text-anchor="middle">10</text>
+        <text class="lha2aV" x="782" y="282" text-anchor="middle">18</text>
+
+        <text class="lha2aL" x="700" y="337" text-anchor="end">Tail total, per 100M miles (constructed)</text>
+        <text class="lha2aV" x="782" y="338" text-anchor="middle">46</text>
+
+        <text class="lha2aN" x="30" y="378">Two levers: meet it less often (route, domain) or fail it less often (perception, prediction, planning).</text>
+        <text class="lha2aN" x="30" y="398">Ranking by how often you meet a class, or by how alarming it sounds, gets the order wrong. Rank by the product.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow total is the tail as one number in the dashboard's own unit, and it is built from two very different kinds of rare.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Two kinds of rare, one unit<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Look at the first two rows. The wrong-way vehicle is the scarier story: Lanehart meets one only 300 times per 100 million miles, and fails 2 percent of those encounters, the highest failure probability on the list. The pedestrian behind the parked van is mundane by comparison: met 4,000 times, failed 0.3 percent of the time. Multiply, and the mundane one contributes 12 failures per 100 million miles, twice the wrong-way vehicle's 6.</p>
+        <p>The largest contribution comes from neither extreme. The emergency vehicle crossing a junction is middling on both factors, 1,200 encounters at 1.5 percent, and gives 18, almost two fifths of the tail. A team that ranked its work by the most dramatic scenario, or by the most frequent one, would start in the wrong place. All four classes and their numbers are constructed, so the truth is knowable; the habit of multiplying before ranking carries over to any real fleet.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>The same shape shows up in real human driving. NHTSA's 2022 summary counts an estimated 5,930,496 police-reported crashes and 42,514 deaths over the same 3,196,191 million vehicle miles. That is about 185.55 reported crashes per 100 million miles, about one every 539,000 miles, but one death every 75.2 million (derived from NHTSA 2022). The worse the outcome, the rarer it is, and the more miles it takes before the data holds even one.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Two levers, owned by different teams<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>Meet it less often.</strong> Encounter rate depends on where and when the fleet drives: its operational design domain, its routes, the hours it runs. Cutting a junction-heavy district out of a route lowers the emergency-vehicle encounter rate without touching the software. It also shrinks the domain, which every claim then has to state.</p>
+        <p><strong>Fail it less often.</strong> Failure probability belongs to perception, prediction and planning. Halving the 0.015 for the emergency vehicle takes that row from 18 to 9, and the tail from 46 to 37 (constructed arithmetic). That is engineering work, and it needs evidence that the new failure probability is real, which is where Part 2 begins.</p>
+        <p>A leader's question for any rare-situation plan: which lever does this pull, and how will we know it moved?</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Why "rare" is not a single property<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Inside each class the failure probability is not a constant. Lanehart's bench models every encounter with a severity drawn from a common distribution, and a failure happens when severity crosses a threshold set by the class. Most encounters are easy; a few are much harder than average. That is why the same situation can look solved in a thousand tests and still fail on the road: the tests drew the easy end.</p>
+        <p>It is also why the class list itself is never finished. Every new city, season or road layout adds situations nobody wrote down. ISO 21448 (safety of the intended functionality) is the reported standard concept for exactly this: hazards that arise with no fault at all, from a sensor or a model working as designed and still falling short. Concept only; the standard is paid and was not read in full.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="section" id="part-2">
+    <div class="section-kicker">
+      <span class="klabel">Part 2 · covers why logged miles under-sample the tail</span>
+      <h2>Why the fleet's own logs barely see it</h2>
+      <span class="tag concept">10 min live</span>
+    </div>
+    <p class="lede">A drive log samples the world in the proportions the road serves it. That is perfect for the common case and nearly useless for the rare one, because the thing you need to count is not the encounter but the failure, and failures are rarer still. Take one constructed class and give it 2,000 tries two ways: as the road serves them, and skewed on purpose toward the hard cases.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 362" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn comparison for the constructed pedestrian behind a parked van class, 2,000 tries each. Top row, plain sampling as the road serves the encounters: 1 failure seen, highlighted in yellow, against about 6 expected; the rate is 1 over 2,000 times 4,000, an estimate of 2.00 per 100 million miles against a truth of 12. Bottom row, importance sampling skewed toward hard cases: 743 failures seen, each reweighted back to road rates, an estimate of 11.52 per 100 million against a truth of 12. A dashed lane line separates the rows.">
+        <defs>
+          <filter id="lha2bSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="53" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha2bHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha2bAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha2bH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha2bL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha2bS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha2bB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lha2bV { font: 800 18px Inter, sans-serif; fill: #1C2328; }
+          .lha2bN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha2bH" x="30" y="32">ONE CLASS, 2,000 TRIES: THE PEDESTRIAN BEHIND THE PARKED VAN (CONSTRUCTED)</text>
+
+        <g filter="url(#lha2bSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="56" width="200" height="84" rx="8" transform="rotate(-0.5 130 98)" fill="#FFFFFF"/>
+          <rect x="270" y="56" width="160" height="84" rx="8" transform="rotate(0.6 350 98)" fill="#F2C230"/>
+          <rect x="470" y="56" width="180" height="84" rx="8" transform="rotate(-0.4 560 98)" fill="#FFFFFF"/>
+          <rect x="690" y="56" width="160" height="84" rx="8" transform="rotate(0.5 770 98)" fill="#F1F3F4"/>
+          <path d="M232 98 L267 98" marker-end="url(#lha2bAr)"/>
+          <path d="M432 98 L467 98" marker-end="url(#lha2bAr)"/>
+          <path d="M652 98 L687 98" marker-end="url(#lha2bAr)"/>
+          <!-- doodle: a lane line between the two ways of sampling -->
+          <path d="M30 166 L80 166 M100 166 L150 166 M170 166 L220 166 M240 166 L290 166 M310 166 L360 166 M380 166 L430 166 M450 166 L500 166 M520 166 L570 166 M590 166 L640 166 M660 166 L710 166 M730 166 L780 166 M800 166 L850 166" stroke="#8C979F" stroke-width="3"/>
+          <rect x="30" y="192" width="200" height="84" rx="8" transform="rotate(0.4 130 234)" fill="#FFFFFF"/>
+          <rect x="270" y="192" width="160" height="84" rx="8" transform="rotate(-0.5 350 234)" fill="url(#lha2bHc)"/>
+          <rect x="470" y="192" width="180" height="84" rx="8" transform="rotate(0.4 560 234)" fill="#FFFFFF"/>
+          <rect x="690" y="192" width="160" height="84" rx="8" transform="rotate(-0.4 770 234)" fill="#F1F3F4"/>
+          <path d="M232 234 L267 234" marker-end="url(#lha2bAr)"/>
+          <path d="M432 234 L467 234" marker-end="url(#lha2bAr)"/>
+          <path d="M652 234 L687 234" marker-end="url(#lha2bAr)"/>
+        </g>
+
+        <text class="lha2bL" x="46" y="80">Plain sampling</text>
+        <text class="lha2bS" x="46" y="102">2,000 encounters,</text>
+        <text class="lha2bS" x="46" y="118">as the road serves them</text>
+        <text class="lha2bL" x="286" y="80">Failures seen</text>
+        <text class="lha2bV" x="286" y="106">1</text>
+        <text class="lha2bS" x="286" y="126" style="fill:#1A1F23">expected about 6</text>
+        <text class="lha2bL" x="486" y="80">1 / 2,000 x 4,000</text>
+        <text class="lha2bS" x="486" y="102">hit share times</text>
+        <text class="lha2bS" x="486" y="118">encounters per 100M</text>
+        <text class="lha2bL" x="706" y="80">Estimate</text>
+        <text class="lha2bV" x="706" y="106">2.00</text>
+        <text class="lha2bS" x="706" y="126">per 100M; truth 12</text>
+
+        <text class="lha2bL" x="46" y="216">Importance sampling</text>
+        <text class="lha2bS" x="46" y="238">2,000 encounters,</text>
+        <text class="lha2bS" x="46" y="254">skewed to hard cases</text>
+        <text class="lha2bL" x="286" y="216">Failures seen</text>
+        <text class="lha2bV" x="286" y="242">743</text>
+        <text class="lha2bS" x="286" y="262" style="fill:#1A1F23">plenty to learn from</text>
+        <text class="lha2bL" x="486" y="216">Reweight each hit</text>
+        <text class="lha2bS" x="486" y="238">back to how often it</text>
+        <text class="lha2bS" x="486" y="254">happens on the road</text>
+        <text class="lha2bL" x="706" y="216">Estimate</text>
+        <text class="lha2bV" x="706" y="242">11.52</text>
+        <text class="lha2bS" x="706" y="262">per 100M; truth 12</text>
+
+        <text class="lha2bB" x="30" y="304">1 failure in 2,000 tries: plain sampling is fair on average, it is just far too thin to read one class.</text>
+        <text class="lha2bN" x="30" y="326">Logged miles behave like the top row: 2,000 of these encounters is about 50 million miles of driving.</text>
+        <text class="lha2bN" x="30" y="346">Constructed Lanehart canon, seed 1016. Practitioner session 8 builds the reweighting step by step.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow box is the whole problem: the miles were spent, the encounters happened, and the failure count is still one.</figcaption>
+    </figure>
+
+    <div class="wk" id="lha2-tail">
+      <div class="wk-head">
+        <b>Live</b>
+        <span class="wk-hint">Pick a constructed class and an amount of logged driving. The arithmetic is exact; the rates are Lanehart's, so your numbers will differ on a real fleet.</span>
+      </div>
+      <div class="wk-body">
+        <label class="sql-label" for="lha2-class">Scenario class</label>
+        <select class="sql-code" id="lha2-class"></select>
+        <label class="sql-label" for="lha2-miles">Miles logged</label>
+        <select class="sql-code" id="lha2-miles"></select>
+        <div id="lha2-out"></div>
+        <p class="sql-note" id="lha2-verdict">...</p>
+      </div>
+      <div class="wk-foot" id="lha2-self">Expected failures = rate per 100M x miles / 100M. The chance of logging none is e to the minus expected failures (a Poisson count). Constructed rates, real maths.</div>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Fair on average, useless one class at a time<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Plain sampling is not biased. Over 200 constructed replicates of the whole tail, its average comes out at 45.68 against a true 46. The trouble is the spread. With 2,000 tries per class, the plain estimate of the tail swings with a standard deviation of 7.251; the skewed-and-reweighted estimate, 1.404, about five times tighter. At 500 tries per class, plain sampling saw zero failures in at least one class in 35 percent of the runs.</p>
+        <p>Read zero failures in a class as what it is: not enough data, not a solved problem. A dashboard that reports "0 wrong-way failures this quarter" may simply be reporting that the fleet met too few wrong-way vehicles to fail one. Try it in the widget above: 10 million miles with the wrong-way class gives better-than-even odds of logging no failure at all.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>Zhao, Lam, Peng and colleagues (2017, IEEE T-ITS) modelled lane-change cut-ins from naturalistic driving data collected in the University of Michigan Safety Pilot Model Deployment, skewed the cut-in statistics toward riskier behaviour, picked the skew with the cross-entropy method, and reweighted results back to real-world rates. The authors report an acceleration of 2,000 to 20,000 times: about 1,000 simulated miles exposing the vehicle to challenges that take 2 to 20 million real miles to meet.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>RAND's conclusion, and what it does not say<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Kalra and Paddock (2016), in RAND's "Driving to Safety", work through how many miles a fleet would need to drive to show it is safer than people, and conclude that developers "cannot simply drive" their way to safety: test driving alone cannot provide sufficient evidence for fatalities and injuries, and other methods are needed, naming simulation, scenario testing and staged deployment among them.</p>
+        <p>Read it carefully. It is a statement about evidence, not about whether any car is safe. It does not say driving is useless; logs are where the encounter rates come from, and where new tail classes are discovered. It says the failure probabilities for rare classes have to be measured somewhere the hard cases can be served on purpose. Leader session 3 does RAND's arithmetic for the headline fatality rate.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>The catch in skewed testing<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Skewing and reweighting only works if two things hold. The encounter rate has to come from real driving, because the reweighting multiplies by it. And the simulated encounter has to behave like the real one; a pedestrian model that steps out more politely than people do will report a failure probability that is too low, however many tries it runs. Practitioner session 6 is that gap between simulation and real miles.</p>
+        <p>So the honest picture is a division of labour. Fleet logs supply exposure and the catalogue of situations. Simulation and scenario testing, weighted back to exposure, supply the failure probabilities. A safety claim that uses only one of the two is missing half its evidence.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 3 ============ -->
+  <section class="section" id="part-3">
+    <div class="section-kicker">
+      <span class="klabel">Part 3 · build-along</span>
+      <h2>Build a tail ledger for your own list</h2>
+      <span class="tag build">17 min hands on</span>
+    </div>
+    <p class="lede">No code. Take the ten rare and dangerous situations you listed after session 1 and turn each into a row: how often you would meet it, how often you would fail it, the product, and how many miles you would drive to see one failure. The figure shows the last column for Lanehart's four constructed classes. It is the column that ends the argument about "just drive more".</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 342" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn bar chart of miles of driving per one failure you would log, derived from constructed Lanehart rates as 100 million miles divided by the rate per 100 million. Pedestrian behind a van, 8.33 million miles. Wrong-way vehicle, 16.7 million miles, highlighted in yellow as the slowest to appear. Debris at highway speed, 10.0 million. Emergency vehicle, 5.56 million. All four together, 2.17 million.">
+        <defs>
+          <filter id="lha2cSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="67" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha2cHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha2cAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha2cH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha2cL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha2cB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lha2cV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lha2cN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha2cH" x="30" y="32">MILES OF DRIVING PER ONE FAILURE YOU WOULD LOG (DERIVED FROM CONSTRUCTED RATES)</text>
+
+        <g filter="url(#lha2cSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M276 56 L276 286"/>
+          <rect x="280" y="67" width="240" height="26" rx="4" transform="rotate(-0.4 400 80)" fill="url(#lha2cHc)"/>
+          <rect x="280" y="111" width="480" height="26" rx="4" transform="rotate(0.2 520 124)" fill="#F2C230"/>
+          <rect x="280" y="155" width="288" height="26" rx="4" transform="rotate(0.3 424 168)" fill="url(#lha2cHc)"/>
+          <rect x="280" y="199" width="160" height="26" rx="4" transform="rotate(-0.5 360 212)" fill="url(#lha2cHc)"/>
+          <path d="M280 240 L760 240" stroke-dasharray="5 6"/>
+          <rect x="280" y="255" width="63" height="26" rx="4" transform="rotate(0.8 311 268)" fill="#F1F3F4"/>
+          <!-- doodle: a wheel -->
+          <circle cx="836" cy="40" r="13" fill="#FFFFFF"/>
+          <circle cx="836" cy="40" r="4" fill="#CED4D9"/>
+        </g>
+
+        <text class="lha2cL" x="262" y="84" text-anchor="end">Pedestrian behind a van</text>
+        <text class="lha2cL" x="262" y="128" text-anchor="end">Wrong-way vehicle</text>
+        <text class="lha2cL" x="262" y="172" text-anchor="end">Debris at highway speed</text>
+        <text class="lha2cL" x="262" y="216" text-anchor="end">Emergency vehicle</text>
+        <text class="lha2cL" x="262" y="272" text-anchor="end">All four together</text>
+
+        <text class="lha2cV" x="530" y="86">8.33M</text>
+        <text class="lha2cV" x="770" y="130">16.7M</text>
+        <text class="lha2cV" x="578" y="174">10.0M</text>
+        <text class="lha2cV" x="450" y="218">5.56M</text>
+        <text class="lha2cV" x="353" y="274">2.17M</text>
+
+        <text class="lha2cB" x="30" y="310">Wrong-way fails most often per encounter and is still the slowest to show up: one failure per 16.7M miles.</text>
+        <text class="lha2cN" x="30" y="330">Derived: 100 million miles divided by the rate per 100M. These are averages; real logs scatter around them.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow bar is the class a fleet's logs will be slowest to show you, which is why it has to be tested somewhere else.</figcaption>
+    </figure>
+
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Write your ten situations as rows</h4>
+        <p>Use the list from session 1's homework. One row each, in plain words, specific enough that two people would agree whether a given moment of driving counts: "a cyclist leaving a parked-car gap at dusk", not "cyclists".</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Guess the encounter rate, as a range</h4>
+        <p>Per 100 million miles of the driving your fleet actually does. You will not know; write a low and a high and where the number would come from (logs, a road survey, a map layer). If nobody could ever measure it, mark the row "exposure unknown". That mark is a finding.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Guess the failure probability, as a range</h4>
+        <p>Per encounter. Write where the evidence would come from: logged near misses, simulation, a closed-track test. A range that spans a factor of ten is normal at this stage. Say so rather than picking the middle.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Multiply, then sort by the product</h4>
+        <p>Low times low and high times high give the row's range in failures per 100 million miles. Sort on the high end. Compare the top three with the three you would have picked by instinct before multiplying; note any that moved.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Divide 100 million by the product</h4>
+        <p>That is the miles of driving per one logged failure, the figure's column. Put next to it the miles your fleet logs in a year, if you know it. Every row where the first number is larger than the second cannot be measured from logs alone.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Write how each row will be tested instead</h4>
+        <p>For those rows: mined from logs for near misses (practitioner session 3), simulated and weighted back (practitioner sessions 6 and 8), or not yet tested at all. The last label is the most useful thing on the page for a funding conversation.</p>
+      </div></div>
+    </div>
+
+    <div class="callout tip">
+      <p><strong>The habit to keep.</strong> When someone names a rare danger, ask for two numbers, not one: how often we meet it, and how often we fail it. Then ask how many miles it would take to see one failure. If the answer is more than the fleet drives, the evidence has to come from somewhere other than the logs, and the plan should say where.</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="section" id="quiz">
+    <div class="section-kicker">
+      <span class="klabel">Check yourself</span>
+      <h2>Three questions</h2>
+    </div>
+
+    <div class="quiz-q" data-answer="2">
+      <p class="qtext">In the constructed Lanehart list, a wrong-way vehicle is met 300 times per 100 million miles and fails 2 percent of the time. A pedestrian behind a parked van is met 4,000 times and fails 0.3 percent of the time. Which adds more to the tail rate?</p>
+      <button class="qopt" type="button">A · The wrong-way vehicle, because its failure probability is highest</button>
+      <button class="qopt" type="button">B · They are about equal, since both are rare</button>
+      <button class="qopt" type="button">C · The pedestrian behind the van: 4,000 x 0.003 = 12 against 300 x 0.02 = 6 failures per 100 million miles</button>
+      <p class="qwhy">The tail rate is a product. A high failure probability on a situation the fleet rarely meets can contribute less than a low one on a situation it meets all the time. Rank by the product, not by either factor.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="0">
+      <p class="qtext">Testing the van class the way the road serves it, 2,000 tries gave 1 failure and an estimate of 2.00 per 100 million miles. The constructed truth is 12. What is the right reading?</p>
+      <button class="qopt" type="button">A · The method is fair on average but far too thin for one rare class; a single failure cannot pin the rate down</button>
+      <button class="qopt" type="button">B · The class is safer than expected, so it can move down the priority list</button>
+      <button class="qopt" type="button">C · Plain sampling is biased and should never be used</button>
+      <p class="qwhy">Over many constructed runs plain sampling averages close to the truth (45.68 against 46 for the whole tail), so C is wrong. Its spread is the problem: about five times wider than the skewed-and-reweighted estimate at the same budget. B reads noise as good news.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="1">
+      <p class="qtext">Lanehart's exposure-matched crash rate is 147.74 per 100 million miles, upper bound 169.04, under the 185.55 human baseline. With the four rare classes added, the total is 192.24. What happens if the rare classes are left out of the evaluation?</p>
+      <button class="qopt" type="button">A · Nothing important; rare classes are too rare to change a fleet-wide rate</button>
+      <button class="qopt" type="button">B · The dashboard reports "proven better" when the constructed truth is worse than the baseline</button>
+      <button class="qopt" type="button">C · The verdict becomes more conservative, which is safe</button>
+      <p class="qwhy">Each class is rare, but together they add about 46 per 100 million miles, enough to flip the verdict. Dropping them does not make the claim cautious; it makes it wrong in the comfortable direction. Practitioner session 4 is about keeping those slices in.</p>
+    </div>
+
+    <div class="quiz-score"></div>
+  </section>
+
+  <!-- ============ HOMEWORK ============ -->
+  <section class="section" id="homework">
+    <div class="section-kicker">
+      <span class="klabel">Before session 3</span>
+      <h2>Homework</h2>
+    </div>
+    <p class="lede">Twenty minutes, on your ledger and one guess.</p>
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Ask for one real pair of numbers</h4>
+        <p>Pick the top row of your ledger and ask the team closest to it for their best estimate of each factor and where it comes from. Note which of the two nobody can answer; that is usually the encounter rate.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Read RAND's summary</h4>
+        <p>Kalra and Paddock (2016), "Driving to Safety", RAND RR-1478, is a free research report. Read the summary and the conclusion, and underline the one sentence you would quote to a board.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Commit to a number</h4>
+        <p>US drivers had 1.33 deaths per 100 million miles in 2022. Write down how many miles with zero deaths you think a fleet needs before it can claim, at 95 percent confidence, to beat that. Leader session 3 checks it.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ OFFICIAL ============ -->
+  <section class="section" id="official">
+    <div class="section-kicker">
+      <span class="klabel">Covered tonight</span>
+      <h2>What this session covers</h2>
+    </div>
+    <div class="covered">
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The tail as a product</span><span class="note">Encounter rate x failure probability per encounter; four constructed Lanehart classes, 12 + 6 + 10 + 18 = 46 per 100 million miles.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Why logged miles under-sample the tail</span><span class="note">Constructed canon: 1 failure in 2,000 plain tries for the van class (2.00 vs true 12) against 743 skewed tries (11.52); SD 7.251 vs 1.404.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The tail flips the verdict</span><span class="note">Constructed canon: matched 147.74 (upper 169.04) becomes 192.24 with the tail, against the 185.55 baseline derived from NHTSA DOT HS 813 643.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Accelerated evaluation</span><span class="note">Zhao et al. (2017), IEEE T-ITS 18(3):595-607. Read at source (abstract); the 2,000 to 20,000 times figure is what the authors report.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Driving alone is not enough evidence</span><span class="note">Kalra and Paddock (2016), RAND RR-1478. Read at source.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Hazards with no fault</span><span class="note">ISO 21448 named as a concept only. Reported.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">How the reweighting works</span><span class="note">Named tonight. Practitioner session 8 builds it; practitioner session 6 covers the simulation gap.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Finding and keeping tail scenarios</span><span class="note">Named tonight. Practitioner session 3 (mining by query) and session 4 (curating evaluation slices).</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Generic anomaly detectors</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-anomaly-detection-with-phoebe/courses/b2-statistical-detectors.html">learn anomaly detection, statistical detectors</a>. Here, rare scenarios are found by query, not detected.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Real fleets, scenarios or incidents</span><span class="note">Out of scope by design. Every scenario class and rate here is constructed.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section class="section" id="cheatsheet">
+    <div class="section-kicker">
+      <span class="klabel">Take this with you</span>
+      <h2>Cheat sheet</h2>
+    </div>
+    <div class="cheat">
+      <div class="cheat-item"><strong>The one sentence.</strong> Safety is decided by situations a fleet meets rarely and sometimes fails, and its own logs barely contain the failures.</div>
+      <div class="cheat-item"><strong>The product.</strong> Tail rate = encounters per 100M miles x failure probability per encounter.</div>
+      <div class="cheat-item"><strong>Rank by the product.</strong> Not by how scary it sounds, not by how often it happens.</div>
+      <div class="cheat-item"><strong>Two levers.</strong> Meet it less (route, domain) or fail it less (perception, prediction, planning).</div>
+      <div class="cheat-item"><strong>Miles per failure.</strong> 100 million divided by the rate. Bigger than your yearly miles means logs alone cannot measure it.</div>
+      <div class="cheat-item"><strong>Zero is not safe.</strong> No failures in a class usually means too few encounters, not a solved problem.</div>
+      <div class="cheat-item"><strong>Skew and reweight.</strong> Serve the hard cases on purpose, then weight back to road rates; exposure still comes from real driving.</div>
+      <div class="cheat-item"><strong>RAND.</strong> Developers "cannot simply drive" their way to safety; test driving alone is not sufficient evidence.</div>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    <div class="wrap">
+      <p>Leader session 2 of 6 · learn-autonomous-driving-with-phoebe · by Phoebe Fu</p>
+      <nav class="pagenav">
+        <a href="a1-the-car-is-a-data-pipeline.html">← Leader session 1 · The car is a data pipeline on wheels</a>
+        <a href="a3-how-many-miles-prove-a-car-is-safe.html">Leader session 3 · How many miles prove a car is safe? →</a>
+      </nav>
+    </div>
+  </footer>
+
+</main>
+
+<script src="../assets/app.js?v=1"></script>
+<script>
+(function () {
+  var CLASSES = [
+    {"name": "Pedestrian behind a parked van", "enc": 4000, "p": 0.003},
+    {"name": "Wrong-way vehicle on a divided road", "enc": 300, "p": 0.02},
+    {"name": "Debris in lane at highway speed", "enc": 2500, "p": 0.004},
+    {"name": "Emergency vehicle crossing a junction", "enc": 1200, "p": 0.015}
+  ];
+  var MILES = [10, 50, 150, 400];
+  var TOTAL = 46;
+  var cls = document.getElementById("lha2-class");
+  var mil = document.getElementById("lha2-miles");
+  var out = document.getElementById("lha2-out");
+  var verdict = document.getElementById("lha2-verdict");
+  if (!cls || !mil || !out) return;
+  CLASSES.forEach(function (c, i) {
+    var o = document.createElement("option");
+    o.value = String(i);
+    o.textContent = c.name;
+    if (i === 1) o.selected = true;
+    cls.appendChild(o);
+  });
+  MILES.forEach(function (m) {
+    var o = document.createElement("option");
+    o.value = String(m);
+    o.textContent = m + " million miles" + (m === 150 ? " (Lanehart so far)" : "");
+    if (m === 10) o.selected = true;
+    mil.appendChild(o);
+  });
+  function fmt(x, d) { return x.toLocaleString("en-US", {minimumFractionDigits: d, maximumFractionDigits: d}); }
+  function render() {
+    var c = CLASSES[Number(cls.value)];
+    var m = Number(mil.value);
+    var rate = c.enc * c.p;
+    var encounters = c.enc * m / 100;
+    var expFail = rate * m / 100;
+    var pZero = Math.exp(-expFail);
+    var perFail = 100 / rate;
+    out.innerHTML = '<table class="sql-table"><thead><tr><th>Quantity</th><th>Value</th></tr></thead><tbody>' +
+      "<tr><td>Encounters per 100M miles x failure probability</td><td>" + fmt(c.enc, 0) + " x " + c.p + " = " + fmt(rate, 0) + " per 100M</td></tr>" +
+      "<tr><td>Share of the 46 tail total</td><td>" + fmt(100 * rate / TOTAL, 1) + "%</td></tr>" +
+      "<tr><td>Expected encounters in " + m + "M miles</td><td>" + fmt(encounters, 0) + "</td></tr>" +
+      "<tr><td>Expected failures in " + m + "M miles</td><td>" + fmt(expFail, 1) + "</td></tr>" +
+      "<tr><td>Chance the logs hold zero failures</td><td>" + fmt(100 * pZero, pZero < 0.001 ? 4 : 1) + "%</td></tr>" +
+      "<tr><td>Miles per one failure, on average</td><td>" + fmt(perFail, 2) + " million</td></tr></tbody></table>";
+    var msg;
+    if (expFail < 3) {
+      msg = "Fewer than 3 failures expected: the logs cannot estimate this class's failure probability. Test it somewhere the hard cases can be served on purpose.";
+    } else if (expFail < 30) {
+      msg = "A handful of failures expected: enough to know the class exists, too few to read its rate with any precision.";
+    } else {
+      msg = "Many failures expected, but only after " + m + " million miles; the class would have hurt people long before the estimate settled.";
+    }
+    verdict.textContent = msg;
+  }
+  cls.addEventListener("change", render);
+  mil.addEventListener("change", render);
+  render();
+})();
+</script>
+<style>
+  #lha2-tail .sql-code { border: 1px solid var(--hairline); border-radius: 8px; max-width: 24rem; margin-bottom: .4rem; }
+  #lha2-tail table.sql-table { margin: .6rem 0 .2rem; font-size: .85rem; }
+</style>
+</body>
+</html>

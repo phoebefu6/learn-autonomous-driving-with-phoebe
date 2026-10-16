@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- social:start -->
+<meta name="description" content="Leader session 6 of 6. The transfer map for anyone arriving from a data team: what carries over, what must be learned, what must be unlearned, each with a skill, a method, a tool class and a reading. Then a 90-day self-study ladder on free sources, each marked official or not. Lanehart is a constructed fleet.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Learn with Phoebe">
+<meta property="og:title" content="From warehouse to autonomous driving: the transfer map - learn autonomous driving with phoebe">
+<meta property="og:description" content="Leader session 6 of 6. Three columns, twelve cards, and a 90-day ladder of free sources marked official or not.">
+<meta property="og:url" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/courses/a6-from-warehouse-to-autonomous-driving.html">
+<meta property="og:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="From warehouse to autonomous driving: the transfer map - learn autonomous driving with phoebe">
+<meta name="twitter:description" content="What a data team already has that is worth more here, what is new, and what is actively dangerous.">
+<meta name="twitter:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<!-- social:end -->
+<title>Leader session 6 · From warehouse to autonomous driving: the transfer map - learn autonomous driving with phoebe</title>
+<link rel="stylesheet" href="../assets/style.css?v=2">
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="wrap">
+    <span class="crumb"><a href="../index.html">learn-autonomous-driving-with-phoebe</a> / Leader session 6 of 6</span>
+    <button class="btn" id="toggle-all" type="button">Expand all</button>
+    <button class="btn primary" id="zoom-toggle" type="button">Projector zoom: off</button>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Learn Autonomous Driving with Phoebe · Leader session 6 of 6</div>
+    <h1>From warehouse to autonomous driving: <span class="accent">the transfer map</span></h1>
+    <p class="sub">Five sessions showed where the warehouse playbook holds and where it breaks. Tonight turns that into one page you can act on: what a data analyst, engineer or scientist already has that is worth more here, what is genuinely new, and which habits are actively dangerous. Every card names a skill, a method, a tool class and a reading. Then a 90-day self-study ladder on free sources only, each marked official or not. Lanehart, a constructed robotaxi pilot fleet in a fictional city, supplies the numbers on the unlearn side; every Lanehart number is generated, not observed.</p>
+    <div class="chip-row">
+      <span class="chip level">🟠 Advanced</span>
+      <span class="chip audience">Data people arriving from the warehouse</span>
+      <span class="chip audience">Leaders who hire, retrain or sign off that move</span>
+      <span class="chip time">45 min</span>
+    </div>
+    <div class="agenda">
+      <span class="a1" style="flex:1">0-3 · Welcome</span>
+      <span class="a2" style="flex:3">3-18 · The transfer map</span>
+      <span class="a3" style="flex:3">18-28 · The 90-day ladder</span>
+      <span class="a4" style="flex:4">28-45 · Build-along and Q&amp;A</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ INTRO ============ -->
+  <section class="section" id="intro">
+    <div class="section-kicker">
+      <span class="klabel">Part 0</span>
+      <h2>Lanehart, six weeks after the first drive logs landed</h2>
+    </div>
+    <p class="lede">Lanehart is a constructed robotaxi pilot fleet in a fictional city. The analyst who arrived from a retail warehouse in leader session 1 has now been asked a different question by her manager: "what do you still need to learn, and what should we stop doing?" She could answer with a reading list. A reading list does not say which of her habits will quietly produce a wrong number. A transfer map does, because it puts every skill in one of three columns and attaches the evidence that put it there.</p>
+
+    <div class="legend">
+      <span class="pill">Live = presented in the 45 minutes</span>
+      <span class="pill">Self-study = the full depth, after class</span>
+      <span class="pill">🔍 Every diagram zooms</span>
+    </div>
+
+    <div class="callout win">
+      <p><strong>★ What you walk out with tonight.</strong> A three-column transfer map, CARRIES OVER, MUST LEARN, MUST UNLEARN, with four concrete cards in each column and the session that owns each card. Two of the unlearn cards drawn as the mechanism that makes the old habit wrong. A 90-day self-study ladder of free sources, every one marked official or not, with the paid standards named honestly as paid. And your own transfer card, sorted through two tests, ready to show a manager.</p>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Why a map, not a reading list<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Someone moving from a warehouse into driving data does not arrive empty. They bring joins, slices, rates and reproducible pipelines, and most of that is worth more here than it was before. The risk is not ignorance. The risk is a habit that worked for years and now returns a confident wrong answer with no error message.</p>
+        <p>So the map has three columns, not two. "Must learn" is the usual training plan. "Must unlearn" is the column most plans leave out, and it is the one that protects the safety claim. Each unlearn card carries a number from Lanehart's constructed bench, so the case against the old habit is shown, not asserted.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>The regulator's own crash-reporting page is the best argument that the warehouse's rate discipline carries over. NHTSA's Standing General Order page says the crash counts "have not" been "normalized or adjusted by any measure of exposure, including operational design domains or vehicle miles traveled". An analyst who refuses to compare counts without a denominator already has the instinct this field needs most. Leader session 4 is built on that sentence.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>How to read a card on the map<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Skill.</strong> What you can do, in plain words: join on time, slice a metric, bound a rate.</li>
+          <li><strong>Method.</strong> The specific technique that skill turns into here: an as-of join with a direction, an exact Poisson bound, an exposure-matched rate.</li>
+          <li><strong>Tool class.</strong> The kind of tool, never a product: a dataframe as-of merge, a grouped metric table, a seeded generator, an annotation cost model.</li>
+          <li><strong>Reading.</strong> One source that teaches it, and the session here that practises it (a1 to a6 for leaders, p1 to p10 for practitioners).</li>
+          <li><strong>Constructed.</strong> Every Lanehart number on the unlearn side comes from the seeded bench. The human baselines (1.33 deaths and 185.55 police-reported crashes per 100 million miles, US 2022) are real and cited.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="section" id="part-1">
+    <div class="section-kicker">
+      <span class="klabel">Part 1 · covers the three columns: carries over, must learn, must unlearn</span>
+      <h2>Twelve cards, three columns, one session each</h2>
+      <span class="tag concept">15 min live</span>
+    </div>
+    <p class="lede">The map agrees with the "If you come from a data team" block on the landing page, card for card, and adds what the block has no room for: the method, the tool class and the reading behind each one. Read it left to right. The left column is what you re-point, the middle is what you add, and the right is what you must catch yourself doing.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn transfer map in three columns of four cards. Carries over: joins and time semantics as an as-of join with a direction and tolerance, practitioner session 1; slicing a metric by distance band, scenario and road context, practitioner session 5; rates with a denominator, refusing a count with no miles, NHTSA SGO page, leader session 4; reproducible pipelines with seeds and two implementations that agree, practitioner session 10. Must learn: multi-sensor drive logs, nuScenes paper, practitioner session 1; label economics at 2 Hz keyframes, practitioner session 2; rare-event statistics, Poisson bounds and exposure matching, RAND RR-1478, practitioner session 7; simulation and importance sampling, Zhao et al. 2017, practitioner session 8. Must unlearn, highlighted in yellow: nearest timestamp by default, right for 28 of 72 frames while strictly after gets 72 of 72; no events means safe, 0 deaths in 150 million miles still bounds at 2.00 above 1.33; totals across different mixes, own mix 120.00 against matched 147.74; ranking by the easy metric, the top disengagement score went to the loose policy with 21 extra crashes. Unlearn numbers are constructed.">
+        <defs>
+          <filter id="lha6aSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="61" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha6aHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha6aAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha6aH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha6aL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha6aS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha6aK { font: 400 11px Inter, sans-serif; fill: #1A1F23; }
+          .lha6aB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lha6aN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha6aH" x="30" y="36">THE TRANSFER MAP, ONE SKILL PER CARD</text>
+
+        <g filter="url(#lha6aSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="50" width="260" height="380" rx="10" transform="rotate(-0.3 160 240)" fill="#F1F3F4"/>
+          <rect x="310" y="50" width="260" height="380" rx="10" transform="rotate(0.3 440 240)" fill="#F1F3F4"/>
+          <rect x="590" y="50" width="260" height="380" rx="10" transform="rotate(-0.3 720 240)" fill="#F1F3F4"/>
+          <rect x="38" y="58" width="244" height="40" rx="6" transform="rotate(0.4 160 78)" fill="#FFFFFF"/>
+          <rect x="318" y="58" width="244" height="40" rx="6" transform="rotate(-0.4 440 78)" fill="#FFFFFF"/>
+          <rect x="598" y="58" width="244" height="40" rx="6" transform="rotate(0.4 720 78)" fill="#F2C230"/>
+          <rect x="38" y="108" width="244" height="70" rx="6" transform="rotate(-0.8 160 143)" fill="#FFFFFF"/>
+          <rect x="38" y="188" width="244" height="70" rx="6" transform="rotate(0.7 160 223)" fill="#FFFFFF"/>
+          <rect x="38" y="268" width="244" height="70" rx="6" transform="rotate(-0.6 160 303)" fill="#FFFFFF"/>
+          <rect x="38" y="348" width="244" height="70" rx="6" transform="rotate(0.8 160 383)" fill="#FFFFFF"/>
+          <rect x="318" y="108" width="244" height="70" rx="6" transform="rotate(0.7 440 143)" fill="#FFFFFF"/>
+          <rect x="318" y="188" width="244" height="70" rx="6" transform="rotate(-0.8 440 223)" fill="#FFFFFF"/>
+          <rect x="318" y="268" width="244" height="70" rx="6" transform="rotate(0.6 440 303)" fill="#FFFFFF"/>
+          <rect x="318" y="348" width="244" height="70" rx="6" transform="rotate(-0.7 440 383)" fill="#FFFFFF"/>
+          <rect x="598" y="108" width="244" height="70" rx="6" transform="rotate(-0.7 720 143)" fill="#FFFFFF"/>
+          <rect x="598" y="188" width="244" height="70" rx="6" transform="rotate(0.8 720 223)" fill="#FFFFFF"/>
+          <rect x="598" y="268" width="244" height="70" rx="6" transform="rotate(-0.6 720 303)" fill="#FFFFFF"/>
+          <rect x="598" y="348" width="244" height="70" rx="6" transform="rotate(0.7 720 383)" fill="#FFFFFF"/>
+          <!-- doodle: a lane line -->
+          <path d="M700 32 L728 32 M744 32 L772 32 M788 32 L816 32" stroke="#8C979F" stroke-width="3"/>
+        </g>
+
+        <text class="lha6aH" x="52" y="76">CARRIES OVER</text>
+        <text class="lha6aS" x="52" y="91">worth more here than before</text>
+        <text class="lha6aH" x="332" y="76">MUST LEARN</text>
+        <text class="lha6aS" x="332" y="91">new, and nobody hands it over</text>
+        <text class="lha6aH" x="612" y="76">MUST UNLEARN</text>
+        <text class="lha6aK" x="612" y="91">actively dangerous here</text>
+
+        <text class="lha6aL" x="52" y="130">Joins and time semantics</text>
+        <text class="lha6aS" x="52" y="148">as-of join: direction + tolerance</text>
+        <text class="lha6aB" x="52" y="165">tool: dataframe as-of merge · p1</text>
+        <text class="lha6aL" x="52" y="210">Slicing a metric by segment</text>
+        <text class="lha6aS" x="52" y="228">by distance band, scenario, road</text>
+        <text class="lha6aB" x="52" y="245">tool: grouped metric table · p5</text>
+        <text class="lha6aL" x="52" y="290">Rates with a denominator</text>
+        <text class="lha6aS" x="52" y="308">refuse a count with no miles</text>
+        <text class="lha6aB" x="52" y="325">reading: NHTSA SGO page · a4</text>
+        <text class="lha6aL" x="52" y="370">Reproducible pipelines</text>
+        <text class="lha6aS" x="52" y="388">seeds; two implementations agree</text>
+        <text class="lha6aB" x="52" y="405">tool: seeded generator · p10</text>
+
+        <text class="lha6aL" x="332" y="130">Multi-sensor drive logs</text>
+        <text class="lha6aS" x="332" y="148">frames, keyframes, stamp meanings</text>
+        <text class="lha6aB" x="332" y="165">reading: nuScenes paper · p1</text>
+        <text class="lha6aL" x="332" y="210">Label economics</text>
+        <text class="lha6aS" x="332" y="228">labels bought by the frame, 2 Hz</text>
+        <text class="lha6aB" x="332" y="245">tool: annotation cost model · p2</text>
+        <text class="lha6aL" x="332" y="290">Rare-event statistics</text>
+        <text class="lha6aS" x="332" y="308">Poisson bounds, exposure matching</text>
+        <text class="lha6aB" x="332" y="325">reading: RAND RR-1478 · p7</text>
+        <text class="lha6aL" x="332" y="370">Simulation, importance sampling</text>
+        <text class="lha6aS" x="332" y="388">skew to risk, reweight to reality</text>
+        <text class="lha6aB" x="332" y="405">reading: Zhao et al. 2017 · p8</text>
+
+        <text class="lha6aL" x="612" y="130">Nearest timestamp by default</text>
+        <text class="lha6aS" x="612" y="148">right for 28 of 72 frames</text>
+        <text class="lha6aB" x="612" y="165">strictly after: 72 of 72 · p1</text>
+        <text class="lha6aL" x="612" y="210">No events means safe</text>
+        <text class="lha6aS" x="612" y="228">0 deaths in 150M miles: bound 2.00</text>
+        <text class="lha6aB" x="612" y="245">above the human 1.33 · a3, p7</text>
+        <text class="lha6aL" x="612" y="290">Totals across different mixes</text>
+        <text class="lha6aS" x="612" y="308">own mix 120.00, matched 147.74</text>
+        <text class="lha6aB" x="612" y="325">easy miles flatter a rate · a4</text>
+        <text class="lha6aL" x="612" y="370">Ranking by the easy metric</text>
+        <text class="lha6aS" x="612" y="388">top score: the loose policy</text>
+        <text class="lha6aB" x="612" y="405">21 extra crashes · a4, p10</text>
+
+        <text class="lha6aN" x="30" y="452">Unlearn numbers are Lanehart, constructed. Codes name the session that practises each card.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow column is the one most retraining plans leave out, and every card in it carries the number that proves the old habit wrong.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Carries over: four skills, re-pointed<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>Joins and time semantics.</strong> You already know an as-of join: "the price in force when the order was placed". Here the same join attaches each camera frame to a lidar scan, and the direction matters. In the public multi-sensor research dataset read for practitioner session 1, a camera fires while the lidar sweeps past it and the lidar scan is stamped when its rotation completes, so the right scan is the one stamped after the frame. Tool class: a dataframe as-of merge with an explicit direction and tolerance.</p>
+        <p><strong>Slicing a metric by segment.</strong> You sliced revenue by region and channel. Now slice recall by distance band and by scenario, because a detector's misses cluster far away, half hidden, at night. Tool class: a grouped metric table. Practitioner session 5.</p>
+        <p><strong>Rates with a denominator.</strong> You refused a count with no base. The regulator's crash page agrees with you in writing. Leader session 4.</p>
+        <p><strong>Reproducible pipelines.</strong> Seeds, versioned inputs, and a reference implementation that must agree to the digit. Lanehart's bench is checked this way: the shipped engine and an independent reference agree on 881 values, and planting a 0.1% fault on one value fails the comparison. Practitioner session 10.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Must learn: four things nobody hands over<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>Multi-sensor drive logs.</strong> Frames from six cameras at 12 Hz, a lidar at 20 Hz and five radars at 13 Hz in the dataset paper practitioner session 1 reads, each with its own meaning of "timestamp". Reading: Caesar et al. (2020), the nuScenes paper.</p>
+        <p><strong>Label economics.</strong> Labels are bought by the frame. The same paper labels keyframes at 2 Hz and reports that this holds up when interpolated to 10 to 20 Hz. The rare frames cost most, because you pay to find them before you pay to label them. Tool class: an annotation cost model. Practitioner session 2.</p>
+        <p><strong>Rare-event statistics.</strong> Exact Poisson bounds over miles, the rule of three, and exposure matching. Reading: Kalra and Paddock (2016), RAND RR-1478, whose Table 1 needs 275 million failure-free miles to show a fatality rate below 1.09 per 100 million at 95% confidence. Practitioner session 7.</p>
+        <p><strong>Simulation and importance sampling.</strong> For scenarios the fleet almost never meets, skew the simulator toward risk and reweight the result back to real-world rates. Reading: Zhao et al. (2017); the authors report 2,000 to 20,000 times acceleration in lane-change scenarios. On Lanehart's constructed bench, importance sampling is 5.2 times tighter than plain Monte Carlo at the same budget (SD 1.404 against 7.251). Practitioner session 8.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Must unlearn: four habits, each with its number<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>"Nearest timestamp" as the default join.</strong> On one constructed second of Lanehart's timing model, joining 72 camera frames to the nearest lidar stamp puts 28 on the right scan and 44 on the wrong one, with no error raised. Joining to the first scan stamped strictly after the frame puts all 72 right.</p>
+        <p><strong>"No events means safe."</strong> Lanehart's pilot reports zero fatal crashes in 150 million constructed miles. The exact 95% upper bound is still 2.00 per 100 million, above the human 1.33. With zero events the bound clears 1.33 only after 225.2 million miles.</p>
+        <p><strong>Comparing totals across different mixes.</strong> On its own mix of mostly highway miles, Lanehart's crash rate is 120.00 per 100 million. Re-weighted to the human driving mix, it is 147.74. At 60 million miles the exposure match flips the verdict from proven to not proven, because the thin night and rain miles carry the weight.</p>
+        <p><strong>Ranking by the easy metric.</strong> Score three takeover policies by disengagements per mile and the loose policy wins with 0.027 per 100,000 miles. It also lets through 21 extra crashes, 14.00 per 100 million worse. The cautious policy has five times the disengagements of the standard one and identical safety. Disengagements measure the policy as much as the car.</p>
+      </div>
+    </details>
+
+    <p>Two of those unlearn cards are worth drawing as the mechanism, because the mechanism is what convinces a team, not the number alone.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 348" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two hand drawn panels. Left: a timeline with scan k minus 1, scan k highlighted in yellow as one lidar rotation, and scan k plus 1. A camera fires early in scan k. The stamp for scan k minus 1 sits before the camera and the stamp for scan k sits at the end of the rotation. The nearest join snaps to stamp k minus 1, the wrong scan; the strictly after join picks stamp k, the scan the frame belongs to. Nearest gets 28 of 72 right, strictly after 72 of 72, constructed. Right: the 95 percent upper bound on the fatal rate with zero deaths, falling as miles grow, against the human rate of 1.33 per 100 million miles. At 150 million miles the bound is 2.00; the bound meets 1.33 at 225.2 million miles.">
+        <defs>
+          <filter id="lha6bSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="62" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha6bHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha6bAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha6bH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha6bL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha6bS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha6bB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lha6bA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lha6bN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha6bH" x="30" y="36">UNLEARN 1: NEAREST TIMESTAMP</text>
+        <text class="lha6bH" x="450" y="36">UNLEARN 2: NO EVENTS MEANS SAFE</text>
+
+        <g filter="url(#lha6bSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="50" width="400" height="260" rx="10" transform="rotate(-0.3 230 180)" fill="#FFFFFF"/>
+          <rect x="450" y="50" width="400" height="260" rx="10" transform="rotate(0.3 650 180)" fill="#FFFFFF"/>
+          <!-- left: rotations on a timeline -->
+          <rect x="50" y="140" width="70" height="24" rx="3" fill="url(#lha6bHc)"/>
+          <rect x="120" y="140" width="180" height="24" rx="3" fill="#F2C230"/>
+          <rect x="300" y="140" width="110" height="24" rx="3" fill="#F1F3F4"/>
+          <path d="M50 176 L410 176"/>
+          <path d="M120 170 L120 182 M300 170 L300 182"/>
+          <path d="M160 100 L160 136" marker-end="url(#lha6bAr)"/>
+          <path d="M160 216 L124 216" marker-end="url(#lha6bAr)"/>
+          <path d="M160 240 L296 240" marker-end="url(#lha6bAr)"/>
+          <!-- right: the bound sliding -->
+          <path d="M480 86 L480 250 L840 250"/>
+          <path d="M560 250 L560 256 M640 250 L640 256 M720 250 L720 256 M800 250 L800 256"/>
+          <path d="M480 197 L840 197" stroke="#525C64" stroke-dasharray="6 5"/>
+          <path d="M540 90 L560 130 L580 154 L600 170 L620 182 L640 190 L660 197 L690 204 L720 210 L760 216 L800 220 L830 223" stroke-width="2.4"/>
+          <circle cx="600" cy="170" r="5" fill="#FFFFFF"/>
+          <circle cx="660" cy="197" r="6" fill="#F2C230"/>
+          <path d="M660 205 L660 227" stroke-dasharray="3 3"/>
+        </g>
+
+        <text class="lha6bS" x="160" y="92" text-anchor="middle">camera fires mid-sweep</text>
+        <text class="lha6bS" x="85" y="156" text-anchor="middle">scan k-1</text>
+        <text class="lha6bL" x="210" y="157" text-anchor="middle">scan k rotation</text>
+        <text class="lha6bS" x="355" y="156" text-anchor="middle">scan k+1</text>
+        <text class="lha6bS" x="120" y="198" text-anchor="middle">stamp k-1</text>
+        <text class="lha6bS" x="300" y="198" text-anchor="middle">stamp k</text>
+        <text class="lha6bS" x="176" y="220">nearest: snaps to stamp k-1, wrong</text>
+        <text class="lha6bS" x="56" y="262">strictly after: stamp k, the scan it belongs to</text>
+        <text class="lha6bB" x="56" y="290">nearest 28 of 72 right · strictly after 72 of 72</text>
+
+        <text class="lha6bA" x="488" y="80">95% upper bound per 100M miles</text>
+        <text class="lha6bS" x="840" y="188" text-anchor="end">human rate 1.33 (NHTSA 2022)</text>
+        <text class="lha6bS" x="612" y="150">150M miles, 0 deaths: bound 2.00</text>
+        <text class="lha6bB" x="600" y="240">225.2M miles: the bound meets 1.33</text>
+        <text class="lha6bS" x="480" y="268" text-anchor="middle">0</text>
+        <text class="lha6bS" x="560" y="268" text-anchor="middle">100M</text>
+        <text class="lha6bS" x="640" y="268" text-anchor="middle">200M</text>
+        <text class="lha6bS" x="720" y="268" text-anchor="middle">300M</text>
+        <text class="lha6bS" x="800" y="268" text-anchor="middle">400M</text>
+        <text class="lha6bA" x="840" y="290" text-anchor="end">miles with zero deaths</text>
+
+        <text class="lha6bN" x="30" y="332">Lanehart numbers are constructed. The bound is exact Poisson; the human rate is NHTSA 2022.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - both habits fail silently: a join that runs without error, and a zero that looks like proof until you draw the bound sliding down the miles.</figcaption>
+    </figure>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Where serious people disagree, and the map stays honest<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>Is a fleet's crash count comparable with police-reported human crashes?</strong> NHTSA's 2022 summary counts about 5.93 million police-reported crashes, which works out to 185.55 per 100 million miles. Police reports undercount minor crashes. A fleet with full telemetry records more of its own minor crashes than a human population reports. Some argue that makes fleet rates look worse than they are; others argue the matching problem cuts both ways. The map puts "rates with a denominator" in carries over, and leaves the comparability question open.</p>
+        <p><strong>Is disengagement a useful metric at all?</strong> California's regulation, 13 CCR 227.50 as of the 2024 text, defines a disengagement and requires annual reports of autonomous miles and who initiated each one. Critics call the definition open to interpretation (reported). The map does not say "never count disengagements"; it says never rank by them alone.</p>
+        <p><strong>When will Level 4 be broadly available?</strong> Open, and the people closest to the work disagree. No card on the map depends on a date.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="section" id="part-2">
+    <div class="section-kicker">
+      <span class="klabel">Part 2 · covers the 90-day self-study ladder, free sources only</span>
+      <h2>Five rungs, each marked official or not</h2>
+      <span class="tag concept">10 min live</span>
+    </div>
+    <p class="lede">Every rung is free to read, and each says plainly whether it is official, meaning issued by a regulator or a standards body, or not. The order is deliberate: definitions first, then what the regulator counts, then the arithmetic of proof, then the shape of the data, then the method for the tail. The three paid standards sit beside the ladder, named honestly as paid.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn staircase of five rungs rising left to right. Days 1 to 14, highlighted in yellow: SAE J3016 chart plus the NHTSA crash summary DOT HS 813 643, official and free. Days 15 to 30: NHTSA Standing General Order page and data plus California 13 CCR 227.50, official and free. Days 31 to 50: RAND RR-1478 Driving to Safety, free research report, not official. Days 51 to 70: dataset papers, nuScenes, KITTI, Argoverse, Waymo Open Dataset, free, not official. Days 71 to 90: Zhao et al. 2017, arXiv 1605.04965, importance sampling, free preprint, not official. Beside the ladder: paid, not on the free ladder, UL 4600 Edition 3 and ISO 26262 and ISO 21448, concepts only.">
+        <defs>
+          <filter id="lha6cSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="63" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha6cHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha6cAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha6cH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha6cL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha6cS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha6cK { font: 400 11px Inter, sans-serif; fill: #1A1F23; }
+          .lha6cW { font: 800 11px Inter, sans-serif; fill: #1A1F23; }
+          .lha6cB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lha6cN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha6cH" x="30" y="36">A 90-DAY LADDER: FREE SOURCES ONLY, EACH MARKED</text>
+
+        <g filter="url(#lha6cSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="56" width="300" height="100" rx="8" transform="rotate(-0.6 180 106)" fill="#FFFFFF" stroke-dasharray="7 5"/>
+          <rect x="30" y="230" width="160" height="130" rx="6" transform="rotate(0.5 110 295)" fill="#F2C230"/>
+          <rect x="198" y="190" width="160" height="170" rx="6" transform="rotate(-0.4 278 275)" fill="#FFFFFF"/>
+          <rect x="366" y="150" width="160" height="210" rx="6" transform="rotate(0.4 446 255)" fill="#F1F3F4"/>
+          <rect x="534" y="110" width="160" height="250" rx="6" transform="rotate(-0.4 614 235)" fill="url(#lha6cHc)"/>
+          <rect x="702" y="70" width="160" height="290" rx="6" transform="rotate(0.4 782 215)" fill="#FFFFFF"/>
+          <!-- doodle: a cone -->
+          <path d="M826 52 L836 22 L846 52 Z" fill="#FFFFFF"/>
+          <path d="M830 42 L842 42"/>
+        </g>
+
+        <text class="lha6cH" x="44" y="80">PAID, NOT ON THE FREE LADDER</text>
+        <text class="lha6cS" x="44" y="100">UL 4600 Ed. 3 (2023): the safety case</text>
+        <text class="lha6cS" x="44" y="118">ISO 26262 faults · ISO 21448 SOTIF</text>
+        <text class="lha6cS" x="44" y="136">concepts only here, reported tier</text>
+
+        <text class="lha6cH" x="42" y="250">DAYS 1-14</text>
+        <text class="lha6cL" x="42" y="270">SAE J3016 chart</text>
+        <text class="lha6cK" x="42" y="288">who drives, per level</text>
+        <text class="lha6cK" x="42" y="304">+ NHTSA crash summary</text>
+        <text class="lha6cK" x="42" y="320">DOT HS 813 643</text>
+        <text class="lha6cW" x="42" y="342">OFFICIAL, FREE</text>
+
+        <text class="lha6cH" x="210" y="210">DAYS 15-30</text>
+        <text class="lha6cL" x="210" y="230">NHTSA SGO page</text>
+        <text class="lha6cS" x="210" y="248">crash reports + data</text>
+        <text class="lha6cS" x="210" y="264">+ 13 CCR 227.50</text>
+        <text class="lha6cS" x="210" y="280">disengagement rule</text>
+        <text class="lha6cB" x="210" y="302">OFFICIAL, FREE</text>
+
+        <text class="lha6cH" x="378" y="170">DAYS 31-50</text>
+        <text class="lha6cL" x="378" y="190">RAND RR-1478</text>
+        <text class="lha6cS" x="378" y="208">Driving to Safety</text>
+        <text class="lha6cS" x="378" y="224">275M / 8.8B / 11B mi</text>
+        <text class="lha6cS" x="378" y="240">free research report</text>
+        <text class="lha6cB" x="378" y="262">FREE, NOT OFFICIAL</text>
+
+        <text class="lha6cH" x="546" y="130">DAYS 51-70</text>
+        <text class="lha6cL" x="546" y="150">Dataset papers</text>
+        <text class="lha6cK" x="546" y="168">nuScenes (p1 anatomy)</text>
+        <text class="lha6cK" x="546" y="184">KITTI, Argoverse,</text>
+        <text class="lha6cK" x="546" y="200">Waymo Open Dataset</text>
+        <text class="lha6cB" x="546" y="222">FREE, NOT OFFICIAL</text>
+
+        <text class="lha6cH" x="714" y="90">DAYS 71-90</text>
+        <text class="lha6cL" x="714" y="110">Zhao et al. 2017</text>
+        <text class="lha6cS" x="714" y="128">arXiv 1605.04965</text>
+        <text class="lha6cS" x="714" y="144">importance sampling</text>
+        <text class="lha6cS" x="714" y="160">free preprint</text>
+        <text class="lha6cB" x="714" y="182">FREE, NOT OFFICIAL</text>
+
+        <text class="lha6cN" x="30" y="384">Official = issued by a regulator or a standards body. Datasets are named as readings, never as products.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow rung is the one to start on tomorrow: two official, free documents that fix the vocabulary and the human baseline everything else is measured against.</figcaption>
+    </figure>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Days 1 to 30: the official rungs<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>Days 1 to 14. SAE J3016 visual chart (official, free).</strong> SAE International made J3016_202104 free and publishes the chart for distribution with attribution. Read it until you can say, for any level, who is driving. Pair it with <strong>NHTSA's "Summary of Motor Vehicle Traffic Crashes: 2022 Data", DOT HS 813 643 (official, free)</strong>: 42,514 people killed, 1.33 per 100 million vehicle miles, 41% of deaths on rural roads that carry 32% of the miles. Leader sessions 1 and 4 replay those pages.</p>
+        <p><strong>Days 15 to 30. NHTSA Standing General Order page and its data (official, free).</strong> Learn what triggers a report (an automated driving system in use within 30 seconds of a crash), what the page says the counts are not, and the limitations it lists: incomplete reports, duplicates, earlier misclassification. Then <strong>California Code of Regulations, Title 13, section 227.50 (official, free)</strong>, the disengagement reporting rule, read as of the 2024 text, because a 2025 proposal to amend it was not confirmed as adopted when the source map was checked.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>California's rule defines a disengagement as a deactivation of the autonomous mode when a failure of the technology is detected, or when safe operation requires the test driver to take manual control. The annual report must say who initiated it: the technology, the test driver, a remote operator or a passenger. That "who" is the point of rung two: a takeover is a decision made under a policy, so a count of them measures the policy as much as the car.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Days 31 to 50: the arithmetic of proof<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>Kalra and Paddock (2016), "Driving to Safety", RAND RR-1478 (free research report, not official).</strong> Independent research, free to read, and the most cited argument in this field for why driving alone cannot prove safety. Work through its three questions with the numbers in Table 1: 275 million failure-free miles to show a fatality rate below 1.09 per 100 million at 95% confidence; about 8.8 billion miles to estimate the rate within 20%; 11 billion miles to show it is 20% better with 80% power. The report's own conclusion is that developers "cannot simply drive" their way to safety.</p>
+        <p>Then redo the first number with the 2022 rate from rung one. At 1.33 it is 225.2 million miles. Why it fell is the lesson: the human rate rose.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Days 51 to 90: the data and the method for the tail<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>Days 51 to 70. Dataset papers (free, not official).</strong> Read them as descriptions of how a drive log is built, not as recommendations of any dataset. Start with Caesar et al. (2020), "nuScenes: A multimodal dataset for autonomous driving", arXiv 1903.11027: its synchronisation section is practitioner session 1 in the authors' own words. Its data licence is non-commercial. Then, for comparison of design choices, the papers behind three more public datasets: Geiger, Lenz and Urtasun (2012), the KITTI vision benchmark suite; Sun et al. (2020), Waymo Open Dataset; Chang et al. (2019), Argoverse. These three are named here, not read at source for this page, so check each paper yourself.</p>
+        <p><strong>Days 71 to 90. Zhao et al. (2017), arXiv 1605.04965 (free preprint, not official).</strong> The published version is IEEE Transactions on Intelligent Transportation Systems 18(3):595-607. Cut-ins modelled from naturalistic driving data, skewed toward riskier behaviour, then reweighted to real-world rates. The authors report 2,000 to 20,000 times acceleration. Practitioner session 8 runs the same idea on Lanehart's constructed tail.</p>
+        <p><strong>Paid, beside the ladder.</strong> UL 4600 (Edition 3, 2023) describes a safety case as structured claims, argument and evidence across the lifecycle. ISO 26262 covers hazards from malfunctions of electrical and electronic systems; ISO 21448 (safety of the intended functionality) covers hazards with no fault at all, such as a sensor that works as designed and still misses. All three are paid standards, so they appear here as concepts at the reported tier only. Read their public summaries before deciding whether your team needs to buy them.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 3 ============ -->
+  <section class="section" id="part-3">
+    <div class="section-kicker">
+      <span class="klabel">Part 3 · build-along</span>
+      <h2>Sort your own skills into the three columns</h2>
+      <span class="tag build">17 min hands on</span>
+    </div>
+    <p class="lede">No code. Write your own transfer card, the one you would show a manager. Every skill you bring goes through two tests. The tests are the two ways the warehouse playbook breaks hardest: events that almost never happen, and a source that is many sensors on their own clocks instead of a row someone meant.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 440" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn sorting flow. Your skills, one card each, go through test one: does it still hold when the event is rare? If no, the skill goes to must unlearn, or re-point. If yes, test two: does it still hold with many sensors on their own clocks? If no, must unlearn. If yes, it carries over, highlighted in yellow: name the seat it lands in. Below, the five seats, drive logs, labels, evaluation slices, simulation, safety claim: any seat with nobody on your team becomes must learn, one ladder rung per gap.">
+        <defs>
+          <filter id="lha6dSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="64" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha6dHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha6dAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha6dH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha6dL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha6dS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha6dK { font: 400 11px Inter, sans-serif; fill: #1A1F23; }
+          .lha6dA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lha6dN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha6dH" x="30" y="36">SORT EVERY SKILL YOU OWN THROUGH TWO TESTS</text>
+
+        <g filter="url(#lha6dSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="70" width="150" height="90" rx="8" transform="rotate(-1.5 105 115)" fill="url(#lha6dHc)"/>
+          <rect x="220" y="70" width="170" height="90" rx="8" transform="rotate(0.8 305 115)" fill="#FFFFFF"/>
+          <rect x="430" y="70" width="170" height="90" rx="8" transform="rotate(-0.8 515 115)" fill="#FFFFFF"/>
+          <rect x="640" y="70" width="210" height="90" rx="8" transform="rotate(0.6 745 115)" fill="#F2C230"/>
+          <rect x="220" y="232" width="380" height="70" rx="8" transform="rotate(-0.4 410 267)" fill="#F1F3F4"/>
+          <rect x="30" y="330" width="570" height="70" rx="8" transform="rotate(0.3 315 365)" fill="#FFFFFF"/>
+          <rect x="640" y="330" width="210" height="70" rx="8" transform="rotate(-0.6 745 365)" fill="#F1F3F4"/>
+          <path d="M182 115 L216 115" marker-end="url(#lha6dAr)"/>
+          <path d="M392 115 L426 115" marker-end="url(#lha6dAr)"/>
+          <path d="M602 115 L636 115" marker-end="url(#lha6dAr)"/>
+          <path d="M305 162 L305 228" marker-end="url(#lha6dAr)"/>
+          <path d="M515 162 L515 228" marker-end="url(#lha6dAr)"/>
+          <path d="M602 365 L636 365" marker-end="url(#lha6dAr)"/>
+          <!-- doodle: a lane line -->
+          <path d="M700 32 L728 32 M744 32 L772 32 M788 32 L816 32" stroke="#8C979F" stroke-width="3"/>
+        </g>
+
+        <text class="lha6dL" x="44" y="100">Your skills</text>
+        <text class="lha6dK" x="44" y="120">one card each, ten</text>
+        <text class="lha6dK" x="44" y="138">from the warehouse</text>
+
+        <text class="lha6dL" x="234" y="100">Still holds when</text>
+        <text class="lha6dL" x="234" y="118">the event is rare?</text>
+        <text class="lha6dS" x="234" y="140">a weekly count does not</text>
+
+        <text class="lha6dL" x="444" y="100">Still holds with</text>
+        <text class="lha6dL" x="444" y="118">many clocks?</text>
+        <text class="lha6dS" x="444" y="140">one-source rows do not</text>
+
+        <text class="lha6dH" x="654" y="100">CARRIES OVER</text>
+        <text class="lha6dK" x="654" y="120">name the seat it lands in</text>
+        <text class="lha6dK" x="654" y="138">and the session for it</text>
+
+        <text class="lha6dA" x="410" y="105" text-anchor="middle">yes</text>
+        <text class="lha6dA" x="620" y="105" text-anchor="middle">yes</text>
+        <text class="lha6dA" x="315" y="200">no</text>
+        <text class="lha6dA" x="525" y="200">no</text>
+
+        <text class="lha6dH" x="236" y="260">MUST UNLEARN, or re-point</text>
+        <text class="lha6dS" x="236" y="282">write the number that proves the old habit wrong here</text>
+
+        <text class="lha6dL" x="46" y="356">The five seats</text>
+        <text class="lha6dS" x="46" y="374">drive logs, labels, evaluation slices, simulation, safety claim</text>
+        <text class="lha6dS" x="46" y="390">which seat has nobody on your team who has done it?</text>
+
+        <text class="lha6dH" x="654" y="358">MUST LEARN</text>
+        <text class="lha6dS" x="654" y="378">one ladder rung per gap</text>
+
+        <text class="lha6dN" x="30" y="422">The column a skill lands in matters less than the number or the session you write beside it.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - only a skill that survives both tests reaches the yellow box; everything else is either retrained with a number or added from the ladder.</figcaption>
+    </figure>
+
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Write ten skills you actually use</h4>
+        <p>From your last warehouse role, in your own words: "as-of joins on price history", "weekly churn by segment", "A/B test readouts", "tested data models". One per line. Do not pre-sort.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Run test one: does it still hold when the event is rare?</h4>
+        <p>A weekly count of a common event fails it; a rate with a denominator and an exact bound passes. If it fails, move it to MUST UNLEARN and write the number that shows why, borrowing from the map: "0 deaths in 150 million miles still bounds at 2.00" (constructed).</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Run test two: does it still hold with many sensors on their own clocks?</h4>
+        <p>Anything that assumes one row per event someone meant fails it. A join habit that defaults to "nearest" fails it; the same join with a direction and a tolerance passes. Write the re-pointed version next to it.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Name the seat for each survivor</h4>
+        <p>Drive logs, labels, evaluation slices, simulation or the safety claim. Add the session that practises it, from the codes on the map. A skill with no seat is not wrong, it is just not part of this job.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Find the empty seats, then pick rungs</h4>
+        <p>Any seat nobody on your team has worked in goes to MUST LEARN. Give each one a rung of the ladder and a date inside the 90 days. Mark which of those sources are official.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Compare with the landing page's three columns</h4>
+        <p>If your MUST UNLEARN column is empty, look again at the four habits on the map. An empty unlearn column is the commonest sign that the sort was done too kindly.</p>
+      </div></div>
+    </div>
+
+    <div class="callout tip">
+      <p><strong>The habit to keep.</strong> Every time you reach for a familiar technique on driving data, ask the two questions first: does it still hold when the event is rare, and does it still hold with many clocks? If either answer is no, the technique is not wrong, it is pointed at the wrong thing. Re-point it before you run it.</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="section" id="quiz">
+    <div class="section-kicker">
+      <span class="klabel">Check yourself</span>
+      <h2>Three questions</h2>
+    </div>
+
+    <div class="quiz-q" data-answer="2">
+      <p class="qtext">A new hire joins each camera frame to the lidar scan with the nearest timestamp, the way they joined prices to orders. Where does that habit go on the transfer map?</p>
+      <button class="qopt" type="button">A · Carries over as it is: a nearest-timestamp join is standard practice</button>
+      <button class="qopt" type="button">B · Must learn: the team needs a new kind of join it has never seen</button>
+      <button class="qopt" type="button">C · Must unlearn as a default: on one constructed second it puts 28 of 72 frames on the right scan, while strictly after puts all 72 right</button>
+      <p class="qwhy">The as-of join itself carries over; the default direction must be unlearned. The lidar scan is stamped when its rotation completes, so a camera that fires mid-sweep belongs to the scan stamped after it. Practitioner session 1 runs the join.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="0">
+      <p class="qtext">Which of these sources on the 90-day ladder is official, in the sense of being issued by a regulator or a standards body?</p>
+      <button class="qopt" type="button">A · California Code of Regulations, Title 13, section 227.50, the disengagement reporting rule</button>
+      <button class="qopt" type="button">B · Kalra and Paddock (2016), RAND RR-1478, "Driving to Safety"</button>
+      <button class="qopt" type="button">C · Zhao et al. (2017), arXiv 1605.04965</button>
+      <p class="qwhy">The California regulation is official and free. RAND RR-1478 is a free independent research report, and the Zhao et al. preprint is free academic work; both are valuable and neither is official. UL 4600 and the ISO standards are paid and sit beside the ladder.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="1">
+      <p class="qtext">A dashboard ranks takeover policies by fewest disengagements per mile. Where does that practice sit on the map?</p>
+      <button class="qopt" type="button">A · Carries over: fewer disengagements means a safer car</button>
+      <button class="qopt" type="button">B · Must unlearn: disengagements measure the takeover policy; on Lanehart's constructed bench the top score went to the loose policy, which let through 21 extra crashes</button>
+      <button class="qopt" type="button">C · Must learn: a better disengagement formula would fix the ranking</button>
+      <p class="qwhy">A takeover is a decision made under a policy, and California's rule asks who initiated each one for that reason. The cautious policy had five times the disengagements of the standard one and identical safety. Rank by an outcome, not by the policy's own trace.</p>
+    </div>
+
+    <div class="quiz-score"></div>
+  </section>
+
+  <!-- ============ HOMEWORK ============ -->
+  <section class="section" id="homework">
+    <div class="section-kicker">
+      <span class="klabel">Before practitioner session 1</span>
+      <h2>Homework</h2>
+    </div>
+    <p class="lede">Thirty minutes this week, then a ten-minute check at day 30.</p>
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Climb rung one</h4>
+        <p>Read the SAE J3016 chart and the first pages of NHTSA DOT HS 813 643. Write the level definitions from memory, then the 2022 rate and the rural share of deaths and miles. Check yourself against the sources.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Show your transfer card to one person</h4>
+        <p>A manager, a mentor or a colleague on the perception team. Ask them which card in your MUST UNLEARN column they would have missed. Add one card if they name a habit you left out.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Book the day-30 re-sort</h4>
+        <p>Put a calendar entry for day 30: sort the same ten skills again after rung two. Skills that move columns are the evidence the ladder is working.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ OFFICIAL ============ -->
+  <section class="section" id="official">
+    <div class="section-kicker">
+      <span class="klabel">Covered tonight</span>
+      <h2>What this session covers</h2>
+    </div>
+    <div class="covered">
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Carries over</span><span class="note">As-of joins with a direction, sliced metrics, rates with a denominator, reproducible pipelines; agrees with the landing page block.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Must learn</span><span class="note">Drive logs, label economics, rare-event statistics, simulation and importance sampling, each with a reading and a session.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Must unlearn</span><span class="note">Four habits with Lanehart canon numbers (constructed): 28 of 72, bound 2.00, 120.00 vs 147.74, 21 extra crashes.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Official rungs</span><span class="note">SAE International (2021), J3016_202104 and visual chart; NHTSA NCSA (2024), DOT HS 813 643; NHTSA Standing General Order page; California 13 CCR 227.50 (2024 text). Read at source.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The arithmetic of proof</span><span class="note">Kalra and Paddock (2016), RAND RR-1478, doi:10.7249/RR1478. Free research report, read at source.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Dataset papers</span><span class="note">Caesar et al. (2020), arXiv 1903.11027, read at source. Geiger et al. (2012), Sun et al. (2020), Chang et al. (2019): named only, as datasets.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Importance sampling for AVs</span><span class="note">Zhao et al. (2017), IEEE T-ITS 18(3):595-607, arXiv 1605.04965. Read at source (abstract). Practitioner session 8 goes deep.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Paid safety standards</span><span class="note">UL 4600 Ed. 3 (2023), ISO 26262, ISO 21448: reported, concepts only, no numbers.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Label noise and cleaning in general</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-data-centric-ai-with-phoebe/courses/02-when-labellers-disagree.html">learn data-centric AI, when labellers disagree</a>. We own label cost per frame.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">General evaluation metrics</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-model-evaluation-with-phoebe/courses/a1-why-one-number-lies.html">learn model evaluation, why one number lies</a>. We own slicing by distance band and scenario.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Confidence intervals and A/B power</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-statistics-with-phoebe/courses/b7-confidence-intervals.html">learn statistics, confidence intervals</a> and <a href="https://phoebefu6.github.io/learn-experimentation-with-phoebe/courses/b2-power-and-sample-size.html">learn experimentation, power and sample size</a>.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Real fleets, companies or hiring markets</span><span class="note">Out of scope by design. Lanehart is constructed; no dataset is recommended over another.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section class="section" id="cheatsheet">
+    <div class="section-kicker">
+      <span class="klabel">Take this with you</span>
+      <h2>Cheat sheet</h2>
+    </div>
+    <div class="cheat">
+      <div class="cheat-item"><strong>The one sentence.</strong> You do not arrive empty; you arrive with habits, and some of them now give confident wrong answers.</div>
+      <div class="cheat-item"><strong>Carries over.</strong> As-of joins with a direction, sliced metrics, rates with a denominator, reproducible pipelines.</div>
+      <div class="cheat-item"><strong>Must learn.</strong> Drive logs, label economics, rare-event statistics, simulation and importance sampling.</div>
+      <div class="cheat-item"><strong>Must unlearn.</strong> Nearest by default, zero means safe, totals across mixes, ranking by the easy metric.</div>
+      <div class="cheat-item"><strong>Two tests.</strong> Does it hold when the event is rare? Does it hold with many clocks?</div>
+      <div class="cheat-item"><strong>Official rungs.</strong> SAE J3016 chart, NHTSA DOT HS 813 643, NHTSA SGO page, 13 CCR 227.50.</div>
+      <div class="cheat-item"><strong>Free, not official.</strong> RAND RR-1478, the dataset papers, Zhao et al. 2017 preprint.</div>
+      <div class="cheat-item"><strong>Paid.</strong> UL 4600, ISO 26262, ISO 21448: know the concepts, buy only if the work needs them.</div>
+    </div>
+
+    <div class="callout next">
+      <span class="nx-pill">Next session</span>
+      <p><strong>Practitioner session 1 · Anatomy of a drive log.</strong> The first card on your MUST LEARN column, hands on: many sensors on their own clocks, and the as-of join that puts 72 of 72 camera frames on the right lidar scan. <a href="p1-anatomy-of-a-drive-log.html">Start the practitioner track →</a></p>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    <div class="wrap">
+      <p>Leader session 6 of 6 · learn-autonomous-driving-with-phoebe · by Phoebe Fu</p>
+      <nav class="pagenav">
+        <a href="a5-why-the-warehouse-playbook-breaks-here.html">← Leader session 5 · Why the warehouse playbook breaks here</a>
+        <a href="../index.html">All sessions →</a>
+      </nav>
+    </div>
+  </footer>
+
+</main>
+
+<script src="../assets/app.js?v=1"></script>
+</body>
+</html>

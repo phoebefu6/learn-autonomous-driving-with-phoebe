@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- social:start -->
+<meta name="description" content="Practitioner session 9 of 10. A fleet learns from what it uploads, and the policy on the road decides what gets uploaded. Shadow mode, triggers, the data flywheel, drift across cities, and what the 30-second crash reporting window does and does not capture. Lanehart is a constructed fleet.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Learn with Phoebe">
+<meta property="og:title" content="The fleet feedback loop - learn autonomous driving with phoebe">
+<meta property="og:description" content="Practitioner session 9 of 10. Shadow mode, triggers, the data flywheel, drift across cities and the 30-second reporting window.">
+<meta property="og:url" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/courses/p9-the-fleet-feedback-loop.html">
+<meta property="og:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The fleet feedback loop - learn autonomous driving with phoebe">
+<meta name="twitter:description" content="Fewer takeovers, fewer uploads: 290 clips became 40, and the 21 extra crashes sit where no trigger fired.">
+<meta name="twitter:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<!-- social:end -->
+<title>Practitioner session 9 · The fleet feedback loop - learn autonomous driving with phoebe</title>
+<link rel="stylesheet" href="../assets/style.css?v=2">
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="wrap">
+    <span class="crumb"><a href="../index.html">learn-autonomous-driving-with-phoebe</a> / Practitioner session 9 of 10</span>
+    <button class="btn" id="toggle-all" type="button">Expand all</button>
+    <button class="btn primary" id="zoom-toggle" type="button">Projector zoom: off</button>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Learn Autonomous Driving with Phoebe · Practitioner session 9 of 10</div>
+    <h1>The fleet <span class="accent">feedback loop</span></h1>
+    <p class="sub">A warehouse dashboard reads data that was going to arrive anyway. A fleet only learns from what it chooses to send home, and the software on the road makes that choice. Change the driving policy and you change the triggers that fire, the clips that upload, the scenarios that get mined and the evaluation that says the release was safe. Lanehart, a constructed robotaxi pilot fleet in a fictional city, runs the loop; its numbers come from the engine's canon run, and the reporting rules come from the NHTSA Standing General Order, read at source.</p>
+    <div class="chip-row">
+      <span class="chip level">🟠 Advanced</span>
+      <span class="chip audience">Data engineers who own the upload and mining pipeline</span>
+      <span class="chip audience">Analysts who sign off a release</span>
+      <span class="chip time">45 min</span>
+    </div>
+    <div class="agenda">
+      <span class="a1" style="flex:1">0-3 · Welcome</span>
+      <span class="a2" style="flex:3">3-17 · Shadow and triggers</span>
+      <span class="a3" style="flex:3">17-28 · Flywheel, drift, window</span>
+      <span class="a4" style="flex:4">28-45 · Build-along and Q&amp;A</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ INTRO ============ -->
+  <section class="section" id="intro">
+    <div class="section-kicker">
+      <span class="klabel">Part 0</span>
+      <h2>The release note that cut the data team's uploads</h2>
+    </div>
+    <p class="lede">Lanehart is a constructed robotaxi pilot. A release note arrives with good news: across 150 million constructed supervised miles, takeovers fell from 290 to 40. The data team notices a second number fall with it. Every takeover sent a clip home, so the mining queue shrank by the same factor. On the engine's canon run, the "loose" policy behind that release adds 21 crashes, and every one of them came from a conflict where nobody took over, so no clip was ever uploaded. The loop got quieter exactly where it got worse.</p>
+
+    <div class="legend">
+      <span class="pill">Live = worked through in the 45 minutes</span>
+      <span class="pill">Self-study = the full depth, after class</span>
+      <span class="pill">🔍 Every diagram zooms</span>
+    </div>
+
+    <div class="callout win">
+      <p><strong>★ What you walk out with tonight.</strong> A sketch of shadow mode that shows where it stops being evidence. A takeover trigger read as a logging policy: on the canon run, cautious uploads 1,480 clips, standard 290, loose 40, and loose is the one with 21 extra crashes. The data flywheel drawn stage by stage, with the step where it lies (drop the tail slices and 147.74 per 100M looks proven; keep them and 192.24 is worse than the human 185.55). Drift across cities as a re-weighting of the same rate card. And the Standing General Order's 30-second rule, with the three things it never captures.</p>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>The loop in one paragraph<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>The fleet drives and logs everything on the car (session 1). A small fraction comes home, chosen by triggers. The team mines it for rare scenarios (session 3), buys labels for the keyframes (session 2), curates for the tail (session 4), trains, and evaluates on slices and bounds (sessions 5, 7 and 8). The new policy rides in shadow, then takes control. Then it drives, and its own behaviour decides which triggers fire on the next turn.</p>
+        <p>Every stage of that loop has been taught already. What is new tonight is the loop itself: the output of the last stage is an input to the first, so a mistake does not stay where it was made.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>The words that keep coming back<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Shadow mode.</strong> A candidate policy runs on the car's live inputs and logs what it would have done, without control of the vehicle.</li>
+          <li><strong>Trigger.</strong> A rule on the car that decides which moments are uploaded: a takeover, a hard brake, a disagreement between policies.</li>
+          <li><strong>Data flywheel.</strong> The loop from fleet logs to a new release and back to the fleet.</li>
+          <li><strong>Drift.</strong> The miles a fleet drives stop looking like the miles it was evaluated on: a new city, a new season, a new mix of roads.</li>
+          <li><strong>Standing General Order (SGO).</strong> NHTSA's crash reporting order for automated driving systems and Level 2 driver assistance.</li>
+          <li><strong>Constructed.</strong> Lanehart's miles, policies and city B are generated or chosen for teaching; only the NHTSA rates and rules are real.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="section" id="part-1">
+    <div class="section-kicker">
+      <span class="klabel">Part 1 · covers shadow mode and triggers</span>
+      <h2>What the fleet chooses to send home</h2>
+      <span class="tag concept">14 min live</span>
+    </div>
+    <p class="lede">Two mechanisms decide what a fleet learns from. Shadow mode lets a candidate policy watch the road and record its opinions without touching the wheel. Triggers decide which moments are worth the upload. Both feel like neutral plumbing, and neither is: shadow mode stops being evidence the moment the two policies disagree, and a trigger tied to the driving policy moves whenever the policy moves.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn sketch of shadow mode on a two lane road. A car on the left drives a solid path straight along its lane: the policy in control. A dashed path, the candidate policy in shadow, follows the same frames until a point highlighted in yellow, its first disagreement, then bends toward the other lane into a hatched region it never drove. Before the yellow point both decisions are logged on the same frames and are comparable. After it the road reacted to the policy in control, so the candidate's next frames do not exist. Concept sketch, no numbers.">
+        <defs>
+          <filter id="lhp9aSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="29" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp9aHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp9aAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp9aH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp9aL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp9aS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp9aB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lhp9aN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp9aH" x="30" y="30">SHADOW MODE: TWO POLICIES, ONE SET OF WHEELS (CONCEPT SKETCH)</text>
+
+        <g filter="url(#lhp9aSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M40 100 L850 100 M40 220 L850 220" stroke="#8C979F"/>
+          <path d="M40 160 L850 160" stroke="#CED4D9" stroke-dasharray="18 14"/>
+          <rect x="620" y="112" width="220" height="34" rx="6" transform="rotate(-0.6 730 129)" fill="url(#lhp9aHc)" stroke="#8C979F"/>
+          <rect x="56" y="179" width="42" height="22" rx="5" transform="rotate(-2 77 190)" fill="#FFFFFF"/>
+          <path d="M104 192 L850 192" marker-end="url(#lhp9aAr)"/>
+          <path d="M104 186 L420 186 C470 186 520 140 600 130 L850 130" stroke="#525C64" stroke-dasharray="8 6" marker-end="url(#lhp9aAr)"/>
+          <circle cx="430" cy="187" r="8" fill="#F2C230"/>
+        </g>
+
+        <text class="lhp9aS" x="104" y="88">solid: the policy in control</text>
+        <text class="lhp9aS" x="520" y="88">dashed: the candidate in shadow, never driven</text>
+        <text class="lhp9aB" x="430" y="240" text-anchor="middle">first disagreement</text>
+
+        <text class="lhp9aL" x="56" y="268">Before the yellow point: comparable</text>
+        <text class="lhp9aS" x="56" y="284">both decisions are logged on the same frames</text>
+        <text class="lhp9aL" x="500" y="268">After it: counterfactual</text>
+        <text class="lhp9aS" x="500" y="284">the road reacted to the policy in control,</text>
+        <text class="lhp9aS" x="500" y="300">so the candidate's next frames do not exist</text>
+
+        <text class="lhp9aN" x="30" y="322">Shadow mode shows where a candidate disagrees, never what would have happened next.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow point is where shadow mode stops measuring and starts guessing.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>What shadow mode logs, and what it cannot<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>In shadow mode the candidate sees exactly the frames the deployed policy sees and writes down its plan. Nothing it decides reaches the steering or the brakes. That makes the comparison paired: same scene, same instant, two answers. Where they agree, the candidate inherits the deployed policy's record on those frames. Where they disagree, you have found the interesting moment, and a disagreement is a natural trigger for an upload.</p>
+        <p>What you cannot have is the next frame. The other road users reacted to the car that was actually driving. Session 6 met the same wall in log replay: once the new plan diverges from the logged path, the recording can no longer say what would have happened. Shadow mode tells you <em>where</em> to look, and hands the <em>what next</em> to simulation (session 6) and to rare-event statistics (sessions 7 and 8).</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>RAND's "Driving to Safety" (Kalra and Paddock 2016) concludes that developers cannot simply drive their way to safety: test driving alone cannot give enough evidence for fatalities and injuries, and other methods, including simulation, scenario testing and staged deployment, are needed. Shadow mode is one way of staging: the candidate earns miles of opinion before it earns miles of control.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Shadow mode is not an A/B test<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>An A/B test randomises which version is in control and compares outcomes. Shadow mode never puts the candidate in control, so it measures agreement, not outcomes. The two answer different questions, and the mistake is to report a shadow disagreement rate as if it were a safety result. A low disagreement rate says the candidate drives like the old policy, which is reassuring only if the old policy was good on exactly those miles.</p>
+        <p>Randomised comparisons, power and sample size are owned by <a href="https://phoebefu6.github.io/learn-experimentation-with-phoebe/courses/b2-power-and-sample-size.html">learn experimentation</a>; they are not retaught here. The point on this side of the seam: on public roads the outcome you care about is rare enough that sessions 3 and 7 decide the design, not a dashboard.</p>
+      </div>
+    </details>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 336" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn severity axis from 0.85 to 1.00 for 3,000 constructed conflicts in 150 million supervised miles. Three rows show which conflicts a takeover trigger uploads under each policy. Cautious takes over from severity 0.50, off the left edge, and uploads 1,480 clips with 0 extra crashes. Standard takes over from 0.90 and uploads 290 with 0 extra crashes. Loose takes over only from 0.985 and uploads 40 clips; its window from 0.97 to 0.985, highlighted in yellow, is missed and never uploaded, and it holds the 21 extra crashes. A dashed line at 0.97 marks where an untaken conflict can crash.">
+        <defs>
+          <filter id="lhp9bSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="31" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp9bHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp9bAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp9bH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp9bL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp9bS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp9bB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lhp9bV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lhp9bA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp9bN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp9bH" x="30" y="30">A TAKEOVER TRIGGER UPLOADS WHAT THE POLICY TAKES OVER (CONSTRUCTED, 150M MILES)</text>
+        <text class="lhp9bS" x="600" y="62" text-anchor="middle">0.97: above this, a miss can crash</text>
+        <text class="lhp9bA" x="740" y="62">uploaded</text>
+
+        <g filter="url(#lhp9bSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M600 70 L600 212" stroke="#525C64" stroke-dasharray="6 6"/>
+          <rect x="120" y="91" width="600" height="18" rx="4" transform="rotate(-0.3 420 100)" fill="url(#lhp9bHc)"/>
+          <path d="M150 100 L126 100" marker-end="url(#lhp9bAr)"/>
+          <rect x="320" y="141" width="400" height="18" rx="4" transform="rotate(0.3 520 150)" fill="url(#lhp9bHc)"/>
+          <rect x="600" y="191" width="60" height="18" rx="4" transform="rotate(-0.8 630 200)" fill="#F2C230"/>
+          <rect x="660" y="191" width="60" height="18" rx="4" transform="rotate(0.8 690 200)" fill="url(#lhp9bHc)"/>
+          <path d="M120 250 L720 250"/>
+          <path d="M120 245 L120 255 M320 245 L320 255 M520 245 L520 255 M600 245 L600 255 M720 245 L720 255" stroke="#2F3A42"/>
+        </g>
+
+        <text class="lhp9bL" x="110" y="100" text-anchor="end">Cautious</text>
+        <text class="lhp9bS" x="110" y="114" text-anchor="end">from 0.50</text>
+        <text class="lhp9bL" x="110" y="150" text-anchor="end">Standard</text>
+        <text class="lhp9bS" x="110" y="164" text-anchor="end">from 0.90</text>
+        <text class="lhp9bL" x="110" y="200" text-anchor="end">Loose</text>
+        <text class="lhp9bS" x="110" y="214" text-anchor="end">from 0.985</text>
+
+        <text class="lhp9bV" x="740" y="104">1,480</text>
+        <text class="lhp9bS" x="740" y="118">0 extra crashes</text>
+        <text class="lhp9bV" x="740" y="154">290</text>
+        <text class="lhp9bS" x="740" y="168">0 extra crashes</text>
+        <text class="lhp9bV" x="740" y="204">40</text>
+        <text class="lhp9bS" x="740" y="218">21 extra crashes</text>
+        <text class="lhp9bB" x="630" y="230" text-anchor="middle">missed, not uploaded</text>
+
+        <text class="lhp9bA" x="120" y="270" text-anchor="middle">0.85</text>
+        <text class="lhp9bA" x="320" y="270" text-anchor="middle">0.90</text>
+        <text class="lhp9bA" x="520" y="270" text-anchor="middle">0.95</text>
+        <text class="lhp9bA" x="600" y="270" text-anchor="middle">0.97</text>
+        <text class="lhp9bA" x="720" y="270" text-anchor="middle">1.00 severity</text>
+
+        <text class="lhp9bN" x="30" y="300">Loose uploads 40 clips, not 290; its 21 extra crashes sit in the yellow window it never sends home.</text>
+        <text class="lhp9bN" x="30" y="318">Cautious sends 5x the clips of standard for identical safety. Constructed policies, engine canon (seed 1016).</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow window is the part of the road the loose policy stops reporting, and it is where the crashes are.</figcaption>
+    </figure>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>A trigger is a logging policy<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>The canon run gives Lanehart 3,000 constructed conflicts in 150 million supervised miles, each with a severity between 0 and 1. A policy takes over when severity passes its threshold: cautious at 0.50, standard at 0.90, loose at 0.985. A conflict above 0.97 that nobody takes over crashes with probability 0.25. Suppose, as many teams do, that every takeover sends a clip home.</p>
+        <ul>
+          <li><strong>Cautious:</strong> 1,480 takeovers, 0.987 per 100,000 miles, 0 extra crashes. The mining queue is full of moments that were never dangerous.</li>
+          <li><strong>Standard:</strong> 290 takeovers, 0.193 per 100,000 miles, 0 extra crashes. Five times fewer clips for identical safety.</li>
+          <li><strong>Loose:</strong> 40 takeovers, 0.027 per 100,000 miles, 21 extra crashes, a true rate of 206.24 against 192.24. The conflicts that crashed are exactly the ones in the window between 0.97 and 0.985, and none of them fired the trigger.</li>
+        </ul>
+        <p>So the trigger is not a sensor reading the road. It is the policy, reporting on itself. Score a release by "takeovers per mile" and the score picks loose; feed the loop from takeovers and the loop goes blind in the same place. Session 10's bench calls this the anti-lever.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>California's regulation (13 CCR 227.50, as of the 2024 text) defines a disengagement as a deactivation of the autonomous mode when a failure of the technology is detected or when safe operation requires the test driver to take manual control, and asks who initiated it: the technology, the test driver, a remote operator or a passenger. Who decides to take over is the operator's policy, so a disengagement count measures the policy as much as the car. Whether disengagements per mile are a useful safety metric at all is contested; critics call the definition open to interpretation (reported).</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Writing a trigger you can audit<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>A trigger has the same two errors as any classifier: it uploads moments that do not matter, and it misses moments that do. The first error costs storage and labelling budget (session 2). The second is invisible, because a moment that was never uploaded leaves no row to count.</p>
+        <p>The only way to see what triggers miss is to upload something no trigger chose: a small random sample of ordinary driving, kept on a fixed schedule that does not depend on the policy. It is the denominator for every trigger. Mine it with the same queries as session 3 and compare what the triggers sent with what the random sample says was out there. Keep at least one trigger that does not depend on the driving policy at all, such as a scenario query run on the car, so a policy change cannot switch it off.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="section" id="part-2">
+    <div class="section-kicker">
+      <span class="klabel">Part 2 · covers the data flywheel, drift across cities and the 30-second reporting window</span>
+      <h2>A loop that feeds itself, a road that changes, a rule that counts</h2>
+      <span class="tag concept">11 min live</span>
+    </div>
+    <p class="lede">Put the stages in a ring and the danger shows: every turn changes the policy, and the policy changes what the next turn can see. Then move the fleet to a new city, and the same car is evaluated on a road mix it was never weighted for. Last, look at what the regulator's crash reporting actually counts, because that is the only part of the loop anyone outside the team sees.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 376" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn ring of seven stages. 1 the fleet drives and logs every sensor, 2 triggers pick clips and only uploads come home, 3 mine the scenarios, 4 label the keyframes, 5 curate and train, 6 evaluate on slices with recall, bounds and importance sampling, 7 release in shadow then hand over control. A curved arrow returns from stage 7 to stage 1, and a yellow chip on it says the new policy decides what step 2 sees next. In the middle: drop the tail slices at step 6 and 147.74 per 100 million miles looks proven; keep them and 192.24 is worse than the human 185.55.">
+        <defs>
+          <filter id="lhp9cSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="37" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp9cHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp9cAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp9cH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp9cL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp9cS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp9cN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp9cH" x="30" y="32">THE DATA FLYWHEEL, AND THE EDGE THAT BENDS IT</text>
+
+        <g filter="url(#lhp9cSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="40" y="56" width="220" height="54" rx="10" transform="rotate(-0.6 150 83)" fill="url(#lhp9cHc)"/>
+          <rect x="330" y="56" width="220" height="54" rx="10" transform="rotate(0.5 440 83)" fill="#FFFFFF"/>
+          <rect x="620" y="56" width="220" height="54" rx="10" transform="rotate(-0.4 730 83)" fill="#FFFFFF"/>
+          <rect x="620" y="168" width="220" height="54" rx="10" transform="rotate(0.6 730 195)" fill="#FFFFFF"/>
+          <rect x="620" y="280" width="220" height="54" rx="10" transform="rotate(-0.5 730 307)" fill="#FFFFFF"/>
+          <rect x="330" y="280" width="220" height="54" rx="10" transform="rotate(0.4 440 307)" fill="#F1F3F4"/>
+          <rect x="40" y="280" width="220" height="54" rx="10" transform="rotate(-0.6 150 307)" fill="#FFFFFF"/>
+          <path d="M264 83 L324 83 M554 83 L614 83" marker-end="url(#lhp9cAr)"/>
+          <path d="M730 114 L730 162 M730 226 L730 274" marker-end="url(#lhp9cAr)"/>
+          <path d="M616 307 L556 307 M326 307 L266 307" marker-end="url(#lhp9cAr)"/>
+          <path d="M40 300 C10 266 10 130 36 92" marker-end="url(#lhp9cAr)"/>
+          <rect x="64" y="172" width="240" height="46" rx="12" transform="rotate(-1.2 184 195)" fill="#F2C230"/>
+        </g>
+
+        <text class="lhp9cL" x="56" y="80">1 · The fleet drives</text>
+        <text class="lhp9cS" x="56" y="98">every sensor, every mile (p1)</text>
+        <text class="lhp9cL" x="346" y="80">2 · Triggers pick clips</text>
+        <text class="lhp9cS" x="346" y="98">only uploads come home (p9)</text>
+        <text class="lhp9cL" x="636" y="80">3 · Mine the scenarios</text>
+        <text class="lhp9cS" x="636" y="98">query for rare events (p3)</text>
+        <text class="lhp9cL" x="636" y="192">4 · Label the keyframes</text>
+        <text class="lhp9cS" x="636" y="210">bought by the frame (p2)</text>
+        <text class="lhp9cL" x="636" y="304">5 · Curate and train</text>
+        <text class="lhp9cS" x="636" y="322">balance for the tail (p4)</text>
+        <text class="lhp9cL" x="346" y="304">6 · Evaluate on slices</text>
+        <text class="lhp9cS" x="346" y="322">recall, bounds, IS (p5, p7, p8)</text>
+        <text class="lhp9cL" x="56" y="304">7 · Release in shadow</text>
+        <text class="lhp9cS" x="56" y="322">compare, then hand control (p9)</text>
+
+        <text class="lhp9cL" x="184" y="191" text-anchor="middle">the new policy decides</text>
+        <text class="lhp9cL" x="184" y="207" text-anchor="middle">what step 2 sees next</text>
+
+        <text class="lhp9cL" x="350" y="160">Where the loop lies to you</text>
+        <text class="lhp9cS" x="350" y="180">Drop the tail slices at step 6:</text>
+        <text class="lhp9cS" x="350" y="196">147.74 per 100M looks proven.</text>
+        <text class="lhp9cS" x="350" y="212">Keep them: 192.24, worse than</text>
+        <text class="lhp9cS" x="350" y="228">the human 185.55. Canon run.</text>
+
+        <text class="lhp9cN" x="30" y="362">Each turn changes the policy, and the policy changes what the next turn sees. Lanehart canon, seed 1016.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow chip is the edge a warehouse pipeline does not have: the output steers the input.</figcaption>
+    </figure>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>The flywheel, stage by stage, and where it bends<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Read the ring as a set of filters. Step 2 decides which moments exist for everything after it. Step 3 can only mine what was uploaded. Step 4 only labels what was mined. Step 6 can only evaluate on the slices it kept. Every filter is reasonable alone, and their product is a picture of the road shaped by the last policy.</p>
+        <p>Two places bend the loop. The first is the yellow edge: a policy that takes over less uploads less, so the next training set holds fewer of the moments it handled badly. The second is step 6. On the canon run, Lanehart's exposure-matched crash rate is 147.74 per 100 million miles with an upper bound of 169.04, below the human 185.55. Add the importance-sampled tail (44.50 per 100M, session 8) and it becomes 192.24, upper 215.71: worse. Drop the four tail slices from evaluation and 147.74 reads as "proven". The loop then ships a release, the release changes the triggers, and the next turn has even less tail to evaluate on.</p>
+        <p>The fix is structural, not heroic: the tail slices and the random baseline sample from Part 1 sit outside the loop, so no policy change can remove them.</p>
+      </div>
+    </details>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 312" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn rate card and three stacked bars. Lanehart's per-context crash rates per 100 million miles from the canon run: highway 69.09, urban 155.56, night 186.67, rain 333.33 on 25 crashes. Bars show three mixes of miles. Lanehart's own, 55 30 10 5 percent, gives 120.00 against humans 155.09 on the same mix. The constructed human mix, 35 40 15 10, gives 147.74 against 185.55. Constructed city B, 20 40 15 25, gives 187.37 against 216.01. The rain segment, highlighted in yellow, grows from 5 to 25 percent of the miles.">
+        <defs>
+          <filter id="lhp9dSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="41" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp9dHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp9dAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp9dH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp9dL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp9dS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp9dV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lhp9dA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp9dN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp9dH" x="30" y="30">DRIFT ACROSS CITIES: THE SAME RATE CARD, RE-WEIGHTED</text>
+
+        <g filter="url(#lhp9dSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="50" width="230" height="200" rx="10" transform="rotate(-0.5 145 150)" fill="#FFFFFF"/>
+          <rect x="46" y="100" width="16" height="12" rx="2" fill="#FFFFFF"/>
+          <rect x="46" y="130" width="16" height="12" rx="2" fill="#F1F3F4"/>
+          <rect x="46" y="160" width="16" height="12" rx="2" fill="#CED4D9"/>
+          <rect x="46" y="190" width="16" height="12" rx="2" fill="#F2C230"/>
+          <rect x="300" y="96" width="187" height="26" fill="#FFFFFF"/>
+          <rect x="487" y="96" width="102" height="26" fill="#F1F3F4"/>
+          <rect x="589" y="96" width="34" height="26" fill="#CED4D9"/>
+          <rect x="623" y="96" width="17" height="26" fill="#F2C230"/>
+          <rect x="300" y="156" width="119" height="26" fill="#FFFFFF"/>
+          <rect x="419" y="156" width="136" height="26" fill="#F1F3F4"/>
+          <rect x="555" y="156" width="51" height="26" fill="#CED4D9"/>
+          <rect x="606" y="156" width="34" height="26" fill="#F2C230"/>
+          <rect x="300" y="216" width="68" height="26" fill="#FFFFFF"/>
+          <rect x="368" y="216" width="136" height="26" fill="#F1F3F4"/>
+          <rect x="504" y="216" width="51" height="26" fill="#CED4D9"/>
+          <rect x="555" y="216" width="85" height="26" fill="#F2C230"/>
+        </g>
+
+        <text class="lhp9dL" x="46" y="76">One car, one rate card</text>
+        <text class="lhp9dS" x="46" y="90">crashes per 100M miles, canon</text>
+        <text class="lhp9dS" x="70" y="110">highway 69.09</text>
+        <text class="lhp9dS" x="70" y="140">urban day 155.56</text>
+        <text class="lhp9dS" x="70" y="170">night 186.67</text>
+        <text class="lhp9dS" x="70" y="200">rain 333.33 (25 crashes)</text>
+        <text class="lhp9dS" x="46" y="232">humans in rain: 295.40</text>
+
+        <text class="lhp9dA" x="660" y="70">Lanehart</text>
+        <text class="lhp9dA" x="760" y="70">humans, same mix</text>
+
+        <text class="lhp9dS" x="300" y="90">Lanehart's own miles, 55 / 30 / 10 / 5</text>
+        <text class="lhp9dV" x="660" y="116">120.00</text>
+        <text class="lhp9dV" x="760" y="116">155.09</text>
+        <text class="lhp9dS" x="300" y="150">The human mix (constructed split), 35 / 40 / 15 / 10</text>
+        <text class="lhp9dV" x="660" y="176">147.74</text>
+        <text class="lhp9dV" x="760" y="176">185.55</text>
+        <text class="lhp9dS" x="300" y="210">City B, rainier (constructed), 20 / 40 / 15 / 25</text>
+        <text class="lhp9dV" x="660" y="236">187.37</text>
+        <text class="lhp9dV" x="760" y="236">216.01</text>
+
+        <text class="lhp9dN" x="30" y="280">Same car, same per-context rates. City B moves a quarter of the miles into rain, the one context where</text>
+        <text class="lhp9dN" x="30" y="296">Lanehart is worse than humans (333.33 vs 295.40), on just 25 crashes. Your mix will differ.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - nothing about the car changed; the yellow slice of road grew, and it is the slice with the least evidence.</figcaption>
+    </figure>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Drift: the same car in a new city<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>On the canon run Lanehart's crash rates by context are 69.09 on highway, 155.56 on urban day roads, 186.67 at night and 333.33 in rain, per 100 million miles. Its own mix of miles weighs them to 120.00. Weighted to the human mix (a constructed split), the same car is 147.74. Nothing about the software differs between those two numbers; only the road does. That is drift in its simplest form.</p>
+        <p>Now take city B, a constructed second city with a quarter of its miles in rain. The same rate card gives 187.37. Against the national 185.55 that looks worse; against humans weighted to city B's own mix, 216.01, it looks better. Neither answer is settled, because the human context rates are constructed multiples and rain, which now carries 44% of Lanehart's rate in city B, rests on 25 crashes in 7.5 million miles. Its exact 95% upper bound is 465.55 (derived from the canon counts in the build-along). The tail rates may move with the city too, and nothing in the log says by how much.</p>
+        <p>The canon already shows a thin mix flipping a verdict: at 60 million miles the matched rate is 168.23 with an upper bound of 205.62, not proven, because the rain and night miles are too thin. A new city is that problem arriving all at once.</p>
+      </div>
+    </details>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 350" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn timeline from 60 seconds before a crash to 5 seconds after, with the 30 seconds before the crash highlighted in yellow on the axis. Four illustrative cases. A, the automated driving system is in use at impact: reportable. B, it hands over to a human 12 seconds before the crash: reportable, because it was in use within 30 seconds. C, it was switched off 45 seconds before: outside the window, not an ADS report. D, a near miss with no crash: no report at all. Each case also needs the crash to meet damage or injury criteria.">
+        <defs>
+          <filter id="lhp9eSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="43" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp9eHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp9eAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp9eH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp9eL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp9eS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp9eB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lhp9eA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp9eN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp9eH" x="30" y="30">THE STANDING GENERAL ORDER'S 30-SECOND WINDOW, FOR ADS (LEVELS 3-5)</text>
+        <text class="lhp9eS" x="30" y="50">hatched = ADS in use · thin line = a human driving · cross = the crash</text>
+
+        <g filter="url(#lhp9eSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="470" y="70" width="240" height="180" rx="6" transform="rotate(-0.3 590 160)" fill="none" stroke="#6B5200" stroke-dasharray="6 5"/>
+          <rect x="230" y="88" width="480" height="14" rx="3" fill="url(#lhp9eHc)"/>
+          <rect x="230" y="133" width="384" height="14" rx="3" fill="url(#lhp9eHc)"/>
+          <path d="M614 140 L710 140" stroke="#525C64"/>
+          <rect x="230" y="178" width="120" height="14" rx="3" fill="url(#lhp9eHc)"/>
+          <path d="M350 185 L710 185" stroke="#525C64"/>
+          <rect x="230" y="223" width="520" height="14" rx="3" fill="url(#lhp9eHc)"/>
+          <path d="M703 88 L717 102 M717 88 L703 102 M703 133 L717 147 M717 133 L703 147 M703 178 L717 192 M717 178 L703 192" stroke-width="2.6"/>
+          <path d="M230 262 L750 262"/>
+          <rect x="470" y="257" width="240" height="10" rx="3" fill="#F2C230"/>
+          <path d="M230 257 L230 267 M710 254 L710 270"/>
+          <path d="M760 262 L770 240 L780 262 Z M756 262 L784 262" fill="#FFFFFF"/>
+        </g>
+
+        <text class="lhp9eL" x="20" y="100">A · ADS in use at impact</text>
+        <text class="lhp9eL" x="20" y="145">B · handover 12 s before</text>
+        <text class="lhp9eL" x="20" y="190">C · ADS off 45 s before</text>
+        <text class="lhp9eL" x="20" y="235">D · near miss, no crash</text>
+
+        <text class="lhp9eL" x="796" y="100">reportable</text>
+        <text class="lhp9eL" x="796" y="145">reportable</text>
+        <text class="lhp9eS" x="796" y="190">outside</text>
+        <text class="lhp9eS" x="796" y="235">no report</text>
+
+        <text class="lhp9eA" x="230" y="284" text-anchor="middle">-60 s</text>
+        <text class="lhp9eA" x="470" y="284" text-anchor="middle">-30 s</text>
+        <text class="lhp9eA" x="710" y="284" text-anchor="middle">crash</text>
+        <text class="lhp9eB" x="590" y="284" text-anchor="middle">the 30-second window</text>
+
+        <text class="lhp9eN" x="30" y="318">Each case also needs the crash to meet the damage or injury criteria. Times are illustrative.</text>
+        <text class="lhp9eN" x="30" y="336">What the window never captures: miles driven, near misses (D), and handovers longer ago than 30 s (C).</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow band is the whole rule: in use at any time in those 30 seconds, and the crash counts as an ADS crash.</figcaption>
+    </figure>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>What the 30-second window captures, and what it never will<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>The Standing General Order, read at source, makes an ADS crash (SAE Levels 3 to 5) reportable if the system was in use at any time within 30 seconds of the crash and the crash met the damage or injury criteria. The window is there for case B: a system that hands control to a person a few seconds before impact cannot move the crash off its record by handing over. Level 2 driver assistance has narrower criteria: a vulnerable road user struck, a fatality, an air bag deployment or hospital transport. In NHTSA's words, crash reporting criteria are stricter for ADS.</p>
+        <p>Three things never pass through it. Miles: reporting entities are not required to report vehicles operated or distances traveled. Near misses: case D is exactly the conflict a fleet trigger should upload, and it leaves no report. And anything outside the window, like case C. So the public record of the loop is a numerator with no denominator, while the fleet's own triggers hold far more, and the fleet chooses them.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>NHTSA's SGO page states that data on the number of crashes reported have not been normalized or adjusted by any measure of exposure, including operational design domains or vehicle miles traveled. It also lists limits: reports may be incomplete or unverified, the same crash may have several reports, ADS and Level 2 were sometimes misclassified in earlier versions, and telemetry differs by entity. The Order was first issued in 2021 and amended in 2021, 2023 and 2025.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>The comparability disagreement, taught both ways<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>One side: a fleet with full telemetry records crashes no police officer would ever see, so its crash count is inflated against police-reported human crashes (NHTSA's 2022 figure is about 5.93 million police-reported crashes, 185.55 per 100 million miles derived), and the fleet looks worse than it is. RAND itself keeps separate "reported" and "estimated total" human rates for this reason.</p>
+        <p>The other side: the fleet chooses its triggers, its takeover policy and, under the 30-second rule, part of what counts as its crash, so a count can also be shaped downward. Both effects are real and neither has a settled size. Leader session 4 and session 10 show the question to ask instead of picking a side: on which miles, matched to which exposure, with which tail included?</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 3 ============ -->
+  <section class="section" id="part-3">
+    <div class="section-kicker">
+      <span class="klabel">Part 3 · build-along</span>
+      <h2>Re-weight the fleet for a new city, and filter by the window</h2>
+      <span class="tag build">17 min hands on</span>
+    </div>
+    <p class="lede">Rebuild the drift figure in pandas from the four canon contexts, put an exact bound on each context, then write the 30-second rule as a filter. Run it in a notebook or a scratch folder with pandas and scipy. The figure is the plan: two small tables, one weighted sum done on both sides, and one bound that tells you how much to trust the slice that drift made heavy.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 264" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn plan of the build. A contexts table of four canon rows, crashes and miles, and a mixes table of three mixes, own, human and city B, flow into rate times mix, summed, per 100 million miles. A light chip says humans are weighted the same way; a yellow chip says take the exact upper bound per context. The result for city B: 187.37 against 216.01, with rain at 333.33 and an upper bound of 465.55 on 25 crashes in 7.5 million miles.">
+        <defs>
+          <filter id="lhp9fSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="47" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp9fHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp9fAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp9fL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp9fS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp9fK { font: 700 11px Inter, sans-serif; fill: #1A1F23; }
+          .lhp9fV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lhp9fN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <g filter="url(#lhp9fSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="30" width="200" height="86" rx="8" transform="rotate(-0.8 130 73)" fill="url(#lhp9fHc)"/>
+          <rect x="30" y="136" width="200" height="86" rx="8" transform="rotate(0.7 130 179)" fill="#F1F3F4"/>
+          <path d="M234 73 L318 112 M234 179 L318 140" marker-end="url(#lhp9fAr)"/>
+          <rect x="322" y="86" width="230" height="80" rx="10" transform="rotate(-0.4 437 126)" fill="#FFFFFF"/>
+          <rect x="330" y="186" width="214" height="28" rx="14" transform="rotate(0.6 437 200)" fill="#F2C230"/>
+          <rect x="330" y="30" width="214" height="28" rx="14" transform="rotate(-0.6 437 44)" fill="#FDF6DA"/>
+          <path d="M556 126 L640 126" marker-end="url(#lhp9fAr)"/>
+          <rect x="644" y="60" width="210" height="132" rx="8" transform="rotate(0.6 749 126)" fill="#FFFFFF"/>
+        </g>
+
+        <text class="lhp9fL" x="46" y="58">contexts</text>
+        <text class="lhp9fS" x="46" y="78">crashes k, miles (canon)</text>
+        <text class="lhp9fS" x="46" y="96">k = 57 / 70 / 28 / 25</text>
+        <text class="lhp9fL" x="46" y="164">mixes</text>
+        <text class="lhp9fS" x="46" y="184">share of miles per context</text>
+        <text class="lhp9fS" x="46" y="202">own, human, city B</text>
+
+        <text class="lhp9fK" x="437" y="48" text-anchor="middle">humans weighted the same way</text>
+        <text class="lhp9fL" x="437" y="116" text-anchor="middle">rate x mix, summed</text>
+        <text class="lhp9fS" x="437" y="134" text-anchor="middle">per 100M miles</text>
+        <text class="lhp9fS" x="437" y="150" text-anchor="middle">one row per mix</text>
+        <text class="lhp9fK" x="437" y="204" text-anchor="middle">exact upper bound per context</text>
+
+        <text class="lhp9fL" x="660" y="88">city B, both sides</text>
+        <text class="lhp9fV" x="660" y="118">187.37 vs 216.01</text>
+        <text class="lhp9fS" x="660" y="144">rain: 333.33, upper 465.55</text>
+        <text class="lhp9fS" x="660" y="160">on 25 crashes, 7.5M miles</text>
+        <text class="lhp9fS" x="660" y="176">44% of city B's rate</text>
+
+        <text class="lhp9fN" x="30" y="250">The yellow chip is the lesson: the context drift loads hardest is the one with the least evidence.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow chip turns a re-weighted point into a statement you can defend.</figcaption>
+    </figure>
+
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Make the contexts table from the canon run</h4>
+        <p>Four road contexts, Lanehart's crash counts and miles from the canon run (150 million constructed miles), and the human context rates to two decimals. The rates should come out at 69.09, 155.56, 186.67 and 333.33.</p>
+        <div class="prompt-box good"><span class="label">python</span>import pandas as pd
+ctx = pd.DataFrame({
+    "context": ["highway", "urban", "night", "rain"],
+    "k": [57, 70, 28, 25],
+    "miles": [82.5e6, 45e6, 15e6, 7.5e6],
+    "human": [92.31, 212.32, 258.48, 295.40],
+}).set_index("context")
+ctx["rate"] = ctx.k / ctx.miles * 1e8
+ctx.round(2)</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Weight both sides by three mixes</h4>
+        <p>Lanehart's own mix, the constructed human mix, and city B. You should see 120.00, 147.74 and 187.37 on Lanehart's side, and 185.55 and 216.01 on the human side for the last two. The own-mix human figure prints 155.08 here, against 155.09 in the figure, because the inputs are rounded to two decimals; that gap is a useful reminder of how much rounding the engine avoids.</p>
+        <div class="prompt-box good"><span class="label">python</span>mixes = pd.DataFrame({
+    "own":       [0.55, 0.30, 0.10, 0.05],
+    "human_mix": [0.35, 0.40, 0.15, 0.10],
+    "city_b":    [0.20, 0.40, 0.15, 0.25],
+}, index=ctx.index)
+side = pd.DataFrame({"lanehart": mixes.T @ ctx.rate,
+                     "humans":   mixes.T @ ctx.human}).round(2)
+side</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Put an exact bound on every context</h4>
+        <p>The exact Poisson upper bound from session 7, per context. Rain comes out at 465.55 against a point of 333.33; highway, with 57 crashes on 82.5 million miles, only reaches 86.14. Then ask how much of city B's rate each context carries: rain is 44%.</p>
+        <div class="prompt-box good"><span class="label">python</span>from scipy.stats import chi2
+ctx["upper"] = chi2.ppf(0.95, 2 * ctx.k + 2) / 2 / ctx.miles * 1e8
+share = mixes.city_b * ctx.rate / (mixes.city_b @ ctx.rate)
+pd.DataFrame({"upper": ctx.upper, "share_city_b": share}).round(2)</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Try your own city</h4>
+        <p>Change the city B column to a mix you know: more night, less highway, whatever your city drives. Your numbers will differ. Before you read the result, write down which context you expect to dominate, then check the share column. The surprise is almost always the thinnest context.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Write the 30-second rule as a filter</h4>
+        <p>Four illustrative cases, the same as the timeline figure. A case counts as an ADS crash report if there was a crash and the system was last in use 30 seconds or less before it. You should get A and B only. Add a column for the damage or injury criteria and the filter needs it too; the near miss never enters at all.</p>
+        <div class="prompt-box good"><span class="label">python</span>events = pd.DataFrame({
+    "case": ["A", "B", "C", "D"],
+    "crash": [True, True, True, False],
+    "ads_last_in_use_s": [0, 12, 45, 0],
+})
+events["sgo_ads_report"] = events.crash &amp; (events.ads_last_in_use_s &lt;= 30)
+events</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Write down what each filter cannot see</h4>
+        <p>One line each: the trigger (what it misses), the 30-second rule (miles, near misses, older handovers), and the city mix (which context is thin). That list belongs in the release review, next to the rate.</p>
+      </div></div>
+    </div>
+
+    <div class="callout tip">
+      <p><strong>The habit to keep.</strong> Every time the fleet changes, the policy, the triggers or the city, ask what the data pipeline can no longer see. Keep a random sample and the tail slices outside the loop so no release can switch them off. Re-weight to the new road mix before you compare, and put an exact bound on whichever context the new mix made heavy.</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="section" id="quiz">
+    <div class="section-kicker">
+      <span class="klabel">Check yourself</span>
+      <h2>Three questions</h2>
+    </div>
+
+    <div class="quiz-q" data-answer="1">
+      <p class="qtext">A candidate policy runs in shadow mode for a month and disagrees with the deployed policy on a small share of frames. What does that tell you?</p>
+      <button class="qopt" type="button">A · The candidate is safer, because it was tested on real roads</button>
+      <button class="qopt" type="button">B · Where the two differ, and that the candidate drives like the old policy elsewhere; not what would have happened after each disagreement</button>
+      <button class="qopt" type="button">C · The candidate's crash rate, since both policies saw the same frames</button>
+      <p class="qwhy">Shadow mode is paired on the same frames, which makes disagreements easy to find. After a disagreement, the road reacted to the policy in control, so the candidate's outcome is a counterfactual for simulation and rare-event statistics, not a measurement.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="0">
+      <p class="qtext">On the canon run, the loose policy has 40 takeovers against standard's 290, and every takeover uploads a clip. What happened to the loop?</p>
+      <button class="qopt" type="button">A · It uploads fewer clips, and the 21 extra crashes come from conflicts it never took over, so none of them reached the mining queue</button>
+      <button class="qopt" type="button">B · Nothing important: fewer takeovers means a better car and less data to store</button>
+      <button class="qopt" type="button">C · It uploads more useful clips, because each takeover is more severe</button>
+      <p class="qwhy">A takeover trigger reports on the policy. Loose stops taking over in the window from 0.97 to 0.985, which is exactly where untaken conflicts crash, so the loop goes blind where the car got worse (206.24 against 192.24).</p>
+    </div>
+
+    <div class="quiz-q" data-answer="2">
+      <p class="qtext">The count of ADS crash reports under the Standing General Order rises year on year. What can you conclude?</p>
+      <button class="qopt" type="button">A · Automated driving is getting less safe</button>
+      <button class="qopt" type="button">B · Nothing, because handovers before a crash are never counted</button>
+      <button class="qopt" type="button">C · Only that more reports were filed: the counts are not normalized by miles or by operational design domain, and a handover within 30 seconds still counts</button>
+      <p class="qwhy">NHTSA says the counts have not been normalized or adjusted by any measure of exposure. A rise could be more miles, more fleets, or more complete telemetry. The 30-second window exists so that a late handover does not remove a crash from the record.</p>
+    </div>
+
+    <div class="quiz-score"></div>
+  </section>
+
+  <!-- ============ HOMEWORK ============ -->
+  <section class="section" id="homework">
+    <div class="section-kicker">
+      <span class="klabel">Before session 10</span>
+      <h2>Homework</h2>
+    </div>
+    <p class="lede">Thirty minutes, in your own notebook.</p>
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Design one trigger and its blind spot</h4>
+        <p>Pick one of the four constructed rare classes from session 3, say the pedestrian stepping out from behind a parked van. Write a trigger for it in one line, then write the moments it would miss in a second line, and say how a random sample of ordinary driving would let you count those misses.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Move Lanehart to a city you know</h4>
+        <p>Guess the mix of highway, urban day, night and rain miles for your own city and run step 4 of the build-along. Report both sides and the rain share. Your numbers will differ; the point is which context carries the weight and how wide its bound is.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Read the SGO page's limitations</h4>
+        <p>Open NHTSA's Standing General Order page and find the list of data limitations. For each, write one sentence on how it would change a count you might be shown in a meeting.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ OFFICIAL ============ -->
+  <section class="section" id="official">
+    <div class="section-kicker">
+      <span class="klabel">Covered tonight</span>
+      <h2>What this session covers</h2>
+    </div>
+    <div class="covered">
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Shadow mode</span><span class="note">Paired on the same frames; evidence until the first disagreement, counterfactual after. Concept only, no numbers.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Triggers as a logging policy</span><span class="note">Canon anti-lever: takeovers 1,480 / 290 / 40; loose adds 21 crashes in the window it never uploads. Constructed.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The data flywheel</span><span class="note">Seven stages from p1 to release; the break at evaluation, 147.74 falsely proven against 192.24 worse. Canon run.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Drift across cities</span><span class="note">Same rate card, three mixes: 120.00, 147.74, 187.37; rain upper bound 465.55 on 25 crashes. City B constructed.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The SGO 30-second window</span><span class="note">NHTSA. Standing General Order on Crash Reporting (web page, third amended order 2025). Read at source.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Disengagement reporting</span><span class="note">California Code of Regulations, Title 13, section 227.50, Reporting Disengagement of Autonomous Mode. Read at source (2024 text). Taught in full in leader session 4.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Telemetry versus police-reported crashes</span><span class="note">Contested; both sides taught, no resolution. NHTSA NCSA (2024), DOT HS 813 643; Kalra and Paddock (2016), RAND RR-1478.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Randomised comparisons and power</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-experimentation-with-phoebe/courses/b2-power-and-sample-size.html">learn experimentation</a>; shadow-mode comparisons link there.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Real fleet triggers, upload volumes and cities</span><span class="note">Out of scope by design. Every fleet number here is constructed; only NHTSA's rates and rules are real.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section class="section" id="cheatsheet">
+    <div class="section-kicker">
+      <span class="klabel">Take this with you</span>
+      <h2>Cheat sheet</h2>
+    </div>
+    <div class="cheat">
+      <div class="cheat-item"><strong>The one sentence.</strong> The policy on the road decides what the fleet sends home, so the loop's output steers its own input.</div>
+      <div class="cheat-item"><strong>Shadow mode.</strong> Same frames, two answers. Evidence until the first disagreement, counterfactual after.</div>
+      <div class="cheat-item"><strong>Not an A/B test.</strong> Shadow measures agreement, never outcomes. Randomised designs live in learn experimentation.</div>
+      <div class="cheat-item"><strong>Triggers report on the policy.</strong> Canon: 1,480 / 290 / 40 takeover clips; loose adds 21 crashes where it never uploads.</div>
+      <div class="cheat-item"><strong>Keep something outside the loop.</strong> A random baseline sample and the tail slices, so no release can switch them off.</div>
+      <div class="cheat-item"><strong>The break.</strong> Drop the tail at evaluation: 147.74 looks proven. Keep it: 192.24, worse than 185.55.</div>
+      <div class="cheat-item"><strong>Drift is re-weighting.</strong> Same rate card, new mix: 120.00, 147.74, 187.37. Bound the context the mix made heavy.</div>
+      <div class="cheat-item"><strong>The 30-second window.</strong> ADS in use within 30 s of a crash: reportable. No miles, no near misses, not normalized.</div>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    <div class="wrap">
+      <p>Practitioner session 9 of 10 · learn-autonomous-driving-with-phoebe · by Phoebe Fu</p>
+      <nav class="pagenav">
+        <a href="p8-importance-sampling-for-rare-scenarios.html">← Practitioner session 8 · Importance sampling for rare scenarios</a>
+        <a href="p10-the-prove-it-safe-bench.html">Practitioner session 10 · The prove-it-safe bench →</a>
+      </nav>
+    </div>
+  </footer>
+
+</main>
+
+<script src="../assets/app.js?v=1"></script>
+</body>
+</html>

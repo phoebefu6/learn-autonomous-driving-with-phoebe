@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- social:start -->
+<meta name="description" content="Practitioner session 4 of 10. A curated set has two jobs: training, where rebalancing the rare classes is a free choice, and evaluation, where every tail slice must stay in and be weighted by how often the road serves it. Drop the four tail slices and Lanehart's 192.24 crashes per 100M, worse than the human baseline, reads as a proven 147.74. Lanehart is a constructed fleet.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Learn with Phoebe">
+<meta property="og:title" content="Curating for the tail - learn autonomous driving with phoebe">
+<meta property="og:description" content="Practitioner session 4 of 10. Training balance vs evaluation slices, and why the tail slices must stay in evaluation.">
+<meta property="og:url" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/courses/p4-curating-for-the-tail.html">
+<meta property="og:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Curating for the tail - learn autonomous driving with phoebe">
+<meta name="twitter:description" content="All slices kept: 192.24, worse. Tail slices dropped: 147.74, falsely proven. The evaluation set decides the verdict.">
+<meta name="twitter:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<!-- social:end -->
+<title>Practitioner session 4 · Curating for the tail - learn autonomous driving with phoebe</title>
+<link rel="stylesheet" href="../assets/style.css?v=2">
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="wrap">
+    <span class="crumb"><a href="../index.html">learn-autonomous-driving-with-phoebe</a> / Practitioner session 4 of 10</span>
+    <button class="btn" id="toggle-all" type="button">Expand all</button>
+    <button class="btn primary" id="zoom-toggle" type="button">Projector zoom: off</button>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Learn Autonomous Driving with Phoebe · Practitioner session 4 of 10</div>
+    <h1>Curating for the <span class="accent">tail</span></h1>
+    <p class="sub">Session 3 mined the fleet for rare events. Now the mined frames have to be put somewhere, and they go into two sets with opposite rules. The training set may be rebalanced however helps the model learn. The evaluation set has to keep every tail slice and weight each one by how often the road actually serves it, or the safety claim turns green for the wrong reason. Lanehart, a constructed robotaxi pilot fleet in a fictional city, supplies the slices; its numbers come from the course engine's seeded canon run, and the build-along table is constructed.</p>
+    <div class="chip-row">
+      <span class="chip level">🟡 Working depth</span>
+      <span class="chip audience">Data engineers and ML engineers who build datasets</span>
+      <span class="chip audience">Anyone who signs off an evaluation set</span>
+      <span class="chip time">45 min</span>
+    </div>
+    <div class="agenda">
+      <span class="a1" style="flex:1">0-3 · Welcome</span>
+      <span class="a2" style="flex:3">3-18 · Two sets, two rules</span>
+      <span class="a3" style="flex:3">18-28 · The break button</span>
+      <span class="a4" style="flex:4">28-45 · Build-along and Q&amp;A</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ INTRO ============ -->
+  <section class="section" id="intro">
+    <div class="section-kicker">
+      <span class="klabel">Part 0</span>
+      <h2>Lanehart's evaluation set got tidier, and the fleet got "safer"</h2>
+    </div>
+    <p class="lede">Lanehart is a constructed robotaxi pilot. A well-meaning clean-up removed four small scenario slices from its evaluation set: a pedestrian stepping out from behind a parked van, a wrong-way vehicle on a divided road, debris in the lane at highway speed, an emergency vehicle crossing a junction. They were small, noisy and hard to label. Nothing about the fleet changed. Its crash-rate claim moved from worse than the human baseline to proven better. This session is about why that happens and the one habit that stops it.</p>
+
+    <div class="legend">
+      <span class="pill">Live = worked through in the 45 minutes</span>
+      <span class="pill">Self-study = the full depth, after class</span>
+      <span class="pill">🔍 Every diagram zooms</span>
+    </div>
+
+    <div class="callout win">
+      <p><strong>★ What you walk out with tonight.</strong> The split between a training mix, which you may rebalance freely, and evaluation slices, which must be weighted by exposure. The tail as encounters times failure probability: Lanehart's four constructed classes give 12 + 6 + 10 + 18 = 46 crashes per 100M miles. The break button read off the bench: with every slice kept, 192.24 per 100M (upper bound 215.71), worse than the 185.55 human baseline; with the tail slices dropped, 147.74 (upper bound 169.04), falsely proven. And a slice table in pandas that shows three weightings giving 84, 0 and 46, only one of which is a rate.</p>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Where the curated frames come from<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>Logged miles under-serve the tail.</strong> A random sample of driving is mostly ordinary driving. In the bench's canon run, 2,000 randomly drawn encounters with the occluded pedestrian produced 1 failure, while the same budget with the hard cases deliberately over-drawn produced 743 failures to learn from. Rare events have to be sought out.</p>
+        <p><strong>So they are mined and curated.</strong> Session 3's scenario queries pull candidate frames for each rare class, and somebody decides how many go where. That decision is the subject tonight, because the same frames feed two sets that need opposite treatment.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>RAND's "Driving to Safety" (Kalra and Paddock, 2016) concludes that developers cannot simply drive their way to safety: test driving alone cannot provide enough evidence about fatalities and injuries, so other methods such as simulation and scenario testing are needed. Scenario testing is only as honest as the scenario set, which is a curated dataset like any other.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>The words that keep coming back<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Slice.</strong> The frames or encounters of one scenario class, evaluated as a group.</li>
+          <li><strong>Encounter rate.</strong> How often the road serves that scenario, per 100M miles. The exposure.</li>
+          <li><strong>Failure probability.</strong> The chance the car fails on one encounter, measured inside the slice.</li>
+          <li><strong>Training mix.</strong> The proportions the model learns from. A design choice.</li>
+          <li><strong>Exposure weighting.</strong> Turning slice results into a rate by multiplying each by its encounter rate.</li>
+          <li><strong>Break button.</strong> The bench control that drops the four tail slices from evaluation, so their rate becomes 0.</li>
+          <li><strong>Constructed.</strong> Lanehart's classes, rates and probabilities are generated by the seeded engine, not recorded.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="section" id="part-1">
+    <div class="section-kicker">
+      <span class="klabel">Part 1 · covers training balance vs evaluation slices</span>
+      <h2>One curated pile, two sets, two rules</h2>
+      <span class="tag concept">15 min live</span>
+    </div>
+    <p class="lede">The bench curates 2,000 encounters for each of Lanehart's four rare classes. Equal slices are good for measuring each failure probability. They say nothing about how often the road serves each class: the occluded pedestrian turns up 4,000 times per 100M miles and the wrong-way vehicle 300 times. The slice's share of the set and its share of the claim are different numbers.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 376" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn table of Lanehart's four constructed rare classes. Encounters per 100 million miles: occluded pedestrian 4,000, wrong-way vehicle 300, debris in lane 2,500, emergency vehicle 1,200, 8,000 in all. The curated slices hold 2,000 tries each, 8,000 in all. Each slice's share of the claim is encounters times failure probability: 4,000 x 0.003 = 12, 300 x 0.02 = 6, 2,500 x 0.004 = 10, 1,200 x 0.015 = 18. The tail totals 46 crashes per 100 million miles, highlighted in yellow.">
+        <defs>
+          <filter id="lhp4aSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="41" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp4aHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp4aAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp4aH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp4aL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp4aS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp4aA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp4aV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lhp4aN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp4aH" x="30" y="30">CURATED SLICES ARE EQUAL; THE ROAD IS NOT (LANEHART, CONSTRUCTED)</text>
+
+        <g filter="url(#lhp4aSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M30 100 L850 100" stroke="#C8CED3" stroke-dasharray="14 10"/>
+          <rect x="220" y="111" width="170" height="18" rx="3" transform="rotate(-0.6 305 120)" fill="#CED4D9"/>
+          <rect x="220" y="156" width="13" height="18" rx="3" transform="rotate(1 226 165)" fill="#CED4D9"/>
+          <rect x="220" y="201" width="106" height="18" rx="3" transform="rotate(0.6 273 210)" fill="#CED4D9"/>
+          <rect x="220" y="246" width="51" height="18" rx="3" transform="rotate(-0.8 245 255)" fill="#CED4D9"/>
+          <rect x="470" y="111" width="90" height="18" rx="3" transform="rotate(0.5 515 120)" fill="url(#lhp4aHc)"/>
+          <rect x="470" y="156" width="90" height="18" rx="3" transform="rotate(-0.5 515 165)" fill="url(#lhp4aHc)"/>
+          <rect x="470" y="201" width="90" height="18" rx="3" transform="rotate(0.4 515 210)" fill="url(#lhp4aHc)"/>
+          <rect x="470" y="246" width="90" height="18" rx="3" transform="rotate(-0.4 515 255)" fill="url(#lhp4aHc)"/>
+          <path d="M30 280 L850 280" stroke="#E2E6E9" stroke-width="1.5"/>
+          <rect x="632" y="290" width="206" height="32" rx="8" transform="rotate(-1 735 306)" fill="#F2C230"/>
+        </g>
+
+        <text class="lhp4aA" x="220" y="66">Encounters per 100M miles</text>
+        <text class="lhp4aS" x="220" y="84">the road's mix</text>
+        <text class="lhp4aA" x="470" y="66">Curated slice</text>
+        <text class="lhp4aS" x="470" y="84">tries per class</text>
+        <text class="lhp4aA" x="640" y="66">Share of the claim</text>
+        <text class="lhp4aS" x="640" y="84">encounters x failure probability</text>
+
+        <text class="lhp4aL" x="200" y="124" text-anchor="end">Occluded pedestrian</text>
+        <text class="lhp4aL" x="200" y="169" text-anchor="end">Wrong-way vehicle</text>
+        <text class="lhp4aL" x="200" y="214" text-anchor="end">Debris in lane</text>
+        <text class="lhp4aL" x="200" y="259" text-anchor="end">Emergency vehicle</text>
+
+        <text class="lhp4aS" x="398" y="124">4,000</text>
+        <text class="lhp4aS" x="242" y="169">300</text>
+        <text class="lhp4aS" x="334" y="214">2,500</text>
+        <text class="lhp4aS" x="279" y="259">1,200</text>
+        <text class="lhp4aS" x="568" y="124">2,000</text>
+        <text class="lhp4aS" x="568" y="169">2,000</text>
+        <text class="lhp4aS" x="568" y="214">2,000</text>
+        <text class="lhp4aS" x="568" y="259">2,000</text>
+        <text class="lhp4aL" x="640" y="124">4,000 x 0.003 = 12</text>
+        <text class="lhp4aL" x="640" y="169">300 x 0.02 = 6</text>
+        <text class="lhp4aL" x="640" y="214">2,500 x 0.004 = 10</text>
+        <text class="lhp4aL" x="640" y="259">1,200 x 0.015 = 18</text>
+
+        <text class="lhp4aS" x="220" y="310">8,000 in all</text>
+        <text class="lhp4aS" x="470" y="310">8,000 tried</text>
+        <text class="lhp4aV" x="735" y="312" text-anchor="middle">tail = 46 per 100M</text>
+
+        <text class="lhp4aN" x="30" y="348">Equal slices are fine for training and for measuring each failure probability.</text>
+        <text class="lhp4aN" x="30" y="364">The claim weights each slice by the left column, never by the middle one.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the middle column is a choice the team made; the left column is a fact about the road, and only it may weight the claim.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Training: rebalance freely<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>A model that sees the occluded pedestrian a handful of times in a million ordinary frames will barely learn it. So the training mix is curated: rare classes are over-drawn, repeated or up-weighted, and common, easy frames are thinned. None of that is cheating. The training set's job is to teach, and its proportions are a design lever you are free to pull.</p>
+        <p>What you owe is a record. Write down the mix you chose and why, because the next person to read a training-set summary will otherwise assume the proportions describe the road.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Evaluation: keep every slice, weight by exposure<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>The evaluation set has a different job: to estimate a rate on the road. That splits into two steps. Inside each slice, measure the failure probability; equal or deliberately skewed slices are fine here, provided the skew is undone. Then multiply each slice's result by how often the road serves it, and add. For Lanehart that gives 12 + 6 + 10 + 18 = 46 crashes per 100M miles of tail on top of the ordinary driving.</p>
+        <p>Two failure modes, both quiet. Weight the slices by their share of the curated set and the rare, dangerous wrong-way slice is counted as if it were as common as the occluded pedestrian (the build-along shows this gives 84, not 46). Drop a slice and its contribution becomes exactly 0, which is Part 2.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>Zhao et al. (2017, IEEE T-ITS) evaluated lane-change scenarios built from real cut-in data, skewed the statistics toward riskier behaviour so failures show up, then reweighted the estimates back to real-world rates. The authors report acceleration of 2,000 to 20,000 times. Skew to find the failures, reweight to state the rate: the same two steps, written down in a paper.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Where label quality fits<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Tail slices are small and their labels are often disputed, which is exactly why they get cleaned away. Label noise and how to clean it is owned by <a href="https://phoebefu6.github.io/learn-data-centric-ai-with-phoebe/courses/02-when-labellers-disagree.html">learn data-centric AI</a>. The rule here is narrower: a noisy tail slice is relabelled or flagged, never removed from evaluation, because removing it sets its rate to 0.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="section" id="part-2">
+    <div class="section-kicker">
+      <span class="klabel">Part 2 · covers dropping tail slices from evaluation</span>
+      <h2>The break button: the claim turns green and nothing got safer</h2>
+      <span class="tag concept">10 min live</span>
+    </div>
+    <p class="lede">The bench in session 10 has a break button that drops the four tail slices from evaluation. Run on the canon settings (150M constructed miles, 95% bounds), the exposure-matched crash rate is 147.74 per 100M and the importance-sampled tail adds 44.50, for 192.24 with an upper bound of 215.71: worse than the human baseline of 185.55. Press the button and the claim is 147.74 with an upper bound of 169.04, below the baseline: "proven". Same fleet, same miles.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 372" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn bar chart on a scale of 0 to 240 crashes per 100 million miles with a dashed human baseline at 185.55. Top bar, all slices kept: 147.74 exposure-matched plus a yellow 44.50 tail segment, total 192.24, whisker to an upper bound of 215.71, to the right of the baseline: worse. Bottom bar in a red wrong-way panel, tail slices dropped: 147.74, whisker to 169.04, left of the baseline: falsely proven.">
+        <defs>
+          <filter id="lhp4bSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="43" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp4bHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp4bAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp4bH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp4bL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp4bS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp4bB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lhp4bR { font: 800 12px Inter, sans-serif; fill: #991B1B; }
+          .lhp4bA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp4bN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp4bH" x="30" y="30">SAME FLEET, SAME MILES, TAIL SLICES DROPPED (LANEHART CANON RUN, CONSTRUCTED)</text>
+        <text class="lhp4bA" x="664" y="56" text-anchor="middle">human 185.55</text>
+
+        <g filter="url(#lhp4bSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="24" y="186" width="832" height="96" rx="12" transform="rotate(0.3 440 234)" fill="#FEF2F2" stroke="#FCA5A5"/>
+          <rect x="200" y="96" width="369" height="28" rx="4" transform="rotate(-0.4 385 110)" fill="url(#lhp4bHc)"/>
+          <rect x="569" y="96" width="111" height="28" rx="4" transform="rotate(0.5 625 110)" fill="#F2C230"/>
+          <path d="M681 110 L739 110 M739 101 L739 119"/>
+          <rect x="200" y="208" width="369" height="28" rx="4" transform="rotate(0.4 385 222)" fill="url(#lhp4bHc)"/>
+          <path d="M570 222 L623 222 M623 213 L623 231"/>
+          <path d="M664 64 L664 292" stroke="#2F3A42" stroke-dasharray="7 6"/>
+          <path d="M200 302 L800 302"/>
+          <path d="M200 297 L200 307 M350 297 L350 307 M500 297 L500 307 M650 297 L650 307 M800 297 L800 307"/>
+        </g>
+
+        <text class="lhp4bL" x="30" y="106">All slices kept</text>
+        <text class="lhp4bS" x="30" y="122">bench rung 4</text>
+        <text class="lhp4bS" x="200" y="150">147.74 matched + 44.50 tail = 192.24, upper bound 215.71</text>
+        <text class="lhp4bH" x="750" y="115">WORSE</text>
+        <text class="lhp4bS" x="750" y="150">than the baseline</text>
+        <text class="lhp4bB" x="590" y="88">tail 44.50</text>
+
+        <text class="lhp4bL" x="36" y="218">Tail slices</text>
+        <text class="lhp4bL" x="36" y="234">dropped</text>
+        <text class="lhp4bS" x="36" y="250">break button on</text>
+        <text class="lhp4bR" x="684" y="227">✗ falsely proven</text>
+        <text class="lhp4bS" x="200" y="264">147.74, upper bound 169.04: below 185.55, so it reads green</text>
+
+        <text class="lhp4bA" x="200" y="322" text-anchor="middle">0</text>
+        <text class="lhp4bA" x="350" y="322" text-anchor="middle">60</text>
+        <text class="lhp4bA" x="500" y="322" text-anchor="middle">120</text>
+        <text class="lhp4bA" x="650" y="322" text-anchor="middle">180</text>
+        <text class="lhp4bA" x="800" y="322" text-anchor="middle">240</text>
+        <text class="lhp4bA" x="500" y="340" text-anchor="middle">crashes per 100M miles, exposure-matched; whiskers end at the 95% upper bound</text>
+        <text class="lhp4bN" x="30" y="362">Only the evaluation set changed. The fleet, its miles and its true tail of 46 per 100M are untouched.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow segment is the whole difference between "worse" and "proven"; deleting it from the evaluation set deletes it from the claim, not from the road.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Why a missing slice reads as zero<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>An evaluation rate is a sum over slices. A slice that is not in the set contributes nothing to the sum, and nothing is the same number as "never fails". No error is raised, no row is null, the total simply gets smaller. The tail slices are the ones most likely to be cut (small, expensive to label, argued over), and they are also where the risk sits: on the canon run, 44.50 of the 192.24.</p>
+        <p>Notice what the bound does not do. The 95% upper bound on 147.74 is honest about sampling noise in the slices that remain. It cannot see a slice that is gone. Statistical rigour on a curated set inherits every curation decision.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>The same shape in public reporting<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>A slice without its encounter rate is a numerator without a denominator, and a missing slice is a numerator nobody wrote down. Both are reading problems, not arithmetic problems.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>NHTSA's Standing General Order page warns that the crash counts it publishes "have not ... been normalized or adjusted by any measure of exposure, including operational design domains or vehicle miles traveled." A count with no exposure cannot be turned into a rate; a slice with no encounter rate cannot be turned into its share of a claim.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Making the tail slice cheaper to estimate<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>On the canon run, a random 2,000 tries per class estimates the tail at 34.95 per 100M against a true 46; the occluded pedestrian slice saw 1 failure and read as 2.00 against a true 12. Importance sampling over-draws the hard cases and reweights them, and estimates 44.50. That is practitioner session 8. The curation rule is the same either way: the slice stays in, and its weight is known.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 3 ============ -->
+  <section class="section" id="part-3">
+    <div class="section-kicker">
+      <span class="klabel">Part 3 · build-along</span>
+      <h2>Build a slice table and weight it three ways</h2>
+      <span class="tag build">17 min hands on</span>
+    </div>
+    <p class="lede">Build Lanehart's four tail slices as a table in pandas, with the curated tries and the expected failures at the canon failure probabilities (constructed). Then weight it three ways and see which one is a rate. The expected counts make the arithmetic exact; the optional sampled version will give numbers that differ from run to run.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 290" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn plan. A slice table with four rows of class, encounters per 100 million miles, tries and failures (occluded 4,000, 2,000, 6; wrong-way 300, 2,000, 40; debris 2,500, 2,000, 8; emergency 1,200, 2,000, 30) feeds three ways to weight it. Weighting by curated share pools 84 failures over 8,000 tries and gives 84. Dropping the tail slices gives 0. Weighting each slice by its encounter rate, highlighted in yellow, gives 46 per 100 million miles.">
+        <defs>
+          <filter id="lhp4cSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="47" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp4cHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp4cAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp4cH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp4cL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp4cS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp4cV { font: 800 18px Inter, sans-serif; fill: #1C2328; }
+          .lhp4cN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp4cH" x="30" y="30">ONE SLICE TABLE, THREE WAYS TO WEIGHT IT (CONSTRUCTED)</text>
+
+        <g filter="url(#lhp4cSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="58" width="264" height="176" rx="8" transform="rotate(-0.6 162 146)" fill="#F1F3F4"/>
+          <rect x="30" y="58" width="264" height="10" rx="4" transform="rotate(-0.6 162 63)" fill="url(#lhp4cHc)"/>
+          <path d="M298 146 L552 82 M298 146 L552 152 M298 146 L552 222" marker-end="url(#lhp4cAr)"/>
+          <rect x="560" y="52" width="290" height="58" rx="10" transform="rotate(0.5 705 81)" fill="#FFFFFF"/>
+          <rect x="560" y="124" width="290" height="58" rx="10" transform="rotate(-0.5 705 153)" fill="#FFFFFF"/>
+          <rect x="560" y="196" width="290" height="58" rx="10" transform="rotate(0.5 705 225)" fill="#F2C230"/>
+        </g>
+
+        <text class="lhp4cL" x="46" y="90">slices</text>
+        <text class="lhp4cS" x="46" y="110">class, enc_per_100M, tried, failed</text>
+        <text class="lhp4cS" x="46" y="132">occluded pedestrian 4,000 2,000 6</text>
+        <text class="lhp4cS" x="46" y="150">wrong-way vehicle 300 2,000 40</text>
+        <text class="lhp4cS" x="46" y="168">debris in lane 2,500 2,000 8</text>
+        <text class="lhp4cS" x="46" y="186">emergency vehicle 1,200 2,000 30</text>
+        <text class="lhp4cS" x="46" y="214">failed = expected at canon p</text>
+
+        <text class="lhp4cL" x="576" y="76">weight by curated share</text>
+        <text class="lhp4cS" x="576" y="94">pooled 1.05% x 8,000 encounters</text>
+        <text class="lhp4cV" x="834" y="88" text-anchor="end">84</text>
+        <text class="lhp4cL" x="576" y="148">drop the tail slices</text>
+        <text class="lhp4cS" x="576" y="166">nothing measured, nothing counted</text>
+        <text class="lhp4cV" x="834" y="160" text-anchor="end">0</text>
+        <text class="lhp4cL" x="576" y="220">weight by encounter rate</text>
+        <text class="lhp4cS" x="576" y="238">sum of enc x failed / tried</text>
+        <text class="lhp4cV" x="834" y="232" text-anchor="end">46</text>
+
+        <text class="lhp4cN" x="30" y="276">Only the yellow box is a rate per 100M miles. 84 overweights the wrong-way slice; 0 is the break button.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - same four rows, three totals; the yellow one is the only one that answers "how often, on the road".</figcaption>
+    </figure>
+
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Build the slice table</h4>
+        <p>Four tail classes, the road's encounter rate for each, 2,000 curated tries per class, and the failures you would expect at Lanehart's constructed failure probabilities (0.003, 0.02, 0.004, 0.015).</p>
+        <div class="prompt-box good"><span class="label">python</span>import pandas as pd
+slices = pd.DataFrame({
+    "cls": ["occluded pedestrian", "wrong-way vehicle", "debris in lane", "emergency vehicle"],
+    "enc_per_100M": [4000, 300, 2500, 1200],
+    "tried": [2000, 2000, 2000, 2000],
+    "failed": [6, 40, 8, 30],
+})
+slices["p_fail"] = slices.failed / slices.tried
+slices</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Weight it the tempting way: by the curated share</h4>
+        <p>Pool the failures over the tries (84 of 8,000, 1.05%) and apply that to all 8,000 encounters per 100M. You get 84. It treats every slice as equally common, so the wrong-way slice, rare on the road but often failed, counts as if it were as common as the occluded pedestrian.</p>
+        <div class="prompt-box good"><span class="label">python</span>pooled = slices.failed.sum() / slices.tried.sum()
+pooled, pooled * slices.enc_per_100M.sum()</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Weight it by exposure</h4>
+        <p>Multiply each slice's failure probability by its encounter rate and add: 12 + 6 + 10 + 18 = 46 per 100M miles. This is the only one of the three that is a rate on the road.</p>
+        <div class="prompt-box good"><span class="label">python</span>slices["per_100M"] = slices.enc_per_100M * slices.p_fail
+slices[["cls", "per_100M"]], slices.per_100M.sum()</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Press the break button by hand</h4>
+        <p>Filter the four classes out, as a clean-up script would, and sum again. The answer is 0.0, with no warning. Then add each answer to the exposure-matched 147.74 from the canon run: with the true 46 the total is 193.74, above the human 185.55; with 0 it is 147.74, below it.</p>
+        <div class="prompt-box good"><span class="label">python</span>TAIL = ["occluded pedestrian", "wrong-way vehicle", "debris in lane", "emergency vehicle"]
+kept = slices[~slices.cls.isin(TAIL)]
+kept.per_100M.sum(), 147.74 + slices.per_100M.sum(), 147.74 + kept.per_100M.sum()</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Add a guard that refuses to run without the tail</h4>
+        <p>Make the evaluation job fail loudly when a required slice is missing or has no encounter rate. A guard turns a silent 0 into an error somebody has to answer.</p>
+        <div class="prompt-box good"><span class="label">python</span>def check_slices(df, required):
+    missing = set(required) - set(df.cls)
+    assert not missing, f"tail slices missing from evaluation: {sorted(missing)}"
+    assert df.enc_per_100M.notna().all(), "a slice has no encounter rate"
+
+check_slices(slices, TAIL)
+check_slices(kept, TAIL)</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Optional: sample the failures instead</h4>
+        <p>Replace the expected counts with a seeded binomial draw and rerun the three weightings. Your numbers will differ from 84, 0 and 46 and from run to run; the ordering of the three methods is the point, not the decimals.</p>
+        <div class="prompt-box good"><span class="label">python</span>import numpy as np
+rng = np.random.default_rng(4)
+slices["failed"] = rng.binomial(slices.tried, [0.003, 0.02, 0.004, 0.015])</div>
+      </div></div>
+    </div>
+
+    <div class="callout tip">
+      <p><strong>The habit to keep.</strong> Keep two manifests. The training manifest records the mix you chose. The evaluation manifest lists every required slice with its encounter rate and its source, and the evaluation job refuses to run if any slice is missing. Rebalance the first as you like; never let the second shrink without a written reason.</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="section" id="quiz">
+    <div class="section-kicker">
+      <span class="klabel">Check yourself</span>
+      <h2>Three questions</h2>
+    </div>
+
+    <div class="quiz-q" data-answer="1">
+      <p class="qtext">The training set over-draws the four rare classes so the model sees enough of them. Is that a problem?</p>
+      <button class="qopt" type="button">A · Yes: the training mix must match the road's mix or the model is biased</button>
+      <button class="qopt" type="button">B · No: the training mix is a design choice; record it, and keep the evaluation set's weighting tied to exposure</button>
+      <button class="qopt" type="button">C · No, and the evaluation set should use the same over-drawn mix for consistency</button>
+      <p class="qwhy">Rebalancing to help learning is legitimate. The mistake is carrying the curated proportions into the claim, which on the build-along table turns 46 into 84.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="2">
+      <p class="qtext">On the canon run, dropping the four tail slices moves Lanehart from 192.24 (upper 215.71) to 147.74 (upper 169.04) against a human 185.55. What changed?</p>
+      <button class="qopt" type="button">A · The fleet became safer once noisy labels were removed</button>
+      <button class="qopt" type="button">B · The confidence bound tightened because the evaluation set got cleaner</button>
+      <button class="qopt" type="button">C · Only the evaluation set: the missing slices contribute 0 to the sum, so the claim reads green while the road still serves the tail</button>
+      <p class="qwhy">The fleet, its miles and its true tail of 46 per 100M are untouched. The bound is honest about the slices that remain and blind to the ones removed.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="0">
+      <p class="qtext">The wrong-way slice has the highest failure probability (0.02) but contributes only 6 per 100M. Why?</p>
+      <button class="qopt" type="button">A · The road serves it only 300 times per 100M miles, and a slice's share of the claim is encounters times failure probability</button>
+      <button class="qopt" type="button">B · Its 2,000 curated tries are too few to measure it</button>
+      <button class="qopt" type="button">C · Wrong-way failures are less severe than the others</button>
+      <p class="qwhy">300 x 0.02 = 6. The occluded pedestrian fails far less often per encounter (0.003) but is met 4,000 times, so it contributes 12.</p>
+    </div>
+
+    <div class="quiz-score"></div>
+  </section>
+
+  <!-- ============ HOMEWORK ============ -->
+  <section class="section" id="homework">
+    <div class="section-kicker">
+      <span class="klabel">Before session 5</span>
+      <h2>Homework</h2>
+    </div>
+    <p class="lede">Thirty minutes, in your own notebook.</p>
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Add a fifth slice and decide its weight</h4>
+        <p>Invent a rare class of your own and give it an encounter rate and a failure probability, labelled constructed. Before you add it, write down where a real encounter rate would come from (logged miles, a scenario query from session 3, a public statistic). Recompute the tail; your numbers will differ.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Find one evaluation set that only ever shrinks</h4>
+        <p>In any system you work with, find a test or evaluation set whose rows have been removed over time for being noisy or hard. List what was removed and ask what each removal did to the headline number.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Write your evaluation manifest</h4>
+        <p>One line per required slice: name, encounter rate, its source, its minimum size. Wire the guard from the build-along to it.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ OFFICIAL ============ -->
+  <section class="section" id="official">
+    <div class="section-kicker">
+      <span class="klabel">Covered tonight</span>
+      <h2>What this session covers</h2>
+    </div>
+    <div class="covered">
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Training balance vs evaluation slices</span><span class="note">Rebalance training freely; weight evaluation by encounter rate. Lanehart's four constructed classes, 46 per 100M.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The break button</span><span class="note">Canon run: 192.24, upper 215.71, worse; tail dropped 147.74, upper 169.04, falsely proven. Human crash baseline 185.55, derived from NHTSA 2022.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Three weightings of one table</span><span class="note">Curated share 84, dropped 0, exposure 46. Constructed expected counts; sampled counts differ.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Skew, then reweight</span><span class="note">Zhao et al. (2017), IEEE T-ITS 18(3):595-607, read at source (abstract); acceleration reported by the authors.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Why scenario testing is needed at all</span><span class="note">Kalra and Paddock (2016), RAND RR-1478, read at source.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Counts without exposure</span><span class="note">NHTSA Standing General Order on Crash Reporting, "not normalized" sentence. Read at source.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Estimating a tail slice efficiently</span><span class="note">Named tonight (random 34.95 vs importance-sampled 44.50, true 46). Practitioner session 8.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Slicing perception metrics</span><span class="note">Recall by distance band and scenario. Practitioner session 5.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Label noise and cleaning</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-data-centric-ai-with-phoebe/courses/02-when-labellers-disagree.html">learn data-centric AI</a>.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Real fleet scenario sets</span><span class="note">Out of scope by design. Every class, rate and probability here is constructed.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section class="section" id="cheatsheet">
+    <div class="section-kicker">
+      <span class="klabel">Take this with you</span>
+      <h2>Cheat sheet</h2>
+    </div>
+    <div class="cheat">
+      <div class="cheat-item"><strong>The one sentence.</strong> Rebalance training as you like; evaluation keeps every tail slice and weights it by exposure.</div>
+      <div class="cheat-item"><strong>A slice's share.</strong> Encounters per 100M miles x failure probability per encounter.</div>
+      <div class="cheat-item"><strong>Lanehart's tail.</strong> 12 + 6 + 10 + 18 = 46 per 100M (constructed).</div>
+      <div class="cheat-item"><strong>Kept.</strong> 192.24, upper 215.71 vs human 185.55: worse.</div>
+      <div class="cheat-item"><strong>Dropped.</strong> 147.74, upper 169.04: falsely proven. Same fleet, same miles.</div>
+      <div class="cheat-item"><strong>Curated share is not a rate.</strong> Pooling equal slices gives 84, not 46.</div>
+      <div class="cheat-item"><strong>A missing slice is a zero.</strong> No error, no null; the sum just shrinks.</div>
+      <div class="cheat-item"><strong>The guard.</strong> An evaluation manifest of required slices, and a job that refuses to run without them.</div>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    <div class="wrap">
+      <p>Practitioner session 4 of 10 · learn-autonomous-driving-with-phoebe · by Phoebe Fu</p>
+      <nav class="pagenav">
+        <a href="p3-scenario-mining.html">← Practitioner session 3 · Scenario mining: querying the fleet for rare events</a>
+        <a href="p5-perception-metrics-that-hide-failures.html">Practitioner session 5 · Perception metrics that hide failures →</a>
+      </nav>
+    </div>
+  </footer>
+
+</main>
+
+<script src="../assets/app.js?v=1"></script>
+</body>
+</html>

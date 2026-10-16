@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- social:start -->
+<meta name="description" content="Practitioner session 1 of 10. A drive log is many sensors on their own clocks: cameras at 12 Hz, lidar at 20 Hz, radar at 13 Hz, labels at 2 Hz. Synchronising them is a join, and the default join is wrong: nearest timestamp lands 28 of 72 camera frames on the right lidar scan. Lanehart is a constructed fleet.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Learn with Phoebe">
+<meta property="og:title" content="Anatomy of a drive log - learn autonomous driving with phoebe">
+<meta property="og:description" content="Practitioner session 1 of 10. Frames, timestamps, and sensor sync as an as-of join that has to point the right way.">
+<meta property="og:url" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/courses/p1-anatomy-of-a-drive-log.html">
+<meta property="og:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Anatomy of a drive log - learn autonomous driving with phoebe">
+<meta name="twitter:description" content="Nearest timestamp: 28 of 72 right. Strictly the next scan: 72 of 72. Sensor sync is a join.">
+<meta name="twitter:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<!-- social:end -->
+<title>Practitioner session 1 · Anatomy of a drive log - learn autonomous driving with phoebe</title>
+<link rel="stylesheet" href="../assets/style.css?v=2">
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="wrap">
+    <span class="crumb"><a href="../index.html">learn-autonomous-driving-with-phoebe</a> / Practitioner session 1 of 10</span>
+    <button class="btn" id="toggle-all" type="button">Expand all</button>
+    <button class="btn primary" id="zoom-toggle" type="button">Projector zoom: off</button>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Learn Autonomous Driving with Phoebe · Practitioner session 1 of 10</div>
+    <h1>Anatomy of a <span class="accent">drive log</span></h1>
+    <p class="sub">A warehouse table has one row per event and a key that says which. A drive log has frames from cameras, lidar and radar, each sensor ticking on its own clock, and a sparse set of keyframes that somebody paid to label. Before anything can be measured, the frames that belong to one moment have to be found, which is a join on time, and the join most people reach for first is wrong. Lanehart, a constructed robotaxi pilot fleet in a fictional city, supplies the log; its timing model follows the published design of a public multi-sensor research dataset, and every count on the page is computed in your browser.</p>
+    <div class="chip-row">
+      <span class="chip level">🟢 Foundations</span>
+      <span class="chip audience">Data engineers and analysts new to sensor logs</span>
+      <span class="chip audience">Anyone who will query a fleet's recordings</span>
+      <span class="chip time">45 min</span>
+    </div>
+    <div class="agenda">
+      <span class="a1" style="flex:1">0-3 · Welcome</span>
+      <span class="a2" style="flex:3">3-18 · Many clocks</span>
+      <span class="a3" style="flex:3">18-28 · Sync is a join</span>
+      <span class="a4" style="flex:4">28-45 · Build-along and Q&amp;A</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ INTRO ============ -->
+  <section class="section" id="intro">
+    <div class="section-kicker">
+      <span class="klabel">Part 0</span>
+      <h2>Lanehart's first query, and why it returned nothing</h2>
+    </div>
+    <p class="lede">Lanehart is a constructed robotaxi pilot. Its data analyst, fresh from a warehouse team, was asked for "every camera image with the lidar scan taken at the same moment". She wrote the join she always writes, on equal timestamps, and got zero rows. The cameras and the lidar never stamp the same instant, so equality finds nothing. The fix everyone tries next, the nearest timestamp, returns every row and is wrong for most of them. The ten practitioner sessions build up from exactly this: a log you can trust to put one moment together.</p>
+
+    <div class="legend">
+      <span class="pill">Live = worked through in the 45 minutes</span>
+      <span class="pill">Self-study = the full depth, after class</span>
+      <span class="pill">🔍 Every diagram zooms</span>
+    </div>
+
+    <div class="callout win">
+      <p><strong>★ What you walk out with tonight.</strong> A picture of a drive log as streams on separate clocks: cameras at 12 Hz, a spinning lidar at 20 Hz, radar at 13 Hz, labelled keyframes at 2 Hz, the rates published for a public multi-sensor research dataset. The rule for which timestamp means what. An as-of join you can defend: on Lanehart's constructed second of driving, the nearest timestamp puts 28 of 72 camera frames on the right lidar scan, the next scan at or after the frame gets 61, and the next scan strictly after it gets all 72. And the two pandas details that decide those counts.</p>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>What is in a drive log<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>Sensor frames.</strong> Images from each camera, lidar point clouds from each sweep, radar returns. Each frame carries a timestamp, and the paper behind the public dataset is precise about which instant it means: an image is stamped at its exposure trigger time, a lidar scan at the moment its full rotation completes.</p>
+        <p><strong>Vehicle state.</strong> Position and orientation from localisation, plus the vehicle's own bus signals: speed, acceleration, steering angle. The same paper reports localisation errors of 10 cm or less from lidar and odometry, and releases the raw bus data alongside.</p>
+        <p><strong>Labels.</strong> Boxes and attributes on a sample of frames, the keyframes. In the public dataset they are sampled at 2 Hz, and the authors report that labels at that rate interpolate well to 10 or 20 Hz. Most frames are never labelled by a person.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>The public dataset's paper describes 1,000 scenes of about 20 seconds each, six cameras, one 32-beam lidar and five radars giving 360-degree coverage, and 40,000 labelled keyframes. Its own footnote names the trap this session is about: 12 camera exposures are spread across 20 lidar scans each second, "so not all lidar scans have a corresponding camera frame".</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>The words that keep coming back<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Frame.</strong> One capture from one sensor at one instant.</li>
+          <li><strong>Sweep or scan.</strong> One full rotation of a spinning lidar; at 20 Hz, 50 ms.</li>
+          <li><strong>Exposure trigger.</strong> The instant a camera starts capturing; its timestamp.</li>
+          <li><strong>Keyframe.</strong> A frame chosen for labelling.</li>
+          <li><strong>As-of join.</strong> A join that matches each row to the nearest row before, after or around it in time, within a tolerance, instead of on equality.</li>
+          <li><strong>Constructed.</strong> Lanehart's timing in the widget is a model built on the published design, not a recording.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="section" id="part-1">
+    <div class="section-kicker">
+      <span class="klabel">Part 1 · covers frames, clocks and timestamps</span>
+      <h2>One moment, many clocks</h2>
+      <span class="tag concept">15 min live</span>
+    </div>
+    <p class="lede">Draw half a second of the log and the problem is visible. The lidar stamps a scan every 50 ms, at the end of each rotation. A camera fires when the sweep passes the centre of its view, so a camera facing forward fires at the start of a rotation and one facing back-left fires about 35 ms later. Radar ticks on its own 13 Hz clock. Labels exist only at the two keyframes.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 352" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn timeline of half a second of a constructed drive log. Lidar stamps every 50 milliseconds at the end of each rotation, from 50 to 500. The front camera fires at 0, 50, 150, 250, 300 and 400 milliseconds, exactly on the previous scan's stamp. The back-left camera fires about 35 milliseconds into the same rotations. Radar ticks every 77 milliseconds. Keyframes, the labelled frames, highlighted in yellow, fall only at 0 and 500 milliseconds.">
+        <defs>
+          <filter id="lhp1aSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="13" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp1aHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp1aAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp1aH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp1aL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp1aS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp1aA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp1aN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp1aH" x="30" y="30">HALF A SECOND OF ONE DRIVE LOG, CONSTRUCTED FROM THE PUBLISHED RATES</text>
+
+        <g filter="url(#lhp1aSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M150 76 L850 76 M150 120 L850 120 M150 164 L850 164 M150 208 L850 208 M150 252 L850 252" stroke="#E2E6E9" stroke-width="1.5"/>
+          <path d="M220 64 L220 88 M290 64 L290 88 M360 64 L360 88 M430 64 L430 88 M500 64 L500 88 M570 64 L570 88 M640 64 L640 88 M710 64 L710 88 M780 64 L780 88 M850 64 L850 88" stroke="#2F3A42" stroke-width="2.4"/>
+          <circle cx="150" cy="120" r="6" fill="#FFFFFF"/>
+          <circle cx="220" cy="120" r="6" fill="#FFFFFF"/>
+          <circle cx="360" cy="120" r="6" fill="#FFFFFF"/>
+          <circle cx="500" cy="120" r="6" fill="#FFFFFF"/>
+          <circle cx="570" cy="120" r="6" fill="#FFFFFF"/>
+          <circle cx="710" cy="120" r="6" fill="#FFFFFF"/>
+          <circle cx="199" cy="164" r="6" fill="#CED4D9"/>
+          <circle cx="269" cy="164" r="6" fill="#CED4D9"/>
+          <circle cx="409" cy="164" r="6" fill="#CED4D9"/>
+          <circle cx="549" cy="164" r="6" fill="#CED4D9"/>
+          <circle cx="619" cy="164" r="6" fill="#CED4D9"/>
+          <circle cx="759" cy="164" r="6" fill="#CED4D9"/>
+          <path d="M146 204 L154 212 M154 204 L146 212 M254 204 L262 212 M262 204 L254 212 M361 204 L369 212 M369 204 L361 212 M469 204 L477 212 M477 204 L469 212 M577 204 L585 212 M585 204 L577 212 M684 204 L692 212 M692 204 L684 212 M792 204 L800 212 M800 204 L792 212"/>
+          <rect x="142" y="240" width="16" height="24" rx="3" transform="rotate(-2 150 252)" fill="#F2C230"/>
+          <rect x="842" y="240" width="16" height="24" rx="3" transform="rotate(2 850 252)" fill="#F2C230"/>
+          <path d="M150 282 L850 282"/>
+          <path d="M150 278 L150 288 M290 278 L290 288 M430 278 L430 288 M570 278 L570 288 M710 278 L710 288 M850 278 L850 288"/>
+        </g>
+
+        <text class="lhp1aL" x="140" y="74" text-anchor="end">Lidar, 20 Hz</text>
+        <text class="lhp1aS" x="140" y="88" text-anchor="end">stamp at turn end</text>
+        <text class="lhp1aL" x="140" y="118" text-anchor="end">Front camera</text>
+        <text class="lhp1aS" x="140" y="132" text-anchor="end">12 Hz, at 0 degrees</text>
+        <text class="lhp1aL" x="140" y="162" text-anchor="end">Back-left camera</text>
+        <text class="lhp1aS" x="140" y="176" text-anchor="end">at 250 degrees</text>
+        <text class="lhp1aL" x="140" y="206" text-anchor="end">Radar, 13 Hz</text>
+        <text class="lhp1aS" x="140" y="220" text-anchor="end">its own clock</text>
+        <text class="lhp1aL" x="140" y="250" text-anchor="end">Keyframes, 2 Hz</text>
+        <text class="lhp1aS" x="140" y="264" text-anchor="end">the labelled ones</text>
+
+        <text class="lhp1aA" x="150" y="302" text-anchor="middle">0 ms</text>
+        <text class="lhp1aA" x="290" y="302" text-anchor="middle">100</text>
+        <text class="lhp1aA" x="430" y="302" text-anchor="middle">200</text>
+        <text class="lhp1aA" x="570" y="302" text-anchor="middle">300</text>
+        <text class="lhp1aA" x="710" y="302" text-anchor="middle">400</text>
+        <text class="lhp1aA" x="850" y="302" text-anchor="middle">500</text>
+
+        <text class="lhp1aN" x="30" y="328">No two streams share an instant. The front camera fires exactly on the previous scan's stamp; 12 exposures over 20 scans</text>
+        <text class="lhp1aN" x="30" y="344">means some scans (like the one ending at 150 ms) have no camera frame at all, and only two frames here carry labels.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - a "moment" is something the data team assembles; the yellow keyframes are the only frames a person ever looked at.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Which instant each timestamp means<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>The public dataset's paper states the rule: the timestamp of an image is the exposure trigger time, and the timestamp of a lidar scan is when the full rotation of that frame completes. So a lidar scan stamped at 200 ms contains points measured from 150 to 200 ms, and a camera frame stamped at 165 ms that was taken during that rotation belongs to the scan stamped 200, not to the one stamped 150, even though 150 is closer.</p>
+        <p>Every sensor has such a rule, and it is rarely written in the column name. A warehouse habit is to treat a timestamp as "when the row happened". In a drive log the first question about any timestamp column is: start, middle or end of what?</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Why the clocks are not merged at the source<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Each sensor has its own physics. A spinning lidar's natural unit is a rotation. A camera's is an exposure, and its rate is a trade between light, motion blur and bandwidth. Radar has its own cycle. The public dataset triggers each camera as the lidar passes the camera's centre, which aligns the two where it matters, and the paper notes that motion compensation is applied using localisation. What it does not do is give every stream one shared tick, because no such tick exists.</p>
+        <p>So the log keeps every stream at its own rate, and alignment is a decision made at query time. That makes it the data team's decision, and it can be made wrongly.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>What 2 Hz labels mean for everything after<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>At 2 Hz, a 20-second scene has about 40 labelled keyframes against about 240 camera frames per camera. The paper reports that its 2 Hz annotations are robust to interpolation to 10 or 20 Hz, which is why sparse labelling is affordable. Interpolation is a model, though: an object that appears and disappears between two keyframes is never labelled at all.</p>
+        <p>That is the bridge to practitioner session 2 (labels are bought by the frame) and to the long tail: the frames that matter most are the ones least likely to be keyframes.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="section" id="part-2">
+    <div class="section-kicker">
+      <span class="klabel">Part 2 · covers sensor sync as a join</span>
+      <h2>Synchronising is a join, and the default join is wrong</h2>
+      <span class="tag concept">10 min live</span>
+    </div>
+    <p class="lede">An equality join on timestamps returns nothing, because no two streams share an instant. An as-of join matches each camera frame to a lidar scan near it in time. The direction decides whether the match is the scan the frame was taken in. Take the back-right camera, which fires 15.3 ms into a rotation: the nearest stamp is the previous scan's end, which is the wrong scan.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two hand drawn panels. Left, wrong way, nearest timestamp: a back-right camera frame at 165.3 milliseconds is matched to the lidar stamp at 150, which ends the previous scan; on the constructed second, 28 of 72 frames land on the right scan. Right, the right way, the first stamp strictly after the frame: the same frame matches the stamp at 200, the scan it was taken in; 72 of 72 land right.">
+        <defs>
+          <filter id="lhp1bSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="17" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp1bHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp1bAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp1bH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp1bL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp1bS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp1bR { font: 800 12px Inter, sans-serif; fill: #991B1B; }
+          .lhp1bV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lhp1bN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <g filter="url(#lhp1bSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="40" y="40" width="390" height="210" rx="12" transform="rotate(-0.4 235 145)" fill="#FEF2F2" stroke="#FCA5A5"/>
+          <rect x="450" y="40" width="390" height="210" rx="12" transform="rotate(0.4 645 145)" fill="#F1F3F4" stroke="#2F3A42"/>
+          <path d="M70 180 L400 180 M480 180 L810 180"/>
+          <path d="M100 170 L100 190 M220 170 L220 190 M340 170 L340 190 M510 170 L510 190 M630 170 L630 190 M750 170 L750 190" stroke="#2F3A42" stroke-width="2.4"/>
+          <circle cx="257" cy="180" r="6" fill="#FFFFFF"/>
+          <circle cx="667" cy="180" r="6" fill="#F2C230"/>
+          <path d="M252 168 C246 154 232 152 224 164" marker-end="url(#lhp1bAr)"/>
+          <path d="M673 168 C690 148 728 146 746 164" marker-end="url(#lhp1bAr)"/>
+        </g>
+
+        <text class="lhp1bR" x="58" y="72">✗ Nearest timestamp</text>
+        <text class="lhp1bS" x="58" y="96">picks 150, which ends the scan before</text>
+        <text class="lhp1bS" x="58" y="112">the frame was taken</text>
+        <text class="lhp1bH" x="468" y="72">✓ First stamp strictly after</text>
+        <text class="lhp1bS" x="468" y="96">picks 200: the rotation that was under</text>
+        <text class="lhp1bS" x="468" y="112">way when the camera fired</text>
+
+        <text class="lhp1bS" x="100" y="208" text-anchor="middle">100</text>
+        <text class="lhp1bS" x="220" y="208" text-anchor="middle">150</text>
+        <text class="lhp1bS" x="340" y="208" text-anchor="middle">200</text>
+        <text class="lhp1bS" x="510" y="208" text-anchor="middle">100</text>
+        <text class="lhp1bS" x="630" y="208" text-anchor="middle">150</text>
+        <text class="lhp1bS" x="750" y="208" text-anchor="middle">200</text>
+        <text class="lhp1bL" x="58" y="236">frame at 165.3 ms</text>
+        <text class="lhp1bV" x="410" y="238" text-anchor="end">28 of 72</text>
+        <text class="lhp1bL" x="468" y="236">same frame</text>
+        <text class="lhp1bV" x="820" y="238" text-anchor="end">72 of 72</text>
+
+        <text class="lhp1bN" x="30" y="282">Constructed second of driving: 6 cameras x 12 frames, 20 lidar scans. Counts printed by the widget below, same engine.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - "nearest" answers a question nobody asked; the yellow dot is matched to the rotation it was actually part of.</figcaption>
+    </figure>
+
+    <div class="wk" id="lhp1-sync">
+      <div class="wk-head">
+        <b>Live</b>
+        <span class="wk-hint">Constructed timing model of one second of Lanehart's log, after the public dataset's published design: lidar at 20 Hz stamped at rotation end, six cameras at 12 Hz fired as the sweep crosses each camera's centre. Choose a join and a tolerance; every count is computed in this page.</span>
+      </div>
+      <div class="wk-body">
+        <label class="sql-label" for="lhp1-dir">Join direction</label>
+        <select class="sql-code" id="lhp1-dir">
+          <option value="nearest" selected>nearest stamp</option>
+          <option value="backward">last stamp at or before the frame</option>
+          <option value="forward">first stamp at or after the frame</option>
+          <option value="forwardStrict">first stamp strictly after the frame</option>
+        </select>
+        <label class="sql-label" for="lhp1-tol">Tolerance</label>
+        <select class="sql-code" id="lhp1-tol">
+          <option value="20">20 ms</option>
+          <option value="60" selected>60 ms</option>
+        </select>
+        <div id="lhp1-out"></div>
+        <p class="sql-note" id="lhp1-verdict">...</p>
+      </div>
+      <div class="wk-foot" id="lhp1-self">...</div>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>The four joins, read off the widget<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Nearest, 60 ms:</strong> 28 correct, 44 wrong, 0 unmatched. Every camera that fires before the half-turn snaps to the previous scan. Every row comes back, which is why the error survives code review.</li>
+          <li><strong>Backward, 60 ms:</strong> 0 correct, 66 wrong, 6 unmatched. The warehouse habit "latest value as of this time" is exactly backwards for a stamp at the end of a window.</li>
+          <li><strong>Forward, 60 ms:</strong> 61 correct, 11 wrong. The 11 are the front camera, which fires exactly on the previous scan's stamp; a tie resolves to the earlier scan.</li>
+          <li><strong>Strictly after, 60 ms:</strong> 72 of 72. The rule follows from the timestamp definitions, not from tuning.</li>
+        </ul>
+        <p>Now set the tolerance to 20 ms with "at or after": 24 correct, 11 wrong, 37 unmatched. A tolerance shorter than one rotation silently drops most cameras. Tolerance is a fact about the sensors (one 50 ms rotation), not a knob.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Where this sits next to sensor drift<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Drift, resampling and clocks on a single device are owned by <a href="https://phoebefu6.github.io/learn-iot-data-with-phoebe/courses/a1-the-sensor-is-the-source-of-truth.html">learn IoT data</a>. The point here is narrower: within one drive log, synchronisation is a join with a direction and a tolerance, and both come from how each sensor defines its timestamp.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 3 ============ -->
+  <section class="section" id="part-3">
+    <div class="section-kicker">
+      <span class="klabel">Part 3 · build-along</span>
+      <h2>Build the sync join in pandas</h2>
+      <span class="tag build">17 min hands on</span>
+    </div>
+    <p class="lede">Rebuild the widget's second in pandas and get the same three counts. Run it in a notebook or a scratch folder. The figure is the plan: two tables sorted by time, one as-of join, and the two arguments that decide the answer.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn plan of the join. A frames table with 72 rows of camera, scan and time in milliseconds, and a lidar table with 20 rows of scan end times, both sorted by time, flow into merge_asof with direction forward. A yellow chip says allow_exact_matches equals False; a second chip says both time columns must share a dtype. The result is 72 frames, each with the scan it was taken in.">
+        <defs>
+          <filter id="lhp1cSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="19" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp1cHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp1cAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp1cH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp1cL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp1cS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp1cK { font: 700 11px Inter, sans-serif; fill: #1A1F23; }
+          .lhp1cV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lhp1cN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <g filter="url(#lhp1cSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="30" width="200" height="86" rx="8" transform="rotate(-0.8 130 73)" fill="url(#lhp1cHc)"/>
+          <rect x="30" y="136" width="200" height="86" rx="8" transform="rotate(0.7 130 179)" fill="#F1F3F4"/>
+          <path d="M234 73 L318 112 M234 179 L318 140" marker-end="url(#lhp1cAr)"/>
+          <rect x="322" y="86" width="230" height="80" rx="10" transform="rotate(-0.4 437 126)" fill="#FFFFFF"/>
+          <rect x="330" y="186" width="214" height="28" rx="14" transform="rotate(0.6 437 200)" fill="#F2C230"/>
+          <rect x="330" y="30" width="214" height="28" rx="14" transform="rotate(-0.6 437 44)" fill="#FDF6DA"/>
+          <path d="M556 126 L640 126" marker-end="url(#lhp1cAr)"/>
+          <rect x="644" y="70" width="210" height="112" rx="8" transform="rotate(0.6 749 126)" fill="#FFFFFF"/>
+        </g>
+
+        <text class="lhp1cL" x="46" y="58">frames</text>
+        <text class="lhp1cS" x="46" y="78">camera, scan, t_ms</text>
+        <text class="lhp1cS" x="46" y="96">72 rows, sorted by t_ms</text>
+        <text class="lhp1cL" x="46" y="164">lidar</text>
+        <text class="lhp1cS" x="46" y="184">t_ms = scan end</text>
+        <text class="lhp1cS" x="46" y="202">20 rows, sorted by t_ms</text>
+
+        <text class="lhp1cK" x="437" y="48" text-anchor="middle">both t_ms columns: one dtype</text>
+        <text class="lhp1cL" x="437" y="116" text-anchor="middle">pd.merge_asof</text>
+        <text class="lhp1cS" x="437" y="134" text-anchor="middle">direction="forward"</text>
+        <text class="lhp1cS" x="437" y="150" text-anchor="middle">tolerance=60</text>
+        <text class="lhp1cK" x="437" y="204" text-anchor="middle">allow_exact_matches=False</text>
+
+        <text class="lhp1cL" x="660" y="98">each frame + its scan</text>
+        <text class="lhp1cV" x="660" y="130">72 of 72</text>
+        <text class="lhp1cS" x="660" y="152">nearest: 28; forward with</text>
+        <text class="lhp1cS" x="660" y="168">exact matches: 61</text>
+
+        <text class="lhp1cN" x="30" y="248">The two chips are the whole lesson: one dtype or pandas refuses; exact matches off or the front camera lands a scan early.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow chip is the one argument that turns 61 into 72.</figcaption>
+    </figure>
+
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Make the lidar table</h4>
+        <p>Twenty scans in one second, each stamped at the end of its 50 ms rotation. Keep a copy of the stamp as its own column, because the join key is consumed.</p>
+        <div class="prompt-box good"><span class="label">python</span>import pandas as pd
+lidar = pd.DataFrame({"t_ms": [50.0 * (i + 1) for i in range(20)]})
+lidar["scan_end"] = lidar["t_ms"]</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Make the camera frames, with the truth beside them</h4>
+        <p>Twelve exposures spread over twenty scans, six cameras at their azimuths, each firing as the sweep crosses its centre. The truth column is the end of the rotation the frame was taken in. This is the constructed model behind the widget.</p>
+        <div class="prompt-box good"><span class="label">python</span>fire = [j * 20 // 12 for j in range(12)]
+cams = {"front": 0, "front right": 55, "back right": 110,
+        "back": 180, "back left": 250, "front left": 305}
+rows = [(c, s, 50 * s + az / 360 * 50, 50 * (s + 1))
+        for c, az in cams.items() for s in fire]
+frames = pd.DataFrame(rows, columns=["camera", "scan", "t_ms", "truth"]).sort_values("t_ms")
+fire</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Join the nearest way first, and count</h4>
+        <p>You should see 28 correct, 44 wrong and 0 missing, the widget's first line. Note that every frame got a match: nothing in the output warns you.</p>
+        <div class="prompt-box good"><span class="label">python</span>def score(m):
+    ok = (m.scan_end == m.truth).sum()
+    bad = (m.scan_end.notna() &amp; (m.scan_end != m.truth)).sum()
+    return ok, bad, m.scan_end.isna().sum()
+
+score(pd.merge_asof(frames, lidar, on="t_ms", direction="nearest", tolerance=60))</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Point it forward, then make it strict</h4>
+        <p>Forward gives 61, 11, 0. Turning off exact matches gives 72, 0, 0. Look at which camera the 11 were: it is the one that fires on the boundary.</p>
+        <div class="prompt-box good"><span class="label">python</span>score(pd.merge_asof(frames, lidar, on="t_ms", direction="forward", tolerance=60))
+score(pd.merge_asof(frames, lidar, on="t_ms", direction="forward", tolerance=60,
+                    allow_exact_matches=False))</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Break it on purpose: mixed dtypes</h4>
+        <p>Build the lidar stamps as integers (drop the ".0") and rerun. pandas 2.1 refuses with "incompatible merge keys", float64 against int64. That error is a gift: a database would often cast silently.</p>
+        <div class="prompt-box good"><span class="label">python</span>lidar_int = pd.DataFrame({"t_ms": [50 * (i + 1) for i in range(20)]})
+pd.merge_asof(frames, lidar_int, on="t_ms", direction="forward")</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Write the sync rule down</h4>
+        <p>One line per sensor: what its timestamp means (start, end, trigger), its period, and the join that attaches it to the lidar. That line belongs next to the table definition, not in someone's head.</p>
+      </div></div>
+    </div>
+
+    <div class="callout tip">
+      <p><strong>The habit to keep.</strong> Before you join two sensor streams, write down what instant each timestamp means. Then choose the direction from those definitions, the tolerance from the sensor period, and test the join against a case where you know the truth. A join that returns every row is not evidence that it is right.</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="section" id="quiz">
+    <div class="section-kicker">
+      <span class="klabel">Check yourself</span>
+      <h2>Three questions</h2>
+    </div>
+
+    <div class="quiz-q" data-answer="2">
+      <p class="qtext">On the constructed second, joining each camera frame to the nearest lidar stamp puts only 28 of 72 frames on the right scan. Why?</p>
+      <button class="qopt" type="button">A · The lidar and cameras run on unsynchronised hardware, so the timestamps are random</button>
+      <button class="qopt" type="button">B · The tolerance of 60 ms is too large</button>
+      <button class="qopt" type="button">C · A lidar scan is stamped when its rotation ends, so a frame taken early in a rotation is closer to the previous scan's stamp; nearest picks the scan before</button>
+      <p class="qwhy">The timestamps follow a rule; the join ignored it. Shrinking the tolerance makes things worse (at 20 ms, 15 frames go unmatched). Direction comes from the timestamp definitions.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="0">
+      <p class="qtext">With "first stamp at or after the frame" and a 20 ms tolerance, 37 of 72 frames go unmatched. What is the right fix?</p>
+      <button class="qopt" type="button">A · Set the tolerance from the sensor: a frame can be up to one 50 ms rotation before its scan's stamp, so the tolerance must cover that</button>
+      <button class="qopt" type="button">B · Drop the unmatched frames; they are noise</button>
+      <button class="qopt" type="button">C · Switch to the nearest join, which matches everything</button>
+      <p class="qwhy">The unmatched frames are real frames from cameras that fire early in the rotation. Dropping them deletes most of the cameras; switching to nearest matches them wrongly.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="1">
+      <p class="qtext">The public dataset labels keyframes at 2 Hz. What follows for the data team?</p>
+      <button class="qopt" type="button">A · Every frame is labelled, just at lower quality</button>
+      <button class="qopt" type="button">B · Most frames carry no human label; labels between keyframes are interpolated, and anything that appears only between two keyframes is never labelled</button>
+      <button class="qopt" type="button">C · Labels are only needed at 2 Hz because cars move slowly</button>
+      <p class="qwhy">The authors report that 2 Hz labels interpolate well to 10 or 20 Hz for objects that persist. Interpolation cannot invent an object nobody labelled, which is why rare, brief events are the expensive ones.</p>
+    </div>
+
+    <div class="quiz-score"></div>
+  </section>
+
+  <!-- ============ HOMEWORK ============ -->
+  <section class="section" id="homework">
+    <div class="section-kicker">
+      <span class="klabel">Before session 2</span>
+      <h2>Homework</h2>
+    </div>
+    <p class="lede">Thirty minutes, in your own notebook.</p>
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Add a radar stream and join it</h4>
+        <p>Radar at 13 Hz, stamped (say) at the middle of its cycle. Decide the direction and tolerance from that definition before you write the join, then check how many radar frames land on each lidar scan. Your numbers will differ with your definition; write it down first.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Find one timestamp column you use today with no definition</h4>
+        <p>In any system you work with, find a time column whose meaning (start, end, insert time, event time) is not written down. Ask its owner, and write the answer next to the schema.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ OFFICIAL ============ -->
+  <section class="section" id="official">
+    <div class="section-kicker">
+      <span class="klabel">Covered tonight</span>
+      <h2>What this session covers</h2>
+    </div>
+    <div class="covered">
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">What a drive log holds</span><span class="note">Frames, vehicle state, sparse labels. Caesar et al. (2020), a public multi-sensor research dataset paper, read at source.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Sensor rates and timestamp rules</span><span class="note">Cameras 12 Hz at exposure trigger, lidar 20 Hz at rotation end, radar 13 Hz, keyframes 2 Hz. Read at source.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Sync as an as-of join</span><span class="note">Constructed second: nearest 28 of 72, forward 61, strictly after 72. Engine and pandas agree.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Tolerance from the sensor period</span><span class="note">20 ms forward leaves 37 of 72 unmatched; a rotation is 50 ms.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Two pandas details</span><span class="note">One dtype for both keys; allow_exact_matches for boundary ties. Run on pandas 2.1.4.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Label cost and interpolation</span><span class="note">Named tonight. Practitioner session 2.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Motion compensation and localisation</span><span class="note">Named only: the paper applies motion compensation and reports localisation errors of 10 cm or less.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Drift and resampling on one device</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-iot-data-with-phoebe/courses/a1-the-sensor-is-the-source-of-truth.html">learn IoT data</a>.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Real fleet recordings</span><span class="note">Out of scope by design. Lanehart's timing is a constructed model; no dataset rows are shipped.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section class="section" id="cheatsheet">
+    <div class="section-kicker">
+      <span class="klabel">Take this with you</span>
+      <h2>Cheat sheet</h2>
+    </div>
+    <div class="cheat">
+      <div class="cheat-item"><strong>The one sentence.</strong> A moment in a drive log is assembled by a join on time, and the join has a direction.</div>
+      <div class="cheat-item"><strong>Rates.</strong> Cameras 12 Hz, lidar 20 Hz, radar 13 Hz, labels 2 Hz (published for a public dataset).</div>
+      <div class="cheat-item"><strong>Stamps.</strong> Image: exposure trigger. Lidar: rotation end. Ask "start, middle or end of what?"</div>
+      <div class="cheat-item"><strong>Nearest is wrong.</strong> 28 of 72 on the constructed second; every row still comes back.</div>
+      <div class="cheat-item"><strong>Strictly after.</strong> 72 of 72. Forward with exact matches: 61 (the boundary camera).</div>
+      <div class="cheat-item"><strong>Tolerance.</strong> One rotation, 50 ms. At 20 ms, 37 of 72 frames go unmatched.</div>
+      <div class="cheat-item"><strong>pandas.</strong> merge_asof needs sorted keys of one dtype; allow_exact_matches decides ties.</div>
+      <div class="cheat-item"><strong>Labels are sparse.</strong> 2 Hz keyframes, interpolated between; brief events are never labelled.</div>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    <div class="wrap">
+      <p>Practitioner session 1 of 10 · learn-autonomous-driving-with-phoebe · by Phoebe Fu</p>
+      <nav class="pagenav">
+        <a href="../index.html">← All sessions</a>
+        <a href="p2-labels-cost-by-the-frame.html">Practitioner session 2 · Labels cost by the frame →</a>
+      </nav>
+    </div>
+  </footer>
+
+</main>
+
+<script src="../assets/av-live.js?v=1"></script>
+<script src="../assets/app.js?v=1"></script>
+<script>
+(function () {
+  if (typeof AV === "undefined") return;
+  var dir = document.getElementById("lhp1-dir");
+  var tol = document.getElementById("lhp1-tol");
+  var out = document.getElementById("lhp1-out");
+  var verdict = document.getElementById("lhp1-verdict");
+  var self = document.getElementById("lhp1-self");
+  var NAMES = { nearest: "nearest stamp", backward: "last stamp at or before", forward: "first stamp at or after", forwardStrict: "first stamp strictly after" };
+  function render() {
+    var r = AV.syncToy({ direction: dir.value, tolMs: Number(tol.value) });
+    var html = '<table class="sql-table"><thead><tr><th>Camera</th><th>Azimuth</th><th>Right scan</th><th>Wrong scan</th><th>Unmatched</th></tr></thead><tbody>';
+    r.cams.forEach(function (c) {
+      html += "<tr><td>" + c.id + "</td><td>" + c.az + " deg</td><td><b>" + c.correct + "</b></td><td>" + c.wrong + "</td><td>" + c.unmatched + "</td></tr>";
+    });
+    html += '<tr class="lhp1-tot"><td>All cameras</td><td></td><td><b>' + r.correct + "</b></td><td><b>" + r.wrong + "</b></td><td><b>" + r.unmatched + "</b></td></tr></tbody></table>";
+    out.innerHTML = html;
+    verdict.textContent = "Join by " + NAMES[r.direction] + ", tolerance " + r.tolMs + " ms: " + r.correct + " of " + r.frames + " camera frames land on the scan they were taken in, " + r.wrong + " on the wrong scan, " + r.unmatched + " unmatched." +
+      (r.wrong > 0 && r.unmatched === 0 ? " Every frame got a match, so nothing in the output warns you." : "") +
+      (r.correct === r.frames ? " Every frame is on its own rotation." : "");
+  }
+  var st = AV.selfTestResult || AV.selfTest();
+  self.textContent = st.pass
+    ? "The engine's " + st.checks.length + " self-checks pass in this browser. The timing is a constructed model after the public dataset's published design, not a recording."
+    : "The engine's self-check did not pass in this browser, so nothing above should be believed.";
+  dir.addEventListener("change", render);
+  tol.addEventListener("change", render);
+  render();
+})();
+</script>
+<style>
+  #lhp1-sync .sql-code { border: 1px solid var(--hairline); border-radius: 8px; max-width: 24rem; }
+  #lhp1-sync table.sql-table { margin: .6rem 0 .2rem; font-size: .85rem; }
+  #lhp1-sync tr.lhp1-tot td { background: var(--indigo-50); }
+</style>
+</body>
+</html>

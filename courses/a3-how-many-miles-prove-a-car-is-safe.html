@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- social:start -->
+<meta name="description" content="Leader session 3 of 6. RAND's three questions in miles: 275 million, 8.8 billion, 11 billion. Why zero deaths is not a rate of zero, the exact bound that slides as miles grow, and why 150 million clean miles still do not beat 1.33 deaths per 100 million. Lanehart is a constructed fleet.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Learn with Phoebe">
+<meta property="og:title" content="How many miles prove a car is safe? - learn autonomous driving with phoebe">
+<meta property="og:description" content="Leader session 3 of 6. Zero deaths in 150 million miles sounds like proof. The 95% bound says 2.00 per 100 million, still above the human 1.33.">
+<meta property="og:url" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/courses/a3-how-many-miles-prove-a-car-is-safe.html">
+<meta property="og:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How many miles prove a car is safe? - learn autonomous driving with phoebe">
+<meta name="twitter:description" content="RAND's arithmetic, the rule of three, and the 225.2 million miles a fleet needs with zero deaths to beat the human rate.">
+<meta name="twitter:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<!-- social:end -->
+<title>Leader session 3 · How many miles prove a car is safe? - learn autonomous driving with phoebe</title>
+<link rel="stylesheet" href="../assets/style.css?v=2">
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="wrap">
+    <span class="crumb"><a href="../index.html">learn-autonomous-driving-with-phoebe</a> / Leader session 3 of 6</span>
+    <button class="btn" id="toggle-all" type="button">Expand all</button>
+    <button class="btn primary" id="zoom-toggle" type="button">Projector zoom: off</button>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Learn Autonomous Driving with Phoebe · Leader session 3 of 6</div>
+    <h1>How many miles prove a car is <span class="accent">safe?</span></h1>
+    <p class="sub">A fleet drives a long way without a single death and someone puts "zero" on a slide. Zero is an observation, not a rate, and the honest question is how high the true rate could still be. Tonight is RAND's arithmetic of proof, the bound that slides down as miles pile up, and a calculator you can point at any claim. Lanehart, a constructed robotaxi pilot fleet in a fictional city, is the worked case; every Lanehart number is generated, not observed. The human rates are NHTSA's and RAND's, read at source.</p>
+    <div class="chip-row">
+      <span class="chip level">🟡 Working depth</span>
+      <span class="chip audience">Leaders who fund or sign off autonomous-driving data work</span>
+      <span class="chip audience">Data people arriving from the warehouse</span>
+      <span class="chip time">45 min</span>
+    </div>
+    <div class="agenda">
+      <span class="a1" style="flex:1">0-3 · Welcome</span>
+      <span class="a2" style="flex:3">3-18 · RAND's three questions</span>
+      <span class="a3" style="flex:2">18-28 · Zero is not a rate</span>
+      <span class="a4" style="flex:4">28-45 · Build-along and Q&amp;A</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ INTRO ============ -->
+  <section class="section" id="intro">
+    <div class="section-kicker">
+      <span class="klabel">Part 0</span>
+      <h2>Lanehart's slide: zero fatal crashes in 150 million miles</h2>
+    </div>
+    <p class="lede">At the end of leader session 1 you committed to a guess. Lanehart, the constructed pilot fleet, reports zero fatal crashes over 150 million constructed miles, and the safety lead wants to write "safer than human drivers" on the board pack. People on US roads in 2022 died at 1.33 per 100 million miles. Zero is smaller than 1.33. Tonight you find out why that comparison is not the one that matters, and what number would be.</p>
+
+    <div class="legend">
+      <span class="pill">Live = presented in the 45 minutes</span>
+      <span class="pill">Self-study = the full depth, after class</span>
+      <span class="pill">🔍 Every diagram zooms</span>
+    </div>
+
+    <div class="callout win">
+      <p><strong>★ What you walk out with tonight.</strong> RAND's three questions and what each one costs in miles: 275 million to show a fatality rate no worse than humans with zero deaths, about 8.8 billion to measure the rate to within 20%, about 11 billion to show it is 20% better. The rule of three, which turns "nothing happened" into an upper bound you can say out loud. Why Lanehart's 150 million clean miles give a 95% bound of 2.00 deaths per 100 million, still above 1.33, and why the line is crossed only at 225.2 million. And a calculator that prices any zero-event claim in seconds.</p>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>The two numbers on the slide are not the same kind of thing<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>1.33 is a rate measured over an enormous amount of driving: 42,514 deaths across 3,196,191 million vehicle miles in 2022. Zero is a count from a much smaller pile of miles. If the true Lanehart rate were exactly the human rate, the fleet would expect only a couple of deaths in 150 million miles, and seeing none would be unremarkable. So "zero" cannot tell the two possibilities apart yet.</p>
+        <p>The fair question is: given zero deaths in these miles, what is the highest rate we cannot rule out? That number, an upper confidence bound, is what you compare with 1.33. If the bound is below the human line, the claim is proven at that confidence. If only the observation is below it, the claim is not proven. Those three words, "proven", "not proven", "worse", are the whole vocabulary of tonight.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>NHTSA's 2022 summary (DOT HS 813 643) puts the US fatality rate at 1.33 per 100 million vehicle miles; over the ten years 2013 to 2022 it ranged from 1.08 (2014) to 1.38 (2021). The human line a fleet must beat is itself a moving target, which matters later tonight.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>The words that keep coming back<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Exposure.</strong> The miles the evidence covers. Every rate here is per 100 million vehicle miles.</li>
+          <li><strong>Point estimate.</strong> Events divided by miles. With zero events it is zero, which is why it misleads.</li>
+          <li><strong>Upper confidence bound.</strong> The highest true rate still consistent with what was seen, at a stated confidence such as 95%.</li>
+          <li><strong>Zero-event bound.</strong> The upper bound when nothing happened. At 95% it is about 3 events divided by the miles: the rule of three.</li>
+          <li><strong>Proven, not proven, worse.</strong> Bound below the human rate; only the point below it; the point itself at or above it.</li>
+          <li><strong>Constructed.</strong> Lanehart and its miles are invented so the truth is knowable. The human baselines are real and cited.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="section" id="part-1">
+    <div class="section-kicker">
+      <span class="klabel">Part 1 · covers RAND's three questions and Table 1</span>
+      <h2>Three questions, three very different mileages</h2>
+      <span class="tag concept">15 min live</span>
+    </div>
+    <p class="lede">Kalra and Paddock (2016), in RAND's "Driving to Safety", asked how many miles of driving it would take to demonstrate the reliability of an automated vehicle, using the 2013 human rate of 1.09 deaths per 100 million miles. The answer depends entirely on which question you ask. "Is it no worse than people?", "how bad is it, exactly?" and "is it clearly better?" sound alike in a board meeting and differ by a factor of forty in miles.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn bar chart on a linear scale of miles. RAND's first question, a fatality rate at most 1.09 per 100 million with zero deaths at 95 percent confidence, needs 275 million miles, about 12.5 years for 100 vehicles driving nonstop, a thin sliver. The second, estimating the rate to within 20 percent, needs about 96 deaths and 8.8 billion miles, about 400 years. The third, highlighted in yellow, showing the rate is 20 percent better with 95 percent confidence and 80 percent power, needs 11 billion miles, about 500 years.">
+        <defs>
+          <filter id="lha3aSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="37" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha3aHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha3aAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha3aH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha3aL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha3aS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha3aK { font: 400 11px Inter, sans-serif; fill: #1A1F23; }
+          .lha3aV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lha3aA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lha3aN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha3aH" x="30" y="32">RAND'S THREE QUESTIONS, IN MILES OF DRIVING ALONE</text>
+
+        <g filter="url(#lha3aSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M300 48 L300 214"/>
+          <rect x="300" y="56" width="13" height="36" rx="3" transform="rotate(-0.6 306 74)" fill="url(#lha3aHc)"/>
+          <rect x="300" y="112" width="400" height="36" rx="5" transform="rotate(0.3 500 130)" fill="#F1F3F4"/>
+          <rect x="300" y="168" width="500" height="36" rx="5" transform="rotate(-0.2 550 186)" fill="#F2C230"/>
+          <path d="M300 214 L800 214"/>
+          <path d="M527 210 L527 218 M755 210 L755 218"/>
+          <!-- doodle: a lane line -->
+          <path d="M660 30 L690 30 M706 30 L736 30 M752 30 L782 30" stroke="#8C979F" stroke-width="3"/>
+        </g>
+
+        <text class="lha3aL" x="286" y="71" text-anchor="end">No worse than 1.09</text>
+        <text class="lha3aS" x="286" y="87" text-anchor="end">zero deaths, 95%</text>
+        <text class="lha3aL" x="286" y="127" text-anchor="end">Rate known to within 20%</text>
+        <text class="lha3aS" x="286" y="143" text-anchor="end">about 96 deaths, 95%</text>
+        <text class="lha3aL" x="286" y="183" text-anchor="end">20% better than 1.09</text>
+        <text class="lha3aS" x="286" y="199" text-anchor="end">95% confidence, 80% power</text>
+
+        <text class="lha3aV" x="326" y="80">275 million</text>
+        <text class="lha3aS" x="440" y="79">about 12.5 years</text>
+        <text class="lha3aV" x="312" y="136">8.8 billion</text>
+        <text class="lha3aS" x="420" y="135">about 400 years</text>
+        <text class="lha3aV" x="312" y="192">11 billion</text>
+        <text class="lha3aK" x="420" y="191">about 500 years</text>
+
+        <text class="lha3aA" x="300" y="234" text-anchor="middle">0</text>
+        <text class="lha3aA" x="527" y="234" text-anchor="middle">5 billion</text>
+        <text class="lha3aA" x="755" y="234" text-anchor="middle">10 billion</text>
+        <text class="lha3aA" x="550" y="254" text-anchor="middle">miles of failure-free or measured driving, linear scale</text>
+
+        <text class="lha3aN" x="30" y="284">Kalra and Paddock (2016), RAND RR-1478, Table 1, at the 2013 human rate of 1.09 deaths per 100 million miles.</text>
+        <text class="lha3aN" x="30" y="304">Years assume 100 vehicles driving 24 hours a day, 365 days a year, at 25 mph. The first bar is drawn to scale.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow bar is the question a board actually asks, "is it better?", and it costs forty times the miles of "is it no worse?".</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Question one: no worse than people, with zero deaths<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Suppose the fleet never kills anyone. How far must it drive before "never" is evidence? RAND solves it as a reliability demonstration: the miles n at which, if the true rate were the human one, seeing zero deaths would happen less than 5% of the time. Their equation is n = ln(1 - C) / ln(R), with C the confidence and R the chance of surviving one mile. At 95% and 1.09 deaths per 100 million, it gives <strong>275 million failure-free miles</strong>.</p>
+        <p>To make that tangible, RAND imagines 100 vehicles driving 24 hours a day, 365 days a year, at 25 mph. That fleet needs about 12.5 years to cover 275 million miles. This is the cheapest of the three questions, and it only shows "no worse than", never "better".</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>Kalra and Paddock (2016), Driving to Safety, RAND RR-1478, doi:10.7249/RR1478, read at source. Their conclusion: developers "cannot simply drive" their way to safety; test driving alone cannot provide sufficient evidence for fatalities and injuries, and other methods such as simulation, scenario testing and staged deployment are needed. Leader session 2 is where those other methods start.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Questions two and three: how precise, and how much better<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>Precision.</strong> To estimate the fatality rate to within 20% at 95% confidence, you need to observe about 96 deaths. At a rate near 1.09 that is about <strong>8.8 billion miles</strong> (RAND prints 8,811,009,174), about 400 years for the same 100-vehicle fleet. A precise rate needs events, and events are deaths.</p>
+        <p><strong>Superiority.</strong> To show with 95% confidence and 80% power that the fleet's rate is 20% better than 1.09 takes <strong>11 billion miles</strong>. The report disagrees with itself on the time: its text says 518 years and Table 1 says 500, so quote it as "about 500 years". To show 5% better takes 215 billion miles, nearly 10,000 years.</p>
+        <p>The pattern to remember: the smaller the improvement you want to prove, the more miles you need, and it grows fast. The same logic governs any A/B test; <a href="https://phoebefu6.github.io/learn-experimentation-with-phoebe/courses/b2-power-and-sample-size.html">learn experimentation, power and sample size</a> owns the general method.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Injuries and crashes are cheaper to prove<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>RAND's Table 1 repeats the three questions for more common events, using 2013 human benchmarks of 77 reported injuries and 190 reported crashes per 100 million miles. For injuries the three answers are 3.9 million, 125 million and 161 million miles. For crashes they are 1.6 million, 51 million and 65 million.</p>
+        <p>Common events are cheap to measure, which is why fleets report crash and injury rates long before they can say anything about deaths. The catch is comparability: police-reported human crashes undercount all crashes, and a fleet with full telemetry records more of its minor ones. Whether those two counts can be compared like for like is contested, and serious people disagree. Leader session 4 takes it apart.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Why RAND's numbers say 2013<span class="mini">2 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>The report was written with 2013 data: 32,719 deaths, 1.09 per 100 million miles. NHTSA's current table gives 32,893 for 2013 and a rate of 1.10, a later revision. The difference does not change the lesson, but it is a good habit to notice which year's baseline a claim is measured against, because the next Part shows how much the answer moves when the baseline does.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="section" id="part-2">
+    <div class="section-kicker">
+      <span class="klabel">Part 2 · covers the rule of three, the exact bound and the 2022 baseline</span>
+      <h2>Zero is not a rate: the bound that slides with miles</h2>
+      <span class="tag concept">10 min live</span>
+    </div>
+    <p class="lede">When nothing has happened, the upper bound at 95% confidence is -ln(0.05) = 2.996 events, spread over the miles driven. That is the rule of three: about 3 divided by the exposure. As the miles grow, the same 2.996 is spread thinner and the bound slides down. The claim is proven on the day the bound crosses the human line, and not before.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn curve of the 95 percent upper bound on deaths per 100 million miles after zero deaths, falling as miles grow. At 60 million miles the bound is 4.99. At Lanehart's constructed 150 million it is 2.00, above the human rate of 1.33 drawn as a horizontal line from NHTSA 2022. The curve meets the line at 225.2 million miles, highlighted in yellow. At 400 million miles the bound is 0.749, below the line.">
+        <defs>
+          <filter id="lha3bSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="43" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha3bHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha3bAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha3bH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha3bL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha3bS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha3bB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lha3bA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lha3bN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha3bH" x="30" y="32">THE 95% UPPER BOUND AFTER ZERO DEATHS, AS MILES GROW</text>
+        <text class="lha3bA" x="90" y="62">deaths per 100M miles, upper bound</text>
+
+        <g filter="url(#lha3bSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M90 74 L90 300 L824 300"/>
+          <path d="M86 256 L90 256 M86 212 L90 212 M86 168 L90 168 M86 124 L90 124 M86 80 L90 80"/>
+          <path d="M272.5 300 L272.5 304 M455 300 L455 304 M637.5 300 L637.5 304 M820 300 L820 304"/>
+          <path d="M90 241.4 L820 241.4" stroke="#8C979F" stroke-width="2.4" stroke-dasharray="8 6"/>
+          <path d="M199.5 80.3 L217.8 111.7 L236 135.2 L272.5 168.2 L318.1 194.6 L363.8 212.1 L455 234.1 L501 241.4 L637.5 256.1 L820 267"/>
+          <path d="M363.8 218 L363.8 298 M501 249 L501 298" stroke-dasharray="4 4"/>
+          <circle cx="199.5" cy="80.3" r="5" fill="#FFFFFF"/>
+          <circle cx="363.8" cy="212.1" r="5" fill="url(#lha3bHc)"/>
+          <circle cx="501" cy="241.4" r="7" fill="#F2C230"/>
+          <circle cx="820" cy="267" r="5" fill="#FFFFFF"/>
+          <!-- doodle: a cone -->
+          <path d="M834 50 L846 22 L858 50 Z M830 50 L862 50" fill="#FFFFFF"/>
+        </g>
+
+        <text class="lha3bA" x="80" y="304" text-anchor="end">0</text>
+        <text class="lha3bA" x="80" y="260" text-anchor="end">1</text>
+        <text class="lha3bA" x="80" y="216" text-anchor="end">2</text>
+        <text class="lha3bA" x="80" y="172" text-anchor="end">3</text>
+        <text class="lha3bA" x="80" y="128" text-anchor="end">4</text>
+        <text class="lha3bA" x="80" y="84" text-anchor="end">5</text>
+        <text class="lha3bA" x="272.5" y="318" text-anchor="middle">100M</text>
+        <text class="lha3bA" x="455" y="318" text-anchor="middle">200M</text>
+        <text class="lha3bA" x="637.5" y="318" text-anchor="middle">300M</text>
+        <text class="lha3bA" x="820" y="318" text-anchor="middle">400M</text>
+        <text class="lha3bA" x="455" y="338" text-anchor="middle">miles driven with zero deaths</text>
+
+        <text class="lha3bL" x="212" y="86">60M miles: 4.99</text>
+        <text class="lha3bL" x="374" y="200">Lanehart, 150M (constructed): 2.00</text>
+        <text class="lha3bB" x="512" y="228">225.2M miles: the bound meets 1.33</text>
+        <text class="lha3bS" x="96" y="234">human rate 1.33 (NHTSA 2022)</text>
+        <text class="lha3bL" x="812" y="290" text-anchor="end">400M: 0.749</text>
+
+        <text class="lha3bN" x="30" y="364">Bound = 2.996 / miles, per 100 million. It falls below the human line only after 225.2 million miles.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow dot is the day "zero deaths" becomes proof; Lanehart's 150 million clean miles sit well to its left.</figcaption>
+    </figure>
+
+    <div class="wk" id="lha3-calc">
+      <div class="wk-head">
+        <b>Live</b>
+        <span class="wk-hint">The exact Poisson bound, computed in this page. Type any fleet's miles and deaths. The maths is real; Lanehart's miles are constructed; the human rates are NHTSA's (2022) and RAND's (2013).</span>
+      </div>
+      <div class="wk-body">
+        <label class="sql-label" for="lha3-miles">Miles driven, in millions</label>
+        <input class="sql-code" id="lha3-miles" type="number" min="1" step="1" value="150">
+        <label class="sql-label" for="lha3-k">Deaths observed</label>
+        <input class="sql-code" id="lha3-k" type="number" min="0" step="1" value="0">
+        <label class="sql-label" for="lha3-conf">Confidence</label>
+        <select class="sql-code" id="lha3-conf">
+          <option value="0.9">90%</option>
+          <option value="0.95" selected>95%</option>
+          <option value="0.99">99%</option>
+        </select>
+        <label class="sql-label" for="lha3-human">Human baseline to beat</label>
+        <select class="sql-code" id="lha3-human">
+          <option value="1.33" selected>1.33 per 100M, NHTSA 2022</option>
+          <option value="1.09">1.09 per 100M, RAND's 2013 figure</option>
+        </select>
+        <div class="lha3-btns">
+          <button class="btn" id="lha3-reset" type="button">Back to Lanehart: 150M miles, 0 deaths, 95%</button>
+        </div>
+        <div id="lha3-out"></div>
+        <p class="sql-note" id="lha3-verdict">...</p>
+      </div>
+      <div class="wk-foot" id="lha3-self">...</div>
+    </div>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>The rule of three, and where it comes from<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>If deaths arrive at random at some rate over miles, the chance of seeing none in a stretch where you would expect m of them is e to the power -m. Set that chance to 5% and solve: m = -ln(0.05) = 2.996. So with zero events, any true expectation above about 3 events would have made "zero" a less than 5% surprise. Divide 2.996 by the miles and you have the 95% upper bound on the rate.</p>
+        <p>For Lanehart: 2.996 over 150 million miles is 2.00 per 100 million. That is above 1.33, so the verdict is <strong>not proven</strong>. Run it the other way: 2.996 divided by 1.33 per 100 million is <strong>225.2 million miles</strong>. Lanehart has driven two thirds of the way to proof.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>The shortcut is old and comes from medicine. Hanley and Lippman-Hand (1983), "If nothing goes wrong, is everything all right? Interpreting zero numerators", JAMA 249(13):1743-1745, is the reported source for the rule that with 0 events in n trials the 95% upper limit is about 3/n. The result itself is derivable, as above.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Why 275 million became 225.2 million<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Same maths, same 95%, different target. RAND compared against 1.09 deaths per 100 million (2013). The 2022 rate is 1.33, so the line sits higher and the falling bound reaches it sooner: 225.2 million instead of 275 million miles. Nothing about any car improved. The human rate got worse.</p>
+        <p>Two lessons for a leader. First, always ask which year's human rate a claim is measured against; across 2013 to 2022 it ranged from 1.08 to 1.38. Second, confidence is a choice with a price: with zero deaths against 1.33, 90% needs 173.1 million miles and 99% needs 346.3 million. Ask which level was chosen, and who chose it.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>When events do happen: the exact bound<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>The rule of three is the k = 0 case of a general result. For k observed events at confidence C, the exact one-sided upper bound on the expected count (the Garwood form) is the chi-square quantile at C with 2k + 2 degrees of freedom, divided by 2; equivalently the gamma quantile with shape k + 1. For k = 0 it is exactly -ln(1 - C). RAND notes that with fewer than 30 events an exact interval should be used, which is why the calculator above uses the exact form rather than a normal approximation.</p>
+        <p>Try the calculator with one or two deaths at the same miles: the bound jumps, because each event is a large share of a small count. Rare-event rates are fragile in both directions. Practitioner session 7 builds the bound by hand; the general idea of a confidence interval lives in <a href="https://phoebefu6.github.io/learn-statistics-with-phoebe/courses/b7-confidence-intervals.html">learn statistics, confidence intervals</a>.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>All crashes clear the bar sooner, and that is not the end<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Deaths are so rare that the fatal bound is the hardest to clear. All crashes are common: the human baseline, derived from NHTSA 2022 police-reported crashes, is 185.55 per 100 million miles. On its own mix of roads, Lanehart's constructed fleet logs 180 crashes in 150 million miles, a rate of 120.00 with an upper bound of 135.79, comfortably "proven".</p>
+        <p>Comfortably, but on the wrong miles. Lanehart drives mostly highway, people drive more city, night and rain. Leader session 4 re-weights the same crashes to the human mix of roads and shows how the margin narrows, and practitioner session 10 adds the rare scenarios that turn the verdict around.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 3 ============ -->
+  <section class="section" id="part-3">
+    <div class="section-kicker">
+      <span class="klabel">Part 3 · build-along</span>
+      <h2>Price a zero-event claim on one sheet</h2>
+      <span class="tag build">17 min hands on</span>
+    </div>
+    <p class="lede">Pen, paper and the calculator above. You will turn "zero deaths in X miles" into a verdict and a distance still to go, then see how much the answer depends on two choices nobody puts on the slide: the confidence level and the human baseline.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 370" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn bar chart in millions of miles. Lanehart, constructed, has driven 150 million with zero deaths. Miles needed with zero deaths to beat 1.33 deaths per 100 million: 173.1 million at 90 percent confidence, 225.2 million at 95 percent highlighted in yellow, 346.3 million at 99 percent. RAND's figure against the 2013 rate of 1.09 at 95 percent: 275 million.">
+        <defs>
+          <filter id="lha3cSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="53" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha3cHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha3cAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha3cH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha3cL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha3cS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha3cV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lha3cA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lha3cN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha3cH" x="30" y="32">MILES NEEDED WITH ZERO DEATHS, AGAINST THE HUMAN BASELINE (MILLIONS)</text>
+
+        <g filter="url(#lha3cSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M300 46 L300 272 L790 272"/>
+          <path d="M420 268 L420 276 M540 268 L540 276 M660 268 L660 276 M780 268 L780 276"/>
+          <rect x="300" y="52" width="180" height="30" rx="4" transform="rotate(-0.4 390 67)" fill="url(#lha3cHc)"/>
+          <rect x="300" y="98" width="208" height="30" rx="4" transform="rotate(0.3 404 113)" fill="#F1F3F4"/>
+          <rect x="300" y="144" width="270" height="30" rx="4" transform="rotate(-0.3 435 159)" fill="#F2C230"/>
+          <rect x="300" y="190" width="416" height="30" rx="4" transform="rotate(0.2 508 205)" fill="#F1F3F4"/>
+          <rect x="300" y="236" width="330" height="30" rx="4" transform="rotate(-0.2 465 251)" fill="#FFFFFF"/>
+          <!-- doodle: a wheel -->
+          <circle cx="842" cy="58" r="14" fill="#FFFFFF"/>
+          <circle cx="842" cy="58" r="4" fill="#CED4D9"/>
+        </g>
+
+        <text class="lha3cL" x="286" y="66" text-anchor="end">Lanehart has driven</text>
+        <text class="lha3cS" x="286" y="80" text-anchor="end">constructed, 0 deaths</text>
+        <text class="lha3cL" x="286" y="112" text-anchor="end">Needed at 90%</text>
+        <text class="lha3cS" x="286" y="126" text-anchor="end">to beat 1.33 (2022)</text>
+        <text class="lha3cL" x="286" y="158" text-anchor="end">Needed at 95%</text>
+        <text class="lha3cS" x="286" y="172" text-anchor="end">to beat 1.33 (2022)</text>
+        <text class="lha3cL" x="286" y="204" text-anchor="end">Needed at 99%</text>
+        <text class="lha3cS" x="286" y="218" text-anchor="end">to beat 1.33 (2022)</text>
+        <text class="lha3cL" x="286" y="250" text-anchor="end">RAND, needed at 95%</text>
+        <text class="lha3cS" x="286" y="264" text-anchor="end">to beat 1.09 (2013)</text>
+
+        <text class="lha3cV" x="492" y="73">150</text>
+        <text class="lha3cV" x="520" y="119">173.1</text>
+        <text class="lha3cV" x="582" y="165">225.2</text>
+        <text class="lha3cV" x="728" y="211">346.3</text>
+        <text class="lha3cV" x="642" y="257">275</text>
+
+        <text class="lha3cA" x="300" y="290" text-anchor="middle">0</text>
+        <text class="lha3cA" x="420" y="290" text-anchor="middle">100</text>
+        <text class="lha3cA" x="540" y="290" text-anchor="middle">200</text>
+        <text class="lha3cA" x="660" y="290" text-anchor="middle">300</text>
+        <text class="lha3cA" x="780" y="290" text-anchor="middle">400</text>
+        <text class="lha3cA" x="540" y="308" text-anchor="middle">millions of miles</text>
+
+        <text class="lha3cN" x="30" y="338">Derived from NHTSA 2022 (1.33) and RAND RR-1478 (1.09, 2013): miles = -ln(1 - C) / rate. Lanehart is constructed.</text>
+        <text class="lha3cN" x="30" y="356">Same fleet, same zero: the confidence level alone moves the finish line from 173.1 to 346.3 million miles.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow bar is the usual finish line; the bars around it show how far it moves when someone quietly picks a different confidence or baseline.</figcaption>
+    </figure>
+
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Write the claim as two numbers</h4>
+        <p>Events and miles: "0 deaths, 150 million miles" for Lanehart, or any claim you have seen. If the claim has no miles, stop and write "not comparable"; there is nothing to bound.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Bound it by hand with the rule of three</h4>
+        <p>Divide 2.996 by the miles and multiply by 100 million. For Lanehart that gives 2.00. Then put the same numbers into the calculator and check it agrees.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Give the verdict in one word</h4>
+        <p>Bound below the human rate: proven. Only the observed rate below it: not proven. Observed rate at or above it: worse. Lanehart against 1.33 is not proven.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Work out the distance still to go</h4>
+        <p>Miles needed with zero events are 2.996 divided by the human rate per mile: 225.2 million against 1.33. Subtract what has been driven. Then ask how long the fleet takes to drive the gap at its current pace; write your answer down, your numbers will differ.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Move the two hidden choices</h4>
+        <p>In the calculator, switch confidence to 90% and 99%, then switch the baseline to RAND's 1.09. Note the four finish lines: 173.1, 225.2, 346.3 and about 275 million. A claim that does not state both choices has not told you its finish line.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Add one death and watch</h4>
+        <p>Set deaths to 1 at the same miles. Write the new bound next to the old one. That jump is why one event can reverse a confident story, and why practitioner session 7 never reports a rare rate without its bound.</p>
+      </div></div>
+    </div>
+
+    <div class="callout tip">
+      <p><strong>The habit to keep.</strong> Never compare a count of zero with a rate. Ask for the upper bound at a stated confidence, against a stated year's human rate, and for the miles still needed if it is not yet proven. And remember RAND's point: for deaths, driving alone takes hundreds of millions of miles even to say "no worse", so the rest of the evidence has to come from somewhere else.</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="section" id="quiz">
+    <div class="section-kicker">
+      <span class="klabel">Check yourself</span>
+      <h2>Three questions</h2>
+    </div>
+
+    <div class="quiz-q" data-answer="2">
+      <p class="qtext">RAND's report says 275 million failure-free miles; this page says 225.2 million for the same 95% zero-death question. Why the difference?</p>
+      <button class="qopt" type="button">A · The maths of the bound changed between 2016 and today</button>
+      <button class="qopt" type="button">B · Automated vehicles became safer, so fewer miles are needed</button>
+      <button class="qopt" type="button">C · The human rate it is compared with rose, from 1.09 in 2013 to 1.33 in 2022, so the falling bound reaches the line sooner</button>
+      <p class="qwhy">The calculation is the same, which rules out A, and it says nothing about any vehicle, which rules out B. Only the target moved. Always ask which year's human rate a claim uses.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="0">
+      <p class="qtext">Lanehart (constructed) reports zero fatal crashes in 150 million miles. What is the honest verdict against 1.33 per 100 million at 95%?</p>
+      <button class="qopt" type="button">A · Not proven: the upper bound is 2.00 per 100 million, still above 1.33; zero deaths would need about 225.2 million miles to prove it</button>
+      <button class="qopt" type="button">B · Proven: an observed rate of zero is below 1.33</button>
+      <button class="qopt" type="button">C · Worse than humans: with no events, nothing good can be said</button>
+      <p class="qwhy">B compares a count with a rate. C ignores that zero events still bound the rate, at about 3 divided by the miles. The verdict is "not proven", with a known distance still to go.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="1">
+      <p class="qtext">A board member asks for 99% confidence instead of 95%. With zero deaths, against 1.33, how many miles does the fleet need?</p>
+      <button class="qopt" type="button">A · 225.2 million, the same; confidence does not change the miles</button>
+      <button class="qopt" type="button">B · 346.3 million</button>
+      <button class="qopt" type="button">C · 173.1 million, fewer, because the bar is stricter</button>
+      <p class="qwhy">The zero-event bound is -ln(1 - C) divided by the miles. At 99% the numerator grows from 2.996 to -ln(0.01), so more miles are needed. 173.1 million is the 90% answer.</p>
+    </div>
+
+    <div class="quiz-score"></div>
+  </section>
+
+  <!-- ============ HOMEWORK ============ -->
+  <section class="section" id="homework">
+    <div class="section-kicker">
+      <span class="klabel">Before session 4</span>
+      <h2>Homework</h2>
+    </div>
+    <p class="lede">Twenty minutes, one claim and one table.</p>
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Price one public claim</h4>
+        <p>Find any public statement of the form "no fatalities in X miles". Run it through the calculator and write three lines: the bound, the verdict, and the miles still needed. If the claim states no confidence or baseline, write which ones you assumed.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Read RAND's Table 1 and its conclusion</h4>
+        <p>Find the fatality, injury and crash rows and the "cannot simply drive" conclusion in Kalra and Paddock (2016). Write one sentence on why injuries and crashes are cheaper to prove than deaths, and one on what that cheapness hides.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Commit to a guess about crashes</h4>
+        <p>Lanehart's crash rate on its own roads is 120.00 per 100 million against a human 185.55. Write down whether you think that survives matching Lanehart's roads to the roads people drive. Leader session 4 checks the guess.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ OFFICIAL ============ -->
+  <section class="section" id="official">
+    <div class="section-kicker">
+      <span class="klabel">Covered tonight</span>
+      <h2>What this session covers</h2>
+    </div>
+    <div class="covered">
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">RAND's three questions</span><span class="note">Kalra and Paddock (2016), Driving to Safety, RAND RR-1478, doi:10.7249/RR1478: 275 million, 8.8 billion, 11 billion miles. Read at source.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The human baseline</span><span class="note">NHTSA NCSA (2024), DOT HS 813 643: 1.33 deaths per 100 million VMT in 2022; range 1.08 to 1.38 over 2013 to 2022. Read at source.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The rule of three</span><span class="note">Hanley and Lippman-Hand (1983), JAMA 249(13):1743-1745. Reported; the result is derived on the page.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The exact Poisson bound</span><span class="note">Garwood form, standard maths; computed live by the engine and checked by its self-test.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Miles needed at 2022 rates</span><span class="note">Derived: 225.2 million at 95%, 173.1 million at 90%, 346.3 million at 99%.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Crash rates and the exposure match</span><span class="note">Named tonight (120.00 against 185.55). Leader session 4, practitioner session 7.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Evidence beyond driving</span><span class="note">RAND's conclusion named tonight. Leader session 2, practitioner sessions 6 and 8.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Power and sample size in general</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-experimentation-with-phoebe/courses/b2-power-and-sample-size.html">learn experimentation, power and sample size</a>.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Rates as a Bayesian posterior</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-bayesian-with-phoebe/courses/p1-beta-binomial-by-hand.html">learn Bayesian, beta-binomial by hand</a>.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Real fleets and their mileage</span><span class="note">Out of scope by design. Every fleet number here is constructed; only the human rates are real.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section class="section" id="cheatsheet">
+    <div class="section-kicker">
+      <span class="klabel">Take this with you</span>
+      <h2>Cheat sheet</h2>
+    </div>
+    <div class="cheat">
+      <div class="cheat-item"><strong>The one sentence.</strong> Zero deaths is a count, not a rate; compare the upper bound with the human rate.</div>
+      <div class="cheat-item"><strong>Rule of three.</strong> With zero events, the 95% upper bound is 2.996 divided by the exposure.</div>
+      <div class="cheat-item"><strong>Three verdicts.</strong> Bound below: proven. Only the point below: not proven. Point at or above: worse.</div>
+      <div class="cheat-item"><strong>The human line.</strong> 1.33 deaths per 100 million miles (NHTSA, 2022); RAND used 1.09 (2013).</div>
+      <div class="cheat-item"><strong>Finish line.</strong> 225.2 million miles with zero deaths at 95%; 173.1 million at 90%; 346.3 million at 99%.</div>
+      <div class="cheat-item"><strong>RAND's three questions.</strong> No worse: 275 million. Within 20%: 8.8 billion. 20% better: 11 billion.</div>
+      <div class="cheat-item"><strong>Lanehart (constructed).</strong> 0 deaths in 150 million miles: bound 2.00, not proven.</div>
+      <div class="cheat-item"><strong>Two hidden choices.</strong> Always ask the confidence level and which year's human rate.</div>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    <div class="wrap">
+      <p>Leader session 3 of 6 · learn-autonomous-driving-with-phoebe · by Phoebe Fu</p>
+      <nav class="pagenav">
+        <a href="a2-the-long-tail.html">← Leader session 2 · The long tail: where the work actually is</a>
+        <a href="a4-reading-a-safety-claim.html">Leader session 4 · Reading a safety claim →</a>
+      </nav>
+    </div>
+  </footer>
+
+</main>
+
+<script src="../assets/av-live.js?v=1"></script>
+<script src="../assets/app.js?v=1"></script>
+<script>
+(function () {
+  if (typeof AV === "undefined") return;
+  var milesIn = document.getElementById("lha3-miles");
+  var kIn = document.getElementById("lha3-k");
+  var conf = document.getElementById("lha3-conf");
+  var human = document.getElementById("lha3-human");
+  var out = document.getElementById("lha3-out");
+  var verdict = document.getElementById("lha3-verdict");
+  var self = document.getElementById("lha3-self");
+  if (!milesIn || !out) return;
+  var VERD = { proven: "proven better", notproven: "not proven", worse: "worse than humans" };
+
+  function fmt(x, d) { return x.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function rate(x) { return fmt(x, x < 1 ? 3 : 2); }
+  function isCanon(m, k, c, h) { return m === 150 && k === 0 && Math.abs(c - 0.95) < 1e-9 && h === 1.33; }
+
+  function render() {
+    var m = Number(milesIn.value), k = Math.floor(Number(kIn.value));
+    var c = Number(conf.value), h = Number(human.value);
+    if (!(m > 0) || !(k >= 0)) {
+      out.innerHTML = "";
+      verdict.textContent = "Enter miles above zero and a count of deaths of zero or more.";
+      return;
+    }
+    var miles = m * 1e6;
+    var point = k / miles * 1e8;
+    var upper = AV.poissonUpper(k, c) / miles * 1e8;
+    var need = AV.poissonUpper(0, c) / (h / 1e8);
+    var v = AV.verdict(point, upper, h);
+    var pc = Math.round(c * 100) + "%";
+    var html = '<table class="sql-table"><thead><tr><th>Quantity</th><th>Value</th></tr></thead><tbody>';
+    html += "<tr><td>Observed rate, deaths per 100M</td><td>" + rate(point) + "</td></tr>";
+    html += '<tr class="lha3-top"><td>' + pc + " upper bound, per 100M</td><td><b>" + rate(upper) + "</b></td></tr>";
+    html += "<tr><td>Human rate to beat</td><td>" + h + "</td></tr>";
+    html += "<tr><td>Miles needed with zero deaths at " + pc + "</td><td>" + fmt(need / 1e6, 1) + " million</td></tr>";
+    html += '<tr><td>Verdict</td><td><span class="lha3-v lha3-' + v + '">' + VERD[v] + "</span></td></tr>";
+    html += "</tbody></table>";
+    html += '<p class="sql-note">' + (isCanon(m, k, c, h)
+      ? "Lanehart's constructed canon settings: the figures in the prose."
+      : "Not Lanehart's canon settings: your numbers will differ from the figures in the prose." + (h === 1.09 && k === 0 && Math.abs(c - 0.95) < 1e-9 ? " RAND rounds the zero-death figure to 275 million." : "")) + "</p>";
+    out.innerHTML = html;
+
+    var msg = k + (k === 1 ? " death" : " deaths") + " in " + fmt(m, 0) + " million miles: the " + pc + " upper bound is " + rate(upper) + " per 100M against " + h + ", so the claim is " + VERD[v] + ".";
+    if (v !== "proven" && k === 0) msg += " With no deaths, the bound reaches the line at " + fmt(need / 1e6, 1) + " million miles, " + fmt(Math.max(0, need / 1e6 - m), 1) + " million to go.";
+    if (v !== "proven" && k > 0) msg += " With deaths observed, more miles alone may not be enough; the observed rate itself has to be well below the line.";
+    verdict.textContent = msg;
+  }
+
+  document.getElementById("lha3-reset").addEventListener("click", function () {
+    milesIn.value = "150"; kIn.value = "0"; conf.value = "0.95"; human.value = "1.33"; render();
+  });
+  [milesIn, kIn].forEach(function (el) { el.addEventListener("input", render); });
+  [conf, human].forEach(function (el) { el.addEventListener("change", render); });
+
+  var st = AV.selfTestResult || AV.selfTest();
+  self.textContent = st.pass
+    ? "The engine's " + st.checks.length + " self-checks pass in this browser, including the zero-event bound equal to -ln(1 - C). Lanehart is constructed; the human rates are NHTSA's and RAND's."
+    : "The engine's self-check did not pass in this browser, so nothing above should be believed.";
+  render();
+})();
+</script>
+<style>
+  #lha3-calc .sql-code { border: 1px solid var(--hairline); border-radius: 8px; max-width: 24rem; width: 100%; padding: .45rem .6rem; font: inherit; }
+  #lha3-calc table.sql-table { margin: .6rem 0 .2rem; font-size: .85rem; }
+  #lha3-calc .lha3-btns { display: flex; flex-wrap: wrap; gap: .5rem; margin: .7rem 0 .3rem; }
+  #lha3-calc tr.lha3-top td { background: var(--amber-50); }
+  #lha3-calc .lha3-v { font-weight: 700; white-space: nowrap; }
+  #lha3-calc .lha3-proven { color: var(--indigo-deep); }
+  #lha3-calc .lha3-notproven { color: var(--amber-ink-text); }
+  #lha3-calc .lha3-worse { color: #991B1B; }
+</style>
+</body>
+</html>

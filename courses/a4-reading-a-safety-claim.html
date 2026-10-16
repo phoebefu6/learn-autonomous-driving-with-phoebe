@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- social:start -->
+<meta name="description" content="Leader session 4 of 6. A crash count with no miles is not a rate, a rate on easy miles is not comparable, and a disengagement count measures the takeover policy as much as the car. Five questions to put to any safety claim. Lanehart is a constructed fleet.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Learn with Phoebe">
+<meta property="og:title" content="Reading a safety claim - learn autonomous driving with phoebe">
+<meta property="og:description" content="Leader session 4 of 6. Numerator, denominator, which miles, how sure, and what was never seen: five gates for any autonomous-driving safety claim.">
+<meta property="og:url" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/courses/a4-reading-a-safety-claim.html">
+<meta property="og:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Reading a safety claim - learn autonomous driving with phoebe">
+<meta name="twitter:description" content="The same crashes weighted by human miles go from 120.00 to 147.74 per 100 million. Why exposure decides the verdict, and why disengagements measure policy.">
+<meta name="twitter:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<!-- social:end -->
+<title>Leader session 4 · Reading a safety claim - learn autonomous driving with phoebe</title>
+<link rel="stylesheet" href="../assets/style.css?v=2">
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="wrap">
+    <span class="crumb"><a href="../index.html">learn-autonomous-driving-with-phoebe</a> / Leader session 4 of 6</span>
+    <button class="btn" id="toggle-all" type="button">Expand all</button>
+    <button class="btn primary" id="zoom-toggle" type="button">Projector zoom: off</button>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Learn Autonomous Driving with Phoebe · Leader session 4 of 6</div>
+    <h1>Reading a <span class="accent">safety claim</span></h1>
+    <p class="sub">Every safety claim is a fraction, and most of the trouble hides in the bottom half. A count of crash reports has no miles under it. A rate on easy miles is compared with a rate on all miles. A falling count of takeovers is read as a safer car when it may only be a looser policy. Lanehart, a constructed robotaxi pilot fleet in a fictional city, supplies the worked numbers; every Lanehart number is generated, not observed. The human baselines are real and cited.</p>
+    <div class="chip-row">
+      <span class="chip level">🟠 Advanced</span>
+      <span class="chip audience">Leaders asked to sign off a safety number</span>
+      <span class="chip audience">Analysts who will be asked to defend one</span>
+      <span class="chip time">45 min</span>
+    </div>
+    <div class="agenda">
+      <span class="a1" style="flex:1">0-3 · Welcome</span>
+      <span class="a2" style="flex:3">3-18 · Counts, miles, which miles</span>
+      <span class="a3" style="flex:2">18-28 · Takeovers measure policy</span>
+      <span class="a4" style="flex:4">28-45 · Build-along and Q&amp;A</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ INTRO ============ -->
+  <section class="section" id="intro">
+    <div class="section-kicker">
+      <span class="klabel">Part 0</span>
+      <h2>Lanehart's safety lead brings a slide to the board</h2>
+    </div>
+    <p class="lede">Lanehart is a constructed robotaxi pilot fleet in a fictional city. After 150 million constructed miles its safety lead brings one slide: 180 crashes, 120.00 per 100 million miles, against 185.55 for human drivers. Below it, a second line: disengagements down from 0.987 to 0.027 per 100,000 miles since the new takeover policy. Both lines are arithmetically true. Tonight is about why neither one, as written, says what the slide says it does.</p>
+
+    <div class="legend">
+      <span class="pill">Live = presented in the 45 minutes</span>
+      <span class="pill">Self-study = the full depth, after class</span>
+      <span class="pill">🔍 Every diagram zooms</span>
+    </div>
+
+    <div class="callout win">
+      <p><strong>★ What you walk out with tonight.</strong> The regulator's own sentence on why public crash counts cannot be ranked. Why the same human drivers die at a rate half again higher on rural miles, and what that does to any comparison that ignores where a fleet drives. A worked exposure match that moves Lanehart's constructed rate from 120.00 to 147.74 per 100 million, and a thinner fleet where it flips the verdict. Why a disengagement count can improve while the car gets worse. And a five-question checklist you can run on any claim in two minutes.</p>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>A claim is a fraction with a comparison word<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Strip any safety claim down and three parts are left: a numerator (what was counted), a denominator (how much driving it covers) and a comparison (better than whom, on what driving). Leader session 3 was about one more part, how sure you can be given how few events there are. Tonight is about the other three, because they fail more quietly.</p>
+        <p>A warehouse analyst already knows the shape of the trap: conversion rate by channel, where the channel with the best rate also gets the easiest traffic. Driving has the same trap with higher stakes. Highway miles, city streets at night and rain are different exposures, and a fleet chooses where it drives.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>The words that matter tonight<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Numerator.</strong> The events counted: crashes, police-reported crashes, injuries, deaths, takeovers. Which one is a choice, and each has its own reporting rule.</li>
+          <li><strong>Exposure.</strong> The denominator, usually miles, and its kind: road type, time of day, weather, the operating domain.</li>
+          <li><strong>Exposure mix.</strong> The share of miles in each kind of driving. Two fleets with identical risk per context can show different overall rates only because their mixes differ.</li>
+          <li><strong>Exposure-matched rate.</strong> Each context's rate re-weighted by the comparison group's mix. Epidemiologists call it a directly standardised rate.</li>
+          <li><strong>Disengagement.</strong> The automated mode switching off because a failure was detected or the safety driver took manual control (California's definition).</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="section" id="part-1">
+    <div class="section-kicker">
+      <span class="klabel">Part 1 · covers the missing denominator and the exposure mismatch</span>
+      <h2>A count is not a rate, and a rate is not a comparison</h2>
+      <span class="tag concept">15 min live</span>
+    </div>
+    <p class="lede">The first two failures stack. A count with no miles under it cannot be compared with anything. Add the miles and you have a rate, but a rate earned on easy driving still cannot be set against a rate earned on all driving. The figure shows Lanehart's constructed crashes weighted two ways: by the miles Lanehart actually drove, and by the mix of miles human drivers drive.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn table of four road contexts for the constructed Lanehart fleet, with its crash rate per 100 million miles in each: highway 69.09, urban day 155.56, night 186.67, rain 333.33. Bars show Lanehart's share of miles, 55, 30, 10 and 5 percent, against the constructed human mix, 35, 40, 15 and 10 percent. Weighted by Lanehart's own miles the rate is 120.00 per 100 million. Weighted by the human mix it is 147.74, highlighted in yellow. The human baseline is 185.55, derived from NHTSA 2022.">
+        <defs>
+          <filter id="lha4aSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="41" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha4aHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha4aAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha4aH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha4aL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha4aS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha4aK { font: 400 11px Inter, sans-serif; fill: #1A1F23; }
+          .lha4aV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lha4aA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lha4aN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha4aH" x="30" y="32">SAME CRASHES, TWO WAYS TO WEIGHT THE MILES</text>
+        <text class="lha4aA" x="30" y="58">Context</text>
+        <text class="lha4aA" x="220" y="58">Lanehart rate</text>
+        <text class="lha4aA" x="330" y="58">Lanehart's own miles</text>
+        <text class="lha4aA" x="590" y="58">Human miles mix</text>
+
+        <g filter="url(#lha4aSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="70" width="170" height="36" rx="6" transform="rotate(-0.5 115 88)" fill="#FFFFFF"/>
+          <rect x="30" y="116" width="170" height="36" rx="6" transform="rotate(0.4 115 134)" fill="#FFFFFF"/>
+          <rect x="30" y="162" width="170" height="36" rx="6" transform="rotate(-0.4 115 180)" fill="#FFFFFF"/>
+          <rect x="30" y="208" width="170" height="36" rx="6" transform="rotate(0.5 115 226)" fill="#FFFFFF"/>
+          <rect x="330" y="76" width="220" height="24" rx="4" transform="rotate(-0.3 440 88)" fill="url(#lha4aHc)"/>
+          <rect x="330" y="122" width="120" height="24" rx="4" transform="rotate(0.4 390 134)" fill="url(#lha4aHc)"/>
+          <rect x="330" y="168" width="40" height="24" rx="4" transform="rotate(-0.6 350 180)" fill="url(#lha4aHc)"/>
+          <rect x="330" y="214" width="20" height="24" rx="4" transform="rotate(0.6 340 226)" fill="url(#lha4aHc)"/>
+          <rect x="590" y="76" width="140" height="24" rx="4" transform="rotate(0.3 660 88)" fill="#F1F3F4"/>
+          <rect x="590" y="122" width="160" height="24" rx="4" transform="rotate(-0.3 670 134)" fill="#F1F3F4"/>
+          <rect x="590" y="168" width="60" height="24" rx="4" transform="rotate(0.5 620 180)" fill="#F1F3F4"/>
+          <rect x="590" y="214" width="40" height="24" rx="4" transform="rotate(-0.5 610 226)" fill="#F1F3F4"/>
+          <rect x="330" y="262" width="230" height="56" rx="8" transform="rotate(-0.4 445 290)" fill="#FFFFFF"/>
+          <rect x="590" y="262" width="230" height="56" rx="8" transform="rotate(0.4 705 290)" fill="#F2C230"/>
+          <path d="M562 290 L586 290" marker-end="url(#lha4aAr)"/>
+          <!-- doodle: a lane line -->
+          <path d="M700 30 L730 30 M746 30 L776 30 M792 30 L822 30" stroke="#8C979F" stroke-width="3"/>
+        </g>
+
+        <text class="lha4aL" x="46" y="93">Highway</text>
+        <text class="lha4aL" x="46" y="139">Urban day</text>
+        <text class="lha4aL" x="46" y="185">Night</text>
+        <text class="lha4aL" x="46" y="231">Rain</text>
+        <text class="lha4aV" x="220" y="94">69.09</text>
+        <text class="lha4aV" x="220" y="140">155.56</text>
+        <text class="lha4aV" x="220" y="186">186.67</text>
+        <text class="lha4aV" x="220" y="232">333.33</text>
+        <text class="lha4aS" x="558" y="92">55%</text>
+        <text class="lha4aS" x="458" y="138">30%</text>
+        <text class="lha4aS" x="378" y="184">10%</text>
+        <text class="lha4aS" x="358" y="230">5%</text>
+        <text class="lha4aS" x="738" y="92">35%</text>
+        <text class="lha4aS" x="758" y="138">40%</text>
+        <text class="lha4aS" x="658" y="184">15%</text>
+        <text class="lha4aS" x="638" y="230">10%</text>
+
+        <text class="lha4aL" x="30" y="284">Crashes per 100M miles</text>
+        <text class="lha4aS" x="30" y="302">human baseline 185.55</text>
+        <text class="lha4aS" x="346" y="284">weighted by own miles</text>
+        <text class="lha4aV" x="346" y="306">120.00</text>
+        <text class="lha4aK" x="606" y="284">weighted by human miles</text>
+        <text class="lha4aV" x="606" y="306">147.74</text>
+
+        <text class="lha4aN" x="30" y="344">Each context rate times its share of miles, summed. Lanehart's own mix is mostly highway, the easiest miles.</text>
+        <text class="lha4aN" x="30" y="364">Constructed numbers (seed 1016, 150M miles). Only 185.55, derived from NHTSA 2022, is real.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - nothing about the car changed between the two boxes; only the weights did, and the yellow box is the honest comparison.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>The regulator's own warning about its counts<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>NHTSA's Standing General Order requires named manufacturers and operators to report crashes involving automated driving systems (SAE Levels 3 to 5) when the system was in use at any time within 30 seconds of the crash and the crash met damage or injury criteria. Level 2 systems are reportable only for a struck vulnerable road user, a fatality, an air bag deployment or a hospital transport. The page says it plainly: "crash reporting criteria are stricter for ADS".</p>
+        <p>Then the sentence every leader should be able to quote. The crash counts "have not" been "normalized or adjusted by any measure of exposure, including operational design domains or vehicle miles traveled". Reporting entities are not required to report vehicles operated or distances travelled. The page also lists what else limits the data: reports may be incomplete or unverified, one crash may have several reports, ADS and Level 2 were sometimes misclassified in earlier versions, and telemetry differs by entity.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>A count of reports is a numerator with no denominator, published by the regulator with that warning attached. A fleet that drives ten times the miles can file more reports and be the safer fleet. Ranking companies by report count reads a numerator as if it were a rate, and the regulator has told you in writing not to.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Same drivers, different miles: rural and urban<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>NHTSA's summary of 2022 US crashes splits the 42,514 deaths by area: 17,283 rural (41 percent) and 25,023 urban (59 percent). FHWA puts the rural share of vehicle miles at 32 percent. Rural areas hold 20 percent of the population, 32 percent of the miles and 41 percent of the deaths.</p>
+        <p>Divide through and the same national population of drivers dies at about 1.69 per 100 million miles on rural roads and about 1.15 on urban ones (derived, approximate because the 32 percent share is rounded). The national 1.33 is a blend of the two, weighted by where people happen to drive.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>This is the exposure mismatch with nothing autonomous in it: the drivers did not change, the roads did, and the rate moved by half again. Any fleet that drives only some kinds of road and compares itself with the all-roads 1.33 or 185.55 is comparing two different blends. Ask for the comparison on the same kind of miles.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>The match, worked, and the fleet where it flips the verdict<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Lanehart's constructed log has 180 crashes over 150 million miles: 120.00 per 100 million, with an exact 95 percent upper bound of 135.79, comfortably below the human 185.55. But 55 percent of those miles are highway, where Lanehart crashes 69.09 per 100 million; the constructed human mix is only 35 percent highway and carries more urban, night and rain driving. Re-weight Lanehart's own context rates by the human mix and the rate becomes 147.74, upper bound 169.04. Still below 185.55, with a much narrower margin.</p>
+        <p>Now take the same constructed fleet after only 60 million miles. On its own mix: 82 crashes, 136.67 per 100 million, upper bound 164.22, "proven". Exposure-matched: 168.23, upper bound 205.62, not proven. The thin night and rain miles carry heavy weight in the human mix, and with few miles there the bound is wide. The match did not just shave the margin; it flipped the verdict.</p>
+        <p>Notice one more line in the figure: in rain, Lanehart's constructed rate of 333.33 is above the constructed human rain rate of 295.40. A single blended rate hid a context where the fleet is worse.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Where serious people disagree: is the numerator comparable?<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Matching the miles does not settle the numerator. The 185.55 human baseline is police-reported crashes divided by all vehicle miles (derived from NHTSA 2022), and police reports undercount crashes; RAND's report keeps separate "reported" and "estimated total" rates for that reason. A fleet with full telemetry records minor bumps no human would report.</p>
+        <p>One side says the fleet is therefore penalised and the true comparison is kinder to it. The other says telemetry fleets also choose what counts as a crash, and that a reporting rule written for one population cannot be assumed to transfer. Both are reasonable. A leader's move is to ask which rule produced each numerator and to write the answer next to the comparison, not to pick a side.</p>
+        <p>The exposure-matched bound uses the gamma interval for directly standardised rates from Fay and Feuer (1997), reported; practitioner session 7 builds it.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="section" id="part-2">
+    <div class="section-kicker">
+      <span class="klabel">Part 2 · covers disengagements as a metric</span>
+      <h2>A takeover count measures the policy as much as the car</h2>
+      <span class="tag concept">10 min live</span>
+    </div>
+    <p class="lede">California's regulation defines a disengagement as a deactivation of the autonomous mode when a failure of the technology is detected, or when safe operation requires the test driver to take manual control. The second half is a judgement. Who takes over, and how early, is set by the operator's takeover policy. So a fleet can halve its disengagements by changing a rule for its safety drivers, with no change to the car at all.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn severity line zoomed to 0.90 to 1.00, constructed. Three takeover policies: cautious takes over above 0.50, standard above 0.90, loose above 0.985. Conflicts above 0.97 that are not taken over crash with probability 0.25. Under the loose policy the band from 0.97 to 0.985, highlighted in yellow, is not taken over and can crash. Results per policy: cautious 0.987 disengagements per 100,000 miles, 0 extra crashes, true rate 192.24; standard 0.193, 0, 192.24; loose 0.027, 21, 206.24.">
+        <defs>
+          <filter id="lha4bSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="43" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha4bHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha4bAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha4bH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha4bL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha4bS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha4bK { font: 600 11px Inter, sans-serif; fill: #1A1F23; }
+          .lha4bB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lha4bV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lha4bA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lha4bN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha4bH" x="30" y="30">ONE SEVERITY LINE, THREE TAKEOVER POLICIES, ZOOMED TO 0.90 - 1.00</text>
+        <text class="lha4bA" x="100" y="56" text-anchor="middle">0.90</text>
+        <text class="lha4bA" x="604" y="56" text-anchor="middle">0.97</text>
+        <text class="lha4bA" x="712" y="56" text-anchor="middle">0.985</text>
+        <text class="lha4bA" x="820" y="56" text-anchor="middle">1.00</text>
+
+        <g filter="url(#lha4bSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M100 70 L820 70"/>
+          <path d="M100 64 L100 76 M604 64 L604 76 M712 64 L712 76 M820 64 L820 76"/>
+          <rect x="100" y="90" width="720" height="36" rx="6" transform="rotate(-0.2 460 108)" fill="#F1F3F4"/>
+          <rect x="100" y="140" width="720" height="36" rx="6" transform="rotate(0.2 460 158)" fill="#F1F3F4"/>
+          <rect x="604" y="190" width="108" height="36" rx="6" transform="rotate(-0.6 658 208)" fill="#F2C230"/>
+          <rect x="712" y="190" width="108" height="36" rx="6" transform="rotate(0.5 766 208)" fill="#F1F3F4"/>
+          <path d="M604 80 L604 86 M604 130 L604 136 M604 180 L604 186" stroke-dasharray="3 3"/>
+          <rect x="30" y="248" width="820" height="88" rx="8" transform="rotate(0.15 440 292)" fill="#FFFFFF"/>
+          <!-- doodle: a cone -->
+          <path d="M836 40 L846 18 L856 40 Z M832 40 L860 40" fill="#FFFFFF"/>
+        </g>
+
+        <text class="lha4bL" x="30" y="113">Cautious</text>
+        <text class="lha4bL" x="30" y="163">Standard</text>
+        <text class="lha4bL" x="30" y="213">Loose</text>
+        <text class="lha4bK" x="116" y="112">taken over from 0.50 (off the left edge)</text>
+        <text class="lha4bK" x="116" y="162">taken over from 0.90</text>
+        <text class="lha4bS" x="116" y="212">no takeover below 0.985</text>
+        <text class="lha4bK" x="618" y="212">crash zone</text>
+        <text class="lha4bK" x="726" y="212">taken over</text>
+        <text class="lha4bB" x="350" y="212">untaken above 0.97: crash odds 0.25</text>
+
+        <text class="lha4bA" x="46" y="270">Policy</text>
+        <text class="lha4bA" x="200" y="270">Disengagements per 100k miles</text>
+        <text class="lha4bA" x="460" y="270">Extra crashes</text>
+        <text class="lha4bA" x="620" y="270">True crashes per 100M</text>
+        <text class="lha4bS" x="46" y="292">cautious</text>
+        <text class="lha4bS" x="46" y="310">standard</text>
+        <text class="lha4bB" x="46" y="328">loose</text>
+        <text class="lha4bS" x="200" y="292">0.987</text>
+        <text class="lha4bS" x="200" y="310">0.193</text>
+        <text class="lha4bB" x="200" y="328">0.027 (looks best)</text>
+        <text class="lha4bS" x="460" y="292">0</text>
+        <text class="lha4bS" x="460" y="310">0</text>
+        <text class="lha4bB" x="460" y="328">21</text>
+        <text class="lha4bS" x="620" y="292">192.24</text>
+        <text class="lha4bS" x="620" y="310">192.24</text>
+        <text class="lha4bB" x="620" y="328">206.24 (worst)</text>
+
+        <text class="lha4bN" x="30" y="362">Ranked by disengagements, loose wins. It is the only policy that adds crashes: +14.00 per 100M.</text>
+        <text class="lha4bN" x="30" y="382">Cautious vs standard: 5x the disengagements, identical safety. All numbers constructed (seed 1016).</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow band is the conflicts the loose policy stops catching; the metric improves exactly where the car gets worse.</figcaption>
+    </figure>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>How the constructed anti-lever works<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>In the constructed model, Lanehart's supervised miles produce 2,000 conflicts per 100 million miles, each with a severity between 0 and 1. A safety driver takes over when severity exceeds the policy's threshold: 0.50 for cautious, 0.90 for standard, 0.985 for loose. A conflict above 0.97 that is not taken over becomes a crash with probability 0.25.</p>
+        <p>Cautious and standard both catch everything above 0.97, so both leave the true crash rate at 192.24 per 100 million; cautious simply logs five times the disengagements. Loose lets the band from 0.97 to 0.985 through, adds 21 crashes and lifts the true rate to 206.24, while posting by far the best disengagement score. Score the fleet on disengagements and the score picks the worst policy.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>California's regulation (13 CCR 227.50, as of the 2024 text) asks for monthly autonomous miles on public roads, the circumstances of each disengagement, the location type (interstate, freeway, highway, rural road, street, parking facility) and who initiated it: the technology, the test driver, a remote operator or a passenger. That is a rich record of when control changed hands. It is not a crash rate, and the "who initiated" column is a reminder that a human decision sits inside many of the rows.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>What disengagement data is good for<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Read inside one fleet under one fixed policy, disengagements are useful: where they cluster, which location types, which conditions, who initiated. They point the data team at the logs worth mining (practitioner session 3). Across fleets, or across a policy change, a count per mile mostly measures the policy.</p>
+        <p>The question to ask is simple: did the takeover rule change during the period? If yes, the trend is about the rule until shown otherwise.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Where serious people disagree: disengagement as a metric<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Some treat disengagements per mile as the most comparable public number available, because the definition is in regulation and the miles come with it. Critics call the definition open to interpretation (reported, trade press) and point out that operators choose test routes and takeover rules. A 2025 proposal from the state regulator would amend the article that holds this section; whether it is adopted is not confirmed here, which is why this page quotes the 2024 text.</p>
+        <p>The constructed anti-lever does not settle the debate. It shows only that the number can move in the wrong direction for safety, which is enough reason never to read it alone.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 3 ============ -->
+  <section class="section" id="part-3">
+    <div class="section-kicker">
+      <span class="klabel">Part 3 · build-along</span>
+      <h2>Five gates for any safety claim</h2>
+      <span class="tag build">17 min hands on</span>
+    </div>
+    <p class="lede">No code. The checklist is five questions in a fixed order, and a claim stops at the first gate it cannot pass. Run Lanehart's constructed claims through the widget first, then take one claim of your own through the same gates on paper.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn row of five gates, left to right. 1, what was counted: events, not choices. 2, how many miles: no denominator, no rate. 3, which miles, highlighted in yellow: road, time, weather matched to the baseline. 4, how sure: an upper bound, not a point. 5, what was never seen: the rare tail and how it was tested. Under each gate, Lanehart's constructed matched claim: 180 crashes; 150M miles; 120.00 to 147.74; upper bound 169.04; tail priced in gives 192.24, worse.">
+        <defs>
+          <filter id="lha4cSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="47" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lha4cHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lha4cAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lha4cH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha4cL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lha4cS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lha4cK { font: 400 11px Inter, sans-serif; fill: #1A1F23; }
+          .lha4cV { font: 800 18px Inter, sans-serif; fill: #1C2328; }
+          .lha4cN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lha4cH" x="30" y="32">FIVE GATES, IN ORDER. A CLAIM STOPS AT THE FIRST ONE IT CANNOT PASS</text>
+
+        <g filter="url(#lha4cSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="50" width="150" height="96" rx="8" transform="rotate(-0.6 105 98)" fill="#FFFFFF"/>
+          <rect x="200" y="50" width="150" height="96" rx="8" transform="rotate(0.5 275 98)" fill="#FFFFFF"/>
+          <rect x="370" y="50" width="150" height="96" rx="8" transform="rotate(-0.4 445 98)" fill="#F2C230"/>
+          <rect x="540" y="50" width="150" height="96" rx="8" transform="rotate(0.6 615 98)" fill="#FFFFFF"/>
+          <rect x="710" y="50" width="150" height="96" rx="8" transform="rotate(-0.5 785 98)" fill="#FFFFFF"/>
+          <path d="M182 98 L197 98" marker-end="url(#lha4cAr)"/>
+          <path d="M352 98 L367 98" marker-end="url(#lha4cAr)"/>
+          <path d="M522 98 L537 98" marker-end="url(#lha4cAr)"/>
+          <path d="M692 98 L707 98" marker-end="url(#lha4cAr)"/>
+          <rect x="30" y="166" width="150" height="36" rx="6" transform="rotate(0.5 105 184)" fill="#F1F3F4"/>
+          <rect x="200" y="166" width="150" height="36" rx="6" transform="rotate(-0.4 275 184)" fill="#F1F3F4"/>
+          <rect x="370" y="166" width="150" height="36" rx="6" transform="rotate(0.4 445 184)" fill="#F1F3F4"/>
+          <rect x="540" y="166" width="150" height="36" rx="6" transform="rotate(-0.5 615 184)" fill="#F1F3F4"/>
+          <rect x="710" y="166" width="150" height="36" rx="6" transform="rotate(0.5 785 184)" fill="url(#lha4cHc)"/>
+          <!-- doodle: a lane line -->
+          <path d="M716 28 L746 28 M762 28 L792 28 M808 28 L838 28" stroke="#8C979F" stroke-width="3"/>
+        </g>
+
+        <text class="lha4cV" x="46" y="78">1</text>
+        <text class="lha4cL" x="46" y="102">What was counted?</text>
+        <text class="lha4cS" x="46" y="120">events, not choices;</text>
+        <text class="lha4cS" x="46" y="136">whose reporting rule</text>
+        <text class="lha4cV" x="216" y="78">2</text>
+        <text class="lha4cL" x="216" y="102">How many miles?</text>
+        <text class="lha4cS" x="216" y="120">no denominator,</text>
+        <text class="lha4cS" x="216" y="136">no rate</text>
+        <text class="lha4cV" x="386" y="78">3</text>
+        <text class="lha4cL" x="386" y="102">Which miles?</text>
+        <text class="lha4cK" x="386" y="120">road, time, weather</text>
+        <text class="lha4cK" x="386" y="136">matched to baseline</text>
+        <text class="lha4cV" x="556" y="78">4</text>
+        <text class="lha4cL" x="556" y="102">How sure?</text>
+        <text class="lha4cS" x="556" y="120">an upper bound,</text>
+        <text class="lha4cS" x="556" y="136">not a point</text>
+        <text class="lha4cV" x="726" y="78">5</text>
+        <text class="lha4cL" x="726" y="102">Never seen?</text>
+        <text class="lha4cS" x="726" y="120">the rare tail, and</text>
+        <text class="lha4cS" x="726" y="136">how it was tested</text>
+
+        <text class="lha4cK" x="46" y="188">180 crashes</text>
+        <text class="lha4cK" x="216" y="188">150M miles</text>
+        <text class="lha4cK" x="386" y="188">120.00 to 147.74</text>
+        <text class="lha4cK" x="556" y="188">upper bound 169.04</text>
+        <text class="lha4cK" x="726" y="188">tail: 192.24, worse</text>
+
+        <text class="lha4cN" x="30" y="232">Lower row: Lanehart's matched claim, constructed. Gates 1 to 4 pass; gate 5, the rare tail, sinks it.</text>
+        <text class="lha4cN" x="30" y="252">Gate 3 is where most claims fail: a rate on easy miles set against a rate on all miles.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow gate is the one tonight is about, and the hatched tab is why passing four gates is still not proof.</figcaption>
+    </figure>
+
+    <div class="wk" id="lha4-check">
+      <div class="wk-head">
+        <b>Live</b>
+        <span class="wk-hint">Pick a constructed Lanehart claim. Each gate shows what the claim answers; the first gate it fails is where the conversation stops.</span>
+      </div>
+      <div class="wk-body">
+        <label class="sql-label" for="lha4-pick">Claim on the slide</label>
+        <select class="sql-code" id="lha4-pick"></select>
+        <div id="lha4-out"></div>
+        <p class="sql-note" id="lha4-verdict">...</p>
+      </div>
+      <div class="wk-foot" id="lha4-self">Every Lanehart number is constructed (seed 1016) and taken from the engine's canon run. Only 185.55 (derived from NHTSA 2022) and 1.33 are real.</div>
+    </div>
+
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Run all five constructed claims through the widget</h4>
+        <p>Note the gate each one stops at. The raw count stops at gate 2, the own-mix rate at gate 3, the 60 million mile claim at gate 4, the disengagement claim at gate 1, and the matched claim reaches gate 5.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Write one claim of your own in one sentence</h4>
+        <p>From a report, a slide or a press line about driving automation. Underline the number, the unit and the comparison word.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Gate 1: what was counted, and could a policy move it?</h4>
+        <p>Crashes, reported crashes, injuries, deaths or takeovers? Under whose reporting rule? If a decision by the operator can change the count without changing what happens on the road, write "policy metric" and stop.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Gates 2 and 3: how many miles, and which?</h4>
+        <p>If there are no miles, write "not comparable" and stop. If there are, ask for the mix by road type, time of day and weather, and whether the comparison rate comes from the same mix. If not, the claim needs re-weighting before it can be read.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Gates 4 and 5: how sure, and what was never seen?</h4>
+        <p>Ask for the upper bound, not the point (leader session 3). Then ask which rare situations the miles did not include and how they were tested instead (leader session 2). Write down the first gate your claim fails.</p>
+      </div></div>
+    </div>
+
+    <div class="callout tip">
+      <p><strong>The habit to keep.</strong> Before you react to a safety number, say its fraction out loud: "this many of these events, over this many miles of this kind, compared with that many over that kind". If you cannot fill every blank, the number is not yet a claim. And when the number is a takeover count, ask what the takeover rule was.</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="section" id="quiz">
+    <div class="section-kicker">
+      <span class="klabel">Check yourself</span>
+      <h2>Three questions</h2>
+    </div>
+
+    <div class="quiz-q" data-answer="1">
+      <p class="qtext">In 2022, rural roads carried about 32 percent of US vehicle miles and 41 percent of traffic deaths. A fleet drives only on urban streets and compares its death rate with the national 1.33 per 100 million. What is the problem?</p>
+      <button class="qopt" type="button">A · None: 1.33 is the official national rate, so it is the right baseline for any fleet</button>
+      <button class="qopt" type="button">B · The national rate blends in rural miles where the same drivers die at a higher rate (about 1.69 against about 1.15 urban, derived), so an urban-only fleet should be compared with urban driving</button>
+      <button class="qopt" type="button">C · Rural deaths should be removed because rural drivers are worse drivers</button>
+      <p class="qwhy">The drivers in the national figures did not change between rural and urban roads; the exposure did. A fair comparison uses the same kind of miles. C invents a cause the data does not show.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="2">
+      <p class="qtext">Lanehart's constructed crash rate is 120.00 per 100 million on its own miles and 147.74 when re-weighted by the human mix of miles. Why does the rate go up?</p>
+      <button class="qopt" type="button">A · Re-weighting found extra crashes that were missing from the log</button>
+      <button class="qopt" type="button">B · The human baseline was revised upward</button>
+      <button class="qopt" type="button">C · The human mix puts more weight on urban, night and rain miles, where Lanehart's own constructed rates are higher, and less on highway, where it is lowest</button>
+      <p class="qwhy">The crashes and the context rates are unchanged; only the weights moved. Lanehart drives 55 percent highway against 35 percent in the human mix, so its own blend flatters it.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="0">
+      <p class="qtext">After a new takeover policy, Lanehart's constructed disengagements fall from 0.193 to 0.027 per 100,000 miles. What should a leader conclude?</p>
+      <button class="qopt" type="button">A · Only that the policy changed what gets counted; in the constructed model the true crash rate rose from 192.24 to 206.24, because the loose policy stopped catching conflicts between 0.97 and 0.985</button>
+      <button class="qopt" type="button">B · The car became about seven times safer</button>
+      <button class="qopt" type="button">C · Safety drivers were previously over-reporting failures, so the old number was wrong</button>
+      <p class="qwhy">A disengagement includes the safety driver's decision to take control, so the takeover rule moves the count. Read across a policy change, the trend measures the rule until shown otherwise.</p>
+    </div>
+
+    <div class="quiz-score"></div>
+  </section>
+
+  <!-- ============ HOMEWORK ============ -->
+  <section class="section" id="homework">
+    <div class="section-kicker">
+      <span class="klabel">Before session 5</span>
+      <h2>Homework</h2>
+    </div>
+    <p class="lede">Twenty minutes, on one real claim and one sentence of your own.</p>
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Read the regulator's caveat at source</h4>
+        <p>Open NHTSA's Standing General Order crash reporting page and find the paragraph on data limitations. Copy the sentence about normalization into the notes you keep for sign-off meetings.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Gate one public claim</h4>
+        <p>Take any public statement about automated driving safety and run the five gates. Do not judge whether it is true; record the first gate it fails and the one question you would send back.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Rewrite your own team's favourite metric as a fraction</h4>
+        <p>Any metric, driving or not. Name the numerator, the denominator, its mix, and whether a policy choice could move it. Leader session 5 asks why warehouse habits miss exactly these.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ OFFICIAL ============ -->
+  <section class="section" id="official">
+    <div class="section-kicker">
+      <span class="klabel">Covered tonight</span>
+      <h2>What this session covers</h2>
+    </div>
+    <div class="covered">
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Counts without miles</span><span class="note">NHTSA, Standing General Order on Crash Reporting (web page, third amended order 2025): 30-second window, stricter ADS criteria, not normalized by exposure. Read at source.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Rural and urban exposure</span><span class="note">NHTSA NCSA (2024), DOT HS 813 643: 41% of deaths, 32% of miles rural. Read at source; 1.69 and 1.15 derived.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The exposure match</span><span class="note">Constructed Lanehart canon: 120.00 to 147.74 per 100M at 150M miles; at 60M miles the verdict flips (205.62 above 185.55).</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Disengagement as a metric</span><span class="note">California Code of Regulations, Title 13, section 227.50. Read at source (2024 text). Constructed anti-lever: loose policy scores best, crashes most.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The five-gate checklist</span><span class="note">Counted, miles, which miles, how sure, never seen.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Comparable numerators</span><span class="note">Police-reported against telemetry crashes: taught as a disagreement, not resolved. Kalra and Paddock (2016), RAND RR-1478, read at source.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">The matched bound</span><span class="note">Fay and Feuer (1997), gamma interval for directly standardised rates. Reported (method implemented). Built in practitioner session 7.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">The rare tail</span><span class="note">Named at gate 5. Leader session 2, practitioner sessions 8 and 10.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Confidence intervals in general</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-statistics-with-phoebe/courses/b7-confidence-intervals.html">learn statistics, confidence intervals</a>.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Real fleets, companies or incidents</span><span class="note">Out of scope by design. Lanehart is constructed; no real report is ranked or read here.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section class="section" id="cheatsheet">
+    <div class="section-kicker">
+      <span class="klabel">Take this with you</span>
+      <h2>Cheat sheet</h2>
+    </div>
+    <div class="cheat">
+      <div class="cheat-item"><strong>The one sentence.</strong> A safety claim is a fraction plus a comparison; check the bottom half first.</div>
+      <div class="cheat-item"><strong>Counts.</strong> The regulator's crash counts are "not normalized" by miles or domain. Never rank them.</div>
+      <div class="cheat-item"><strong>Exposure.</strong> Rural: 32% of US miles, 41% of deaths (2022). Same drivers, different roads.</div>
+      <div class="cheat-item"><strong>Match the mix.</strong> Re-weight context rates by the baseline's mix of miles before comparing.</div>
+      <div class="cheat-item"><strong>Lanehart (constructed).</strong> 120.00 on its own mix, 147.74 matched; at 60M miles the match flips the verdict.</div>
+      <div class="cheat-item"><strong>Disengagements.</strong> Include a human decision to take over, so they measure the policy as much as the car.</div>
+      <div class="cheat-item"><strong>The anti-lever.</strong> The loosest policy posts the best takeover score and the most crashes (constructed).</div>
+      <div class="cheat-item"><strong>Five gates.</strong> What was counted? How many miles? Which miles? How sure? What was never seen?</div>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    <div class="wrap">
+      <p>Leader session 4 of 6 · learn-autonomous-driving-with-phoebe · by Phoebe Fu</p>
+      <nav class="pagenav">
+        <a href="a3-how-many-miles-prove-a-car-is-safe.html">← Leader session 3 · How many miles prove a car is safe?</a>
+        <a href="a5-why-the-warehouse-playbook-breaks-here.html">Leader session 5 · Why the warehouse playbook breaks here →</a>
+      </nav>
+    </div>
+  </footer>
+
+</main>
+
+<script src="../assets/app.js?v=1"></script>
+<script>
+(function () {
+  var GATES = ["What was counted?", "How many miles?", "Which miles?", "How sure?", "What was never seen?"];
+  var CLAIMS = [
+    { label: "\"Lanehart has 180 crashes on the public crash-report list\"", gates: [
+      ["caveat", "Crashes reported under the order's criteria; a telemetry fleet records bumps police reports miss."],
+      ["stop", "No miles. The regulator says these counts are not normalized by exposure."],
+      ["skip", "Not reached."], ["skip", "Not reached."], ["skip", "Not reached."]],
+      verdict: "Stops at gate 2: a numerator with no denominator. Not comparable with anything." },
+    { label: "\"120.00 crashes per 100M miles, against 185.55 for human drivers\"", gates: [
+      ["caveat", "Telemetry crashes against police-reported human crashes: comparability is contested."],
+      ["pass", "150M miles (constructed)."],
+      ["stop", "Own mix, 55% highway. The human mix is 35% highway. Re-weighted, the rate is 147.74."],
+      ["skip", "Not reached."], ["skip", "Not reached."]],
+      verdict: "Stops at gate 3: the rate is earned mostly on easy miles. Ask for the exposure-matched rate." },
+    { label: "\"After 60M miles, matched to human miles: 168.23 per 100M, below 185.55\"", gates: [
+      ["caveat", "Same numerator question as above."],
+      ["pass", "60M miles (constructed)."],
+      ["pass", "Re-weighted by the human mix."],
+      ["stop", "Upper bound 205.62, above 185.55. The point is below; the proof is not."],
+      ["skip", "Not reached."]],
+      verdict: "Stops at gate 4: not proven. On its own mix the same fleet looked proven (upper 164.22); the match flips it." },
+    { label: "\"Disengagements fell from 0.193 to 0.027 per 100,000 miles: the car is safer\"", gates: [
+      ["stop", "Takeovers, not crashes, and the takeover rule changed. The policy moved the count."],
+      ["skip", "Not reached."], ["skip", "Not reached."], ["skip", "Not reached."], ["skip", "Not reached."]],
+      verdict: "Stops at gate 1: a policy metric. In the constructed model the true crash rate rose from 192.24 to 206.24." },
+    { label: "\"Matched to human miles: 147.74 per 100M, upper bound 169.04, below 185.55\"", gates: [
+      ["caveat", "Same numerator question as above."],
+      ["pass", "150M miles (constructed)."],
+      ["pass", "Re-weighted by the human mix."],
+      ["pass", "Upper bound 169.04 is below 185.55 at 95%."],
+      ["stop", "The rare scenarios are not in it. Priced in by importance sampling, the total is 192.24, upper 215.71: worse."]],
+      verdict: "Stops at gate 5: four gates pass and the rare tail still sinks it. Leader session 2 and practitioner session 10." }
+  ];
+  var WORD = { pass: "Pass", caveat: "Pass, with a caveat", stop: "Stops here", skip: "-" };
+  var sel = document.getElementById("lha4-pick");
+  var out = document.getElementById("lha4-out");
+  var verdict = document.getElementById("lha4-verdict");
+  if (!sel || !out) return;
+  CLAIMS.forEach(function (c, i) {
+    var o = document.createElement("option");
+    o.value = String(i);
+    o.textContent = c.label;
+    sel.appendChild(o);
+  });
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function render() {
+    var c = CLAIMS[Number(sel.value)];
+    var rows = c.gates.map(function (g, i) {
+      return '<tr class="lha4-' + g[0] + '"><td>' + (i + 1) + ". " + esc(GATES[i]) + "</td><td>" + esc(WORD[g[0]]) + "</td><td>" + esc(g[1]) + "</td></tr>";
+    }).join("");
+    out.innerHTML = '<table class="lha4-table"><thead><tr><th>Gate</th><th>Result</th><th>What the claim answers</th></tr></thead><tbody>' + rows + "</tbody></table>";
+    verdict.textContent = c.verdict;
+  }
+  sel.addEventListener("change", render);
+  render();
+})();
+</script>
+<style>
+  #lha4-check .sql-code { border: 1px solid var(--hairline); border-radius: 8px; max-width: 100%; width: 100%; }
+  #lha4-check .lha4-table { width: 100%; border-collapse: collapse; margin: .6rem 0 .2rem; font-size: .85rem; }
+  #lha4-check .lha4-table th, #lha4-check .lha4-table td { text-align: left; padding: .45rem .5rem; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+  #lha4-check .lha4-table th { color: var(--muted); font-weight: 700; }
+  #lha4-check .lha4-stop td { background: var(--amber-50); color: var(--ink); font-weight: 600; }
+  #lha4-check .lha4-skip td { color: var(--muted); }
+  @media (max-width: 640px) { #lha4-check .lha4-table { font-size: .78rem; } }
+</style>
+</body>
+</html>

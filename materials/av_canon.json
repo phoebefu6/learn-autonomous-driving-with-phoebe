@@ -1,0 +1,1340 @@
+{
+ "generated": "2026-10-16",
+ "human": {
+  "fatal": 1.33,
+  "crash": 185.54886112876233
+ },
+ "defaults": {
+  "seed": 1016,
+  "miles": 150000000,
+  "conf": 0.95,
+  "budget": 2000,
+  "reps": 200,
+  "fatalTrue": 0.3,
+  "conflictPer100M": 2000,
+  "necessary": 0.97,
+  "crashIfMissed": 0.25
+ },
+ "selfTest": {
+  "pass": true,
+  "checks": [
+   {
+    "name": "zero-event bound is -ln(1 - C), the rule of three at 95%",
+    "pass": true
+   },
+   {
+    "name": "Poisson upper bound sits above the count and leaves exactly 5% in the tail",
+    "pass": true
+   },
+   {
+    "name": "one-stratum matched bound equals the exact Poisson bound",
+    "pass": true
+   },
+   {
+    "name": "exposure-matched rate weights each context by the human mix",
+    "pass": true
+   },
+   {
+    "name": "importance sampling is unbiased: mean estimate within 6% of the true rate",
+    "pass": true
+   },
+   {
+    "name": "importance weights average 1 over the proposal",
+    "pass": true
+   }
+  ]
+ },
+ "faultProofs": [
+  {
+   "fault": "boundLowerTail",
+   "pass": false,
+   "failed": [
+    "zero-event bound is -ln(1 - C), the rule of three at 95%",
+    "Poisson upper bound sits above the count and leaves exactly 5% in the tail",
+    "one-stratum matched bound equals the exact Poisson bound"
+   ]
+  },
+  {
+   "fault": "isNoWeight",
+   "pass": false,
+   "failed": [
+    "importance sampling is unbiased: mean estimate within 6% of the true rate"
+   ]
+  },
+  {
+   "fault": "ownMix",
+   "pass": false,
+   "failed": [
+    "exposure-matched rate weights each context by the human mix"
+   ]
+  }
+ ],
+ "ms": 376,
+ "runs": {
+  "canon": {
+   "contexts": [
+    {
+     "id": "highway",
+     "k": 57,
+     "miles": 82500000,
+     "rate": 69.0909090909091,
+     "humanRate": 92.3128662332151
+    },
+    {
+     "id": "urban",
+     "k": 70,
+     "miles": 45000000,
+     "rate": 155.55555555555557,
+     "humanRate": 212.31959233639472
+    },
+    {
+     "id": "night",
+     "k": 28,
+     "miles": 15000000,
+     "rate": 186.66666666666666,
+     "humanRate": 258.47602545300225
+    },
+    {
+     "id": "rain",
+     "k": 25,
+     "miles": 7500000,
+     "rate": 333.3333333333333,
+     "humanRate": 295.40117194628834
+    }
+   ],
+   "fatal": {
+    "k": 0,
+    "point": 0,
+    "upper": 1.997154849035993,
+    "human": 1.33,
+    "milesNeeded": 225243028.08676612,
+    "verdict": "notproven"
+   },
+   "own": {
+    "k": 180,
+    "point": 120,
+    "upper": 135.78867179206893,
+    "verdict": "proven"
+   },
+   "matched": {
+    "point": 147.73737373737376,
+    "upper": 169.03661367914103,
+    "verdict": "proven"
+   },
+   "tail": {
+    "point": 44.499603609871656,
+    "se": 1.3211413049466658,
+    "upper": 46.67268767702858,
+    "mcPoint": 34.95,
+    "truePoint": 46,
+    "classes": [
+     {
+      "id": "occluded",
+      "mcHits": 1,
+      "isHits": 743,
+      "mcRate": 2,
+      "isRate": 11.522557379175016,
+      "isRateSE": 0.7092392621483325,
+      "wMean": 1.032025267662051
+     },
+     {
+      "id": "wrongway",
+      "mcHits": 42,
+      "isHits": 756,
+      "mcRate": 6.300000000000001,
+      "isRate": 6.4179460530372525,
+      "isRateSE": 0.31575511067840134,
+      "wMean": 0.9783474956440824
+     },
+     {
+      "id": "debris",
+      "mcHits": 5,
+      "isHits": 706,
+      "mcRate": 6.25,
+      "isRate": 9.719256351679464,
+      "isRateSE": 0.604383560930856,
+      "wMean": 0.9889086444320518
+     },
+     {
+      "id": "emergency",
+      "mcHits": 34,
+      "isHits": 749,
+      "mcRate": 20.400000000000002,
+      "isRate": 16.839843825979926,
+      "isRateSE": 0.8817104048498445,
+      "wMean": 0.9912412672676639
+     }
+    ]
+   },
+   "withTail": {
+    "point": 192.2369773472454,
+    "upper": 215.7093013561696,
+    "verdict": "worse"
+   },
+   "brk": {
+    "point": 147.73737373737376,
+    "upper": 169.03661367914103,
+    "verdict": "proven"
+   },
+   "variance": {
+    "reps": 200,
+    "mcMean": 45.68,
+    "mcSD": 7.250993693814572,
+    "isMean": 46.04840068018387,
+    "isSD": 1.4037991301927686,
+    "ratio": 5.165264415585492,
+    "mcZeroAnyShare": 0,
+    "trueTotal": 46
+   },
+   "anti": {
+    "conflicts": 3000,
+    "pickedByScore": "loose",
+    "pickedBySafety": "cautious",
+    "scorePenalty": 14,
+    "policies": [
+     {
+      "id": "cautious",
+      "disengagements": 1480,
+      "disengPer100k": 0.9866666666666667,
+      "extraCrashes": 0,
+      "trueRate": 192.2369773472454
+     },
+     {
+      "id": "standard",
+      "disengagements": 290,
+      "disengPer100k": 0.19333333333333333,
+      "extraCrashes": 0,
+      "trueRate": 192.2369773472454
+     },
+     {
+      "id": "loose",
+      "disengagements": 40,
+      "disengPer100k": 0.02666666666666667,
+      "extraCrashes": 21,
+      "trueRate": 206.2369773472454
+     }
+    ]
+   }
+  },
+  "miles60M": {
+   "contexts": [
+    {
+     "id": "highway",
+     "k": 24,
+     "miles": 33000000.000000004,
+     "rate": 72.72727272727272,
+     "humanRate": 92.3128662332151
+    },
+    {
+     "id": "urban",
+     "k": 32,
+     "miles": 18000000,
+     "rate": 177.77777777777777,
+     "humanRate": 212.31959233639472
+    },
+    {
+     "id": "night",
+     "k": 18,
+     "miles": 6000000,
+     "rate": 300,
+     "humanRate": 258.47602545300225
+    },
+    {
+     "id": "rain",
+     "k": 8,
+     "miles": 3000000,
+     "rate": 266.6666666666667,
+     "humanRate": 295.40117194628834
+    }
+   ],
+   "fatal": {
+    "k": 0,
+    "point": 0,
+    "upper": 4.992887122589983,
+    "human": 1.33,
+    "milesNeeded": 225243028.08676612,
+    "verdict": "notproven"
+   },
+   "own": {
+    "k": 82,
+    "point": 136.66666666666666,
+    "upper": 164.21992161546794,
+    "verdict": "proven"
+   },
+   "matched": {
+    "point": 168.2323232323232,
+    "upper": 205.62418118175424,
+    "verdict": "notproven"
+   },
+   "tail": {
+    "point": 44.499603609871656,
+    "se": 1.3211413049466658,
+    "upper": 46.67268767702858,
+    "mcPoint": 34.95,
+    "truePoint": 46,
+    "classes": [
+     {
+      "id": "occluded",
+      "mcHits": 1,
+      "isHits": 743,
+      "mcRate": 2,
+      "isRate": 11.522557379175016,
+      "isRateSE": 0.7092392621483325,
+      "wMean": 1.032025267662051
+     },
+     {
+      "id": "wrongway",
+      "mcHits": 42,
+      "isHits": 756,
+      "mcRate": 6.300000000000001,
+      "isRate": 6.4179460530372525,
+      "isRateSE": 0.31575511067840134,
+      "wMean": 0.9783474956440824
+     },
+     {
+      "id": "debris",
+      "mcHits": 5,
+      "isHits": 706,
+      "mcRate": 6.25,
+      "isRate": 9.719256351679464,
+      "isRateSE": 0.604383560930856,
+      "wMean": 0.9889086444320518
+     },
+     {
+      "id": "emergency",
+      "mcHits": 34,
+      "isHits": 749,
+      "mcRate": 20.400000000000002,
+      "isRate": 16.839843825979926,
+      "isRateSE": 0.8817104048498445,
+      "wMean": 0.9912412672676639
+     }
+    ]
+   },
+   "withTail": {
+    "point": 212.73192684219487,
+    "upper": 252.29686885878283,
+    "verdict": "worse"
+   },
+   "brk": {
+    "point": 168.2323232323232,
+    "upper": 205.62418118175424,
+    "verdict": "notproven"
+   },
+   "variance": null,
+   "anti": {
+    "conflicts": 1200,
+    "pickedByScore": "loose",
+    "pickedBySafety": "cautious",
+    "scorePenalty": 8.333333333333343,
+    "policies": [
+     {
+      "id": "cautious",
+      "disengagements": 588,
+      "disengPer100k": 0.98,
+      "extraCrashes": 0,
+      "trueRate": 212.73192684219487
+     },
+     {
+      "id": "standard",
+      "disengagements": 113,
+      "disengPer100k": 0.18833333333333332,
+      "extraCrashes": 0,
+      "trueRate": 212.73192684219487
+     },
+     {
+      "id": "loose",
+      "disengagements": 14,
+      "disengPer100k": 0.023333333333333334,
+      "extraCrashes": 5,
+      "trueRate": 221.0652601755282
+     }
+    ]
+   }
+  },
+  "miles400M": {
+   "contexts": [
+    {
+     "id": "highway",
+     "k": 136,
+     "miles": 220000000.00000003,
+     "rate": 61.81818181818181,
+     "humanRate": 92.3128662332151
+    },
+    {
+     "id": "urban",
+     "k": 195,
+     "miles": 120000000,
+     "rate": 162.5,
+     "humanRate": 212.31959233639472
+    },
+    {
+     "id": "night",
+     "k": 51,
+     "miles": 40000000,
+     "rate": 127.50000000000001,
+     "humanRate": 258.47602545300225
+    },
+    {
+     "id": "rain",
+     "k": 75,
+     "miles": 20000000,
+     "rate": 375,
+     "humanRate": 295.40117194628834
+    }
+   ],
+   "fatal": {
+    "k": 0,
+    "point": 0,
+    "upper": 0.7489330683884975,
+    "human": 1.33,
+    "milesNeeded": 225243028.08676612,
+    "verdict": "proven"
+   },
+   "own": {
+    "k": 457,
+    "point": 114.25000000000001,
+    "upper": 123.44017125116255,
+    "verdict": "proven"
+   },
+   "matched": {
+    "point": 143.26136363636363,
+    "upper": 155.7395289012181,
+    "verdict": "proven"
+   },
+   "tail": {
+    "point": 44.499603609871656,
+    "se": 1.3211413049466658,
+    "upper": 46.67268767702858,
+    "mcPoint": 34.95,
+    "truePoint": 46,
+    "classes": [
+     {
+      "id": "occluded",
+      "mcHits": 1,
+      "isHits": 743,
+      "mcRate": 2,
+      "isRate": 11.522557379175016,
+      "isRateSE": 0.7092392621483325,
+      "wMean": 1.032025267662051
+     },
+     {
+      "id": "wrongway",
+      "mcHits": 42,
+      "isHits": 756,
+      "mcRate": 6.300000000000001,
+      "isRate": 6.4179460530372525,
+      "isRateSE": 0.31575511067840134,
+      "wMean": 0.9783474956440824
+     },
+     {
+      "id": "debris",
+      "mcHits": 5,
+      "isHits": 706,
+      "mcRate": 6.25,
+      "isRate": 9.719256351679464,
+      "isRateSE": 0.604383560930856,
+      "wMean": 0.9889086444320518
+     },
+     {
+      "id": "emergency",
+      "mcHits": 34,
+      "isHits": 749,
+      "mcRate": 20.400000000000002,
+      "isRate": 16.839843825979926,
+      "isRateSE": 0.8817104048498445,
+      "wMean": 0.9912412672676639
+     }
+    ]
+   },
+   "withTail": {
+    "point": 187.76096724623528,
+    "upper": 202.41221657824667,
+    "verdict": "worse"
+   },
+   "brk": {
+    "point": 143.26136363636363,
+    "upper": 155.7395289012181,
+    "verdict": "proven"
+   },
+   "variance": null,
+   "anti": {
+    "conflicts": 8000,
+    "pickedByScore": "loose",
+    "pickedBySafety": "cautious",
+    "scorePenalty": 10.25,
+    "policies": [
+     {
+      "id": "cautious",
+      "disengagements": 3985,
+      "disengPer100k": 0.99625,
+      "extraCrashes": 0,
+      "trueRate": 187.76096724623528
+     },
+     {
+      "id": "standard",
+      "disengagements": 814,
+      "disengPer100k": 0.2035,
+      "extraCrashes": 0,
+      "trueRate": 187.76096724623528
+     },
+     {
+      "id": "loose",
+      "disengagements": 121,
+      "disengPer100k": 0.030250000000000003,
+      "extraCrashes": 41,
+      "trueRate": 198.01096724623528
+     }
+    ]
+   }
+  },
+  "conf90": {
+   "contexts": [
+    {
+     "id": "highway",
+     "k": 57,
+     "miles": 82500000,
+     "rate": 69.0909090909091,
+     "humanRate": 92.3128662332151
+    },
+    {
+     "id": "urban",
+     "k": 70,
+     "miles": 45000000,
+     "rate": 155.55555555555557,
+     "humanRate": 212.31959233639472
+    },
+    {
+     "id": "night",
+     "k": 28,
+     "miles": 15000000,
+     "rate": 186.66666666666666,
+     "humanRate": 258.47602545300225
+    },
+    {
+     "id": "rain",
+     "k": 25,
+     "miles": 7500000,
+     "rate": 333.3333333333333,
+     "humanRate": 295.40117194628834
+    }
+   ],
+   "fatal": {
+    "k": 0,
+    "point": 0,
+    "upper": 1.5350567286626973,
+    "human": 1.33,
+    "milesNeeded": 173126698.72135684,
+    "verdict": "notproven"
+   },
+   "own": {
+    "k": 180,
+    "point": 120,
+    "upper": 132.29429129314101,
+    "verdict": "proven"
+   },
+   "matched": {
+    "point": 147.73737373737376,
+    "upper": 164.40942540897169,
+    "verdict": "proven"
+   },
+   "tail": {
+    "point": 44.499603609871656,
+    "se": 1.3211413049466658,
+    "upper": 46.19271431753169,
+    "mcPoint": 34.95,
+    "truePoint": 46,
+    "classes": [
+     {
+      "id": "occluded",
+      "mcHits": 1,
+      "isHits": 743,
+      "mcRate": 2,
+      "isRate": 11.522557379175016,
+      "isRateSE": 0.7092392621483325,
+      "wMean": 1.032025267662051
+     },
+     {
+      "id": "wrongway",
+      "mcHits": 42,
+      "isHits": 756,
+      "mcRate": 6.300000000000001,
+      "isRate": 6.4179460530372525,
+      "isRateSE": 0.31575511067840134,
+      "wMean": 0.9783474956440824
+     },
+     {
+      "id": "debris",
+      "mcHits": 5,
+      "isHits": 706,
+      "mcRate": 6.25,
+      "isRate": 9.719256351679464,
+      "isRateSE": 0.604383560930856,
+      "wMean": 0.9889086444320518
+     },
+     {
+      "id": "emergency",
+      "mcHits": 34,
+      "isHits": 749,
+      "mcRate": 20.400000000000002,
+      "isRate": 16.839843825979926,
+      "isRateSE": 0.8817104048498445,
+      "wMean": 0.9912412672676639
+     }
+    ]
+   },
+   "withTail": {
+    "point": 192.2369773472454,
+    "upper": 210.60213972650337,
+    "verdict": "worse"
+   },
+   "brk": {
+    "point": 147.73737373737376,
+    "upper": 164.40942540897169,
+    "verdict": "proven"
+   },
+   "variance": null,
+   "anti": null
+  },
+  "conf99": {
+   "contexts": [
+    {
+     "id": "highway",
+     "k": 57,
+     "miles": 82500000,
+     "rate": 69.0909090909091,
+     "humanRate": 92.3128662332151
+    },
+    {
+     "id": "urban",
+     "k": 70,
+     "miles": 45000000,
+     "rate": 155.55555555555557,
+     "humanRate": 212.31959233639472
+    },
+    {
+     "id": "night",
+     "k": 28,
+     "miles": 15000000,
+     "rate": 186.66666666666666,
+     "humanRate": 258.47602545300225
+    },
+    {
+     "id": "rain",
+     "k": 25,
+     "miles": 7500000,
+     "rate": 333.3333333333333,
+     "humanRate": 295.40117194628834
+    }
+   ],
+   "fatal": {
+    "k": 0,
+    "point": 0,
+    "upper": 3.0701134573253905,
+    "human": 1.33,
+    "milesNeeded": 346253397.44271326,
+    "verdict": "notproven"
+   },
+   "own": {
+    "k": 180,
+    "point": 120,
+    "upper": 142.506728790495,
+    "verdict": "proven"
+   },
+   "matched": {
+    "point": 147.73737373737376,
+    "upper": 177.94642927883083,
+    "verdict": "proven"
+   },
+   "tail": {
+    "point": 44.499603609871656,
+    "se": 1.3211413049466658,
+    "upper": 47.57303787594187,
+    "mcPoint": 34.95,
+    "truePoint": 46,
+    "classes": [
+     {
+      "id": "occluded",
+      "mcHits": 1,
+      "isHits": 743,
+      "mcRate": 2,
+      "isRate": 11.522557379175016,
+      "isRateSE": 0.7092392621483325,
+      "wMean": 1.032025267662051
+     },
+     {
+      "id": "wrongway",
+      "mcHits": 42,
+      "isHits": 756,
+      "mcRate": 6.300000000000001,
+      "isRate": 6.4179460530372525,
+      "isRateSE": 0.31575511067840134,
+      "wMean": 0.9783474956440824
+     },
+     {
+      "id": "debris",
+      "mcHits": 5,
+      "isHits": 706,
+      "mcRate": 6.25,
+      "isRate": 9.719256351679464,
+      "isRateSE": 0.604383560930856,
+      "wMean": 0.9889086444320518
+     },
+     {
+      "id": "emergency",
+      "mcHits": 34,
+      "isHits": 749,
+      "mcRate": 20.400000000000002,
+      "isRate": 16.839843825979926,
+      "isRateSE": 0.8817104048498445,
+      "wMean": 0.9912412672676639
+     }
+    ]
+   },
+   "withTail": {
+    "point": 192.2369773472454,
+    "upper": 225.5194671547727,
+    "verdict": "worse"
+   },
+   "brk": {
+    "point": 147.73737373737376,
+    "upper": 177.94642927883083,
+    "verdict": "proven"
+   },
+   "variance": null,
+   "anti": null
+  },
+  "budget500": {
+   "contexts": [
+    {
+     "id": "highway",
+     "k": 57,
+     "miles": 82500000,
+     "rate": 69.0909090909091,
+     "humanRate": 92.3128662332151
+    },
+    {
+     "id": "urban",
+     "k": 70,
+     "miles": 45000000,
+     "rate": 155.55555555555557,
+     "humanRate": 212.31959233639472
+    },
+    {
+     "id": "night",
+     "k": 28,
+     "miles": 15000000,
+     "rate": 186.66666666666666,
+     "humanRate": 258.47602545300225
+    },
+    {
+     "id": "rain",
+     "k": 25,
+     "miles": 7500000,
+     "rate": 333.3333333333333,
+     "humanRate": 295.40117194628834
+    }
+   ],
+   "fatal": {
+    "k": 0,
+    "point": 0,
+    "upper": 1.997154849035993,
+    "human": 1.33,
+    "milesNeeded": 225243028.08676612,
+    "verdict": "notproven"
+   },
+   "own": {
+    "k": 180,
+    "point": 120,
+    "upper": 135.78867179206893,
+    "verdict": "proven"
+   },
+   "matched": {
+    "point": 147.73737373737376,
+    "upper": 169.03661367914103,
+    "verdict": "proven"
+   },
+   "tail": {
+    "point": 44.95156517769709,
+    "se": 2.6436996800320354,
+    "upper": 49.30006418496822,
+    "mcPoint": 42.2,
+    "truePoint": 46,
+    "classes": [
+     {
+      "id": "occluded",
+      "mcHits": 1,
+      "isHits": 187,
+      "mcRate": 8,
+      "isRate": 12.153067979008283,
+      "isRateSE": 1.4337596656084768,
+      "wMean": 0.9821814010390544
+     },
+     {
+      "id": "wrongway",
+      "mcHits": 8,
+      "isHits": 198,
+      "mcRate": 4.8,
+      "isRate": 5.99817730308283,
+      "isRateSE": 0.6101576986882377,
+      "wMean": 0.9690516211399575
+     },
+     {
+      "id": "debris",
+      "mcHits": 3,
+      "isHits": 182,
+      "mcRate": 15,
+      "isRate": 11.159244397607672,
+      "isRateSE": 1.29456676557049,
+      "wMean": 0.9971207910243309
+     },
+     {
+      "id": "emergency",
+      "mcHits": 6,
+      "isHits": 169,
+      "mcRate": 14.4,
+      "isRate": 15.641075497998305,
+      "isRateSE": 1.698612872813458,
+      "wMean": 1.028534441971153
+     }
+    ]
+   },
+   "withTail": {
+    "point": 192.68893891507085,
+    "upper": 218.33667786410925,
+    "verdict": "worse"
+   },
+   "brk": {
+    "point": 147.73737373737376,
+    "upper": 169.03661367914103,
+    "verdict": "proven"
+   },
+   "variance": {
+    "reps": 200,
+    "mcMean": 45.708999999999996,
+    "mcSD": 13.495427068410766,
+    "isMean": 45.98533182579243,
+    "isSD": 2.848262335414113,
+    "ratio": 4.738126436113072,
+    "mcZeroAnyShare": 0.35,
+    "trueTotal": 46
+   },
+   "anti": null
+  },
+  "budget8000": {
+   "contexts": [
+    {
+     "id": "highway",
+     "k": 57,
+     "miles": 82500000,
+     "rate": 69.0909090909091,
+     "humanRate": 92.3128662332151
+    },
+    {
+     "id": "urban",
+     "k": 70,
+     "miles": 45000000,
+     "rate": 155.55555555555557,
+     "humanRate": 212.31959233639472
+    },
+    {
+     "id": "night",
+     "k": 28,
+     "miles": 15000000,
+     "rate": 186.66666666666666,
+     "humanRate": 258.47602545300225
+    },
+    {
+     "id": "rain",
+     "k": 25,
+     "miles": 7500000,
+     "rate": 333.3333333333333,
+     "humanRate": 295.40117194628834
+    }
+   ],
+   "fatal": {
+    "k": 0,
+    "point": 0,
+    "upper": 1.997154849035993,
+    "human": 1.33,
+    "milesNeeded": 225243028.08676612,
+    "verdict": "notproven"
+   },
+   "own": {
+    "k": 180,
+    "point": 120,
+    "upper": 135.78867179206893,
+    "verdict": "proven"
+   },
+   "matched": {
+    "point": 147.73737373737376,
+    "upper": 169.03661367914103,
+    "verdict": "proven"
+   },
+   "tail": {
+    "point": 46.79218657663393,
+    "se": 0.6988569948652251,
+    "upper": 47.9417040393584,
+    "mcPoint": 43.8625,
+    "truePoint": 46,
+    "classes": [
+     {
+      "id": "occluded",
+      "mcHits": 21,
+      "isHits": 2936,
+      "mcRate": 10.5,
+      "isRate": 12.001464371264985,
+      "isRateSE": 0.37100823918144066,
+      "wMean": 0.9763384007496898
+     },
+     {
+      "id": "wrongway",
+      "mcHits": 144,
+      "isHits": 2990,
+      "mcRate": 5.3999999999999995,
+      "isRate": 5.818107363445377,
+      "isRateSE": 0.14763034130879674,
+      "wMean": 0.9897498929660634
+     },
+     {
+      "id": "debris",
+      "mcHits": 29,
+      "isHits": 2945,
+      "mcRate": 9.0625,
+      "isRate": 10.494292065200389,
+      "isRateSE": 0.31167589712327876,
+      "wMean": 0.9818015854488421
+     },
+     {
+      "id": "emergency",
+      "mcHits": 126,
+      "isHits": 2900,
+      "mcRate": 18.9,
+      "isRate": 18.478322776723182,
+      "isRateSE": 0.4814741978642134,
+      "wMean": 1.0090279997298637
+     }
+    ]
+   },
+   "withTail": {
+    "point": 194.52956031400768,
+    "upper": 216.97831771849943,
+    "verdict": "worse"
+   },
+   "brk": {
+    "point": 147.73737373737376,
+    "upper": 169.03661367914103,
+    "verdict": "proven"
+   },
+   "variance": {
+    "reps": 200,
+    "mcMean": 46.19800000000001,
+    "mcSD": 3.5385121916069098,
+    "isMean": 45.99046394925338,
+    "isSD": 0.6450960131426946,
+    "ratio": 5.48524889243765,
+    "mcZeroAnyShare": 0,
+    "trueTotal": 46
+   },
+   "anti": null
+  }
+ },
+ "sync": {
+  "nearest60": {
+   "direction": "nearest",
+   "tolMs": 60,
+   "frames": 72,
+   "fireScans": [
+    0,
+    1,
+    3,
+    5,
+    6,
+    8,
+    10,
+    11,
+    13,
+    15,
+    16,
+    18
+   ],
+   "correct": 28,
+   "wrong": 44,
+   "unmatched": 0,
+   "cams": [
+    {
+     "id": "front",
+     "az": 0,
+     "correct": 1,
+     "wrong": 11,
+     "unmatched": 0
+    },
+    {
+     "id": "front right",
+     "az": 55,
+     "correct": 1,
+     "wrong": 11,
+     "unmatched": 0
+    },
+    {
+     "id": "back right",
+     "az": 110,
+     "correct": 1,
+     "wrong": 11,
+     "unmatched": 0
+    },
+    {
+     "id": "back",
+     "az": 180,
+     "correct": 1,
+     "wrong": 11,
+     "unmatched": 0
+    },
+    {
+     "id": "back left",
+     "az": 250,
+     "correct": 12,
+     "wrong": 0,
+     "unmatched": 0
+    },
+    {
+     "id": "front left",
+     "az": 305,
+     "correct": 12,
+     "wrong": 0,
+     "unmatched": 0
+    }
+   ]
+  },
+  "backward60": {
+   "direction": "backward",
+   "tolMs": 60,
+   "frames": 72,
+   "fireScans": [
+    0,
+    1,
+    3,
+    5,
+    6,
+    8,
+    10,
+    11,
+    13,
+    15,
+    16,
+    18
+   ],
+   "correct": 0,
+   "wrong": 66,
+   "unmatched": 6,
+   "cams": [
+    {
+     "id": "front",
+     "az": 0,
+     "correct": 0,
+     "wrong": 11,
+     "unmatched": 1
+    },
+    {
+     "id": "front right",
+     "az": 55,
+     "correct": 0,
+     "wrong": 11,
+     "unmatched": 1
+    },
+    {
+     "id": "back right",
+     "az": 110,
+     "correct": 0,
+     "wrong": 11,
+     "unmatched": 1
+    },
+    {
+     "id": "back",
+     "az": 180,
+     "correct": 0,
+     "wrong": 11,
+     "unmatched": 1
+    },
+    {
+     "id": "back left",
+     "az": 250,
+     "correct": 0,
+     "wrong": 11,
+     "unmatched": 1
+    },
+    {
+     "id": "front left",
+     "az": 305,
+     "correct": 0,
+     "wrong": 11,
+     "unmatched": 1
+    }
+   ]
+  },
+  "forward60": {
+   "direction": "forward",
+   "tolMs": 60,
+   "frames": 72,
+   "fireScans": [
+    0,
+    1,
+    3,
+    5,
+    6,
+    8,
+    10,
+    11,
+    13,
+    15,
+    16,
+    18
+   ],
+   "correct": 61,
+   "wrong": 11,
+   "unmatched": 0,
+   "cams": [
+    {
+     "id": "front",
+     "az": 0,
+     "correct": 1,
+     "wrong": 11,
+     "unmatched": 0
+    },
+    {
+     "id": "front right",
+     "az": 55,
+     "correct": 12,
+     "wrong": 0,
+     "unmatched": 0
+    },
+    {
+     "id": "back right",
+     "az": 110,
+     "correct": 12,
+     "wrong": 0,
+     "unmatched": 0
+    },
+    {
+     "id": "back",
+     "az": 180,
+     "correct": 12,
+     "wrong": 0,
+     "unmatched": 0
+    },
+    {
+     "id": "back left",
+     "az": 250,
+     "correct": 12,
+     "wrong": 0,
+     "unmatched": 0
+    },
+    {
+     "id": "front left",
+     "az": 305,
+     "correct": 12,
+     "wrong": 0,
+     "unmatched": 0
+    }
+   ]
+  },
+  "forward20": {
+   "direction": "forward",
+   "tolMs": 20,
+   "frames": 72,
+   "fireScans": [
+    0,
+    1,
+    3,
+    5,
+    6,
+    8,
+    10,
+    11,
+    13,
+    15,
+    16,
+    18
+   ],
+   "correct": 24,
+   "wrong": 11,
+   "unmatched": 37,
+   "cams": [
+    {
+     "id": "front",
+     "az": 0,
+     "correct": 0,
+     "wrong": 11,
+     "unmatched": 1
+    },
+    {
+     "id": "front right",
+     "az": 55,
+     "correct": 0,
+     "wrong": 0,
+     "unmatched": 12
+    },
+    {
+     "id": "back right",
+     "az": 110,
+     "correct": 0,
+     "wrong": 0,
+     "unmatched": 12
+    },
+    {
+     "id": "back",
+     "az": 180,
+     "correct": 0,
+     "wrong": 0,
+     "unmatched": 12
+    },
+    {
+     "id": "back left",
+     "az": 250,
+     "correct": 12,
+     "wrong": 0,
+     "unmatched": 0
+    },
+    {
+     "id": "front left",
+     "az": 305,
+     "correct": 12,
+     "wrong": 0,
+     "unmatched": 0
+    }
+   ]
+  },
+  "nearest20": {
+   "direction": "nearest",
+   "tolMs": 20,
+   "frames": 72,
+   "fireScans": [
+    0,
+    1,
+    3,
+    5,
+    6,
+    8,
+    10,
+    11,
+    13,
+    15,
+    16,
+    18
+   ],
+   "correct": 24,
+   "wrong": 33,
+   "unmatched": 15,
+   "cams": [
+    {
+     "id": "front",
+     "az": 0,
+     "correct": 0,
+     "wrong": 11,
+     "unmatched": 1
+    },
+    {
+     "id": "front right",
+     "az": 55,
+     "correct": 0,
+     "wrong": 11,
+     "unmatched": 1
+    },
+    {
+     "id": "back right",
+     "az": 110,
+     "correct": 0,
+     "wrong": 11,
+     "unmatched": 1
+    },
+    {
+     "id": "back",
+     "az": 180,
+     "correct": 0,
+     "wrong": 0,
+     "unmatched": 12
+    },
+    {
+     "id": "back left",
+     "az": 250,
+     "correct": 12,
+     "wrong": 0,
+     "unmatched": 0
+    },
+    {
+     "id": "front left",
+     "az": 305,
+     "correct": 12,
+     "wrong": 0,
+     "unmatched": 0
+    }
+   ]
+  },
+  "strict60": {
+   "direction": "forwardStrict",
+   "tolMs": 60,
+   "frames": 72,
+   "fireScans": [
+    0,
+    1,
+    3,
+    5,
+    6,
+    8,
+    10,
+    11,
+    13,
+    15,
+    16,
+    18
+   ],
+   "correct": 72,
+   "wrong": 0,
+   "unmatched": 0,
+   "cams": [
+    {
+     "id": "front",
+     "az": 0,
+     "correct": 12,
+     "wrong": 0,
+     "unmatched": 0
+    },
+    {
+     "id": "front right",
+     "az": 55,
+     "correct": 12,
+     "wrong": 0,
+     "unmatched": 0
+    },
+    {
+     "id": "back right",
+     "az": 110,
+     "correct": 12,
+     "wrong": 0,
+     "unmatched": 0
+    },
+    {
+     "id": "back",
+     "az": 180,
+     "correct": 12,
+     "wrong": 0,
+     "unmatched": 0
+    },
+    {
+     "id": "back left",
+     "az": 250,
+     "correct": 12,
+     "wrong": 0,
+     "unmatched": 0
+    },
+    {
+     "id": "front left",
+     "az": 305,
+     "correct": 12,
+     "wrong": 0,
+     "unmatched": 0
+    }
+   ]
+  }
+ }
+}

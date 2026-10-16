@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- social:start -->
+<meta name="description" content="Practitioner session 7 of 10. Zero fatal crashes in 150 million miles is a bound, not a rate: the exact Poisson upper bound is 2.00 per 100 million miles against the human 1.33. The rule of three, the miles needed (225.2 million at 95%), and an exposure-matched Fay-Feuer bound. Lanehart is a constructed fleet.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Learn with Phoebe">
+<meta property="og:title" content="Rare-event statistics - learn autonomous driving with phoebe">
+<meta property="og:description" content="Practitioner session 7 of 10. Exact Poisson bounds, the rule of three, miles needed and the exposure-matched bound, computed live.">
+<meta property="og:url" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/courses/p7-rare-event-statistics.html">
+<meta property="og:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Rare-event statistics - learn autonomous driving with phoebe">
+<meta name="twitter:description" content="0 fatal crashes in 150M miles: the 95% upper bound is 2.00 per 100M, above the human 1.33. Zero is not proof.">
+<meta name="twitter:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<!-- social:end -->
+<title>Practitioner session 7 · Rare-event statistics - learn autonomous driving with phoebe</title>
+<link rel="stylesheet" href="../assets/style.css?v=2">
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="wrap">
+    <span class="crumb"><a href="../index.html">learn-autonomous-driving-with-phoebe</a> / Practitioner session 7 of 10</span>
+    <button class="btn" id="toggle-all" type="button">Expand all</button>
+    <button class="btn primary" id="zoom-toggle" type="button">Projector zoom: off</button>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Learn Autonomous Driving with Phoebe · Practitioner session 7 of 10</div>
+    <h1>Rare-event <span class="accent">statistics</span></h1>
+    <p class="sub">When the event you care about almost never happens, the count you observe is usually zero, and zero is not a rate. It is a statement about how many miles you have driven. Tonight turns a count and its miles into an exact upper bound, finds the miles a zero has to cover before it means anything, and reweights a fleet's crashes so they are compared on the same roads as the human baseline. Lanehart, a constructed robotaxi pilot fleet in a fictional city, supplies the counts; the human rates are NHTSA's, and every bound on the page is computed in your browser.</p>
+    <div class="chip-row">
+      <span class="chip level">🟠 Advanced</span>
+      <span class="chip audience">Data scientists and analysts who will sign a safety number</span>
+      <span class="chip audience">Anyone reviewing a "zero incidents" claim</span>
+      <span class="chip time">45 min</span>
+    </div>
+    <div class="agenda">
+      <span class="a1" style="flex:1">0-3 · Welcome</span>
+      <span class="a2" style="flex:3">3-18 · Bounds from zero</span>
+      <span class="a3" style="flex:3">18-28 · Miles and matching</span>
+      <span class="a4" style="flex:4">28-45 · Build-along and Q&amp;A</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ INTRO ============ -->
+  <section class="section" id="intro">
+    <div class="section-kicker">
+      <span class="klabel">Part 0</span>
+      <h2>Lanehart's dashboard says zero</h2>
+    </div>
+    <p class="lede">Lanehart, a constructed robotaxi pilot fleet in a fictional city, has driven 150 million miles and its dashboard shows 0 fatal crashes, rate 0.00. The product lead wants to write "safer than human drivers", since the human rate is 1.33 deaths per 100 million miles. The data scientist's job is to say what those 150 million miles can and cannot carry. The answer is a single upper bound, and on these miles it is 2.00, which is above 1.33. Nothing has been proven yet, in either direction.</p>
+
+    <div class="legend">
+      <span class="pill">Live = worked through in the 45 minutes</span>
+      <span class="pill">Self-study = the full depth, after class</span>
+      <span class="pill">🔍 Every diagram zooms</span>
+    </div>
+
+    <div class="callout win">
+      <p><strong>★ What you walk out with tonight.</strong> The exact Poisson upper bound and how to read it off a curve. The rule of three, and its 90% and 99% cousins. The miles a zero has to cover: 225.2 million to get under 1.33 at 95%, 173.1 million at 90%, 346.3 million at 99%. An exposure-matched bound that compares Lanehart on the human mix of roads: its constructed crash rate moves from 120.00 to 147.74 per 100 million miles, still proven better than 185.55 at 150 million miles and not proven at 60 million. And a calculator that prints all of it from the same engine as the bench.</p>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Three numbers, one sentence each<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>The count.</strong> How many events happened: 0 fatal crashes, or 180 crashes of any severity, in Lanehart's constructed 150 million miles.</p>
+        <p><strong>The exposure.</strong> The miles over which they could have happened. A rate is a count divided by exposure, and with rare events the exposure carries almost all the information.</p>
+        <p><strong>The bound.</strong> The largest true rate still consistent with what you saw, at a stated confidence. A safety claim lives or dies on the bound, never on the point estimate, because the point estimate of a zero count is zero for any number of miles.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>The words that keep coming back<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Poisson count.</strong> The model for events that happen independently at a steady rate over exposure. The mean is rate times miles.</li>
+          <li><strong>One-sided upper bound.</strong> A number U such that, if the true mean were above U, a count this low would happen less than 5% of the time (at 95%).</li>
+          <li><strong>Exact, or Garwood, bound.</strong> The upper bound computed from the Poisson distribution itself, not a normal approximation. For k events: the chi-square quantile at C with 2k + 2 degrees of freedom, halved.</li>
+          <li><strong>Rule of three.</strong> With zero events, the 95% upper bound is about 3 events, so about 3 / n as a rate.</li>
+          <li><strong>Exposure match, or direct standardisation.</strong> Reweighting per-context rates by a reference mix of miles, here the human one.</li>
+          <li><strong>Constructed.</strong> Lanehart's miles, contexts and counts come from a seeded generator, not a fleet.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="section" id="part-1">
+    <div class="section-kicker">
+      <span class="klabel">Part 1 · covers the exact Poisson bound and the rule of three</span>
+      <h2>Zero is a bound, not a rate</h2>
+      <span class="tag concept">15 min live</span>
+    </div>
+    <p class="lede">Ask the question backwards. Suppose the true expected number of fatal crashes in Lanehart's 150 million miles were some mean. How likely would it be to see none? For a small mean, quite likely. As the mean grows, a clean record becomes rarer. The upper bound is the mean at which seeing zero has dropped to exactly 5%: any larger mean would make the clean record a less than 5% fluke.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 372" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two hand drawn panels. Left, the probability of seeing zero events falls from 100% as the true expected count grows, and crosses 5% at 2.996 events, marked in yellow. Right, if the true mean were 2.996 events, the chance of each possible count drawn as bars; the bar for zero events, in yellow, is 5%. Note: 2.996 events divided by 150 million miles is 2.00 per 100 million, above the human 1.33.">
+        <defs>
+          <filter id="lhp7aSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="71" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp7aHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp7aAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp7aH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp7aL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp7aS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp7aB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lhp7aA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp7aN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <g filter="url(#lhp7aSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="30" width="410" height="296" rx="12" transform="rotate(-0.4 235 178)" fill="#FFFFFF"/>
+          <rect x="450" y="30" width="410" height="296" rx="12" transform="rotate(0.4 655 178)" fill="#FFFFFF"/>
+          <path d="M70 80 L70 280 L410 280"/>
+          <path d="M70 270 L400 270" stroke="#8C979F" stroke-width="1.5" stroke-dasharray="5 5"/>
+          <path d="M70 80 C84 122 100 166 125 206 C150 236 190 256 235 270 C290 277 345 279 400 279.5" stroke="#2F3A42" stroke-width="2.6"/>
+          <circle cx="235" cy="270" r="6" fill="#F2C230"/>
+          <path d="M395 120 L405 92 L415 120 Z M388 121 L422 121" fill="#FFFFFF"/>
+          <path d="M480 280 L850 280"/>
+          <rect x="486" y="244" width="28" height="36" rx="3" transform="rotate(-1 500 262)" fill="#F2C230"/>
+          <rect x="526" y="173" width="28" height="107" rx="3" transform="rotate(1 540 226)" fill="url(#lhp7aHc)"/>
+          <rect x="566" y="120" width="28" height="160" rx="3" transform="rotate(-1 580 200)" fill="url(#lhp7aHc)"/>
+          <rect x="606" y="120" width="28" height="160" rx="3" transform="rotate(1 620 200)" fill="url(#lhp7aHc)"/>
+          <rect x="646" y="160" width="28" height="120" rx="3" transform="rotate(-1 660 220)" fill="url(#lhp7aHc)"/>
+          <rect x="686" y="208" width="28" height="72" rx="3" transform="rotate(1 700 244)" fill="url(#lhp7aHc)"/>
+          <rect x="726" y="244" width="28" height="36" rx="3" transform="rotate(-1 740 262)" fill="url(#lhp7aHc)"/>
+          <rect x="766" y="265" width="28" height="15" rx="3" transform="rotate(1 780 272)" fill="url(#lhp7aHc)"/>
+          <rect x="806" y="274" width="28" height="6" rx="2" fill="url(#lhp7aHc)"/>
+        </g>
+
+        <text class="lhp7aH" x="50" y="56">CHANCE OF A CLEAN RECORD, AS THE MEAN GROWS</text>
+        <text class="lhp7aA" x="62" y="86" text-anchor="end">100%</text>
+        <text class="lhp7aA" x="62" y="274" text-anchor="end">5%</text>
+        <text class="lhp7aB" x="250" y="246">5% reached at 2.996</text>
+        <text class="lhp7aS" x="250" y="260">= the 95% upper bound</text>
+        <text class="lhp7aA" x="70" y="298" text-anchor="middle">0</text>
+        <text class="lhp7aA" x="180" y="298" text-anchor="middle">2</text>
+        <text class="lhp7aA" x="235" y="298" text-anchor="middle">2.996</text>
+        <text class="lhp7aA" x="290" y="298" text-anchor="middle">4</text>
+        <text class="lhp7aA" x="400" y="298" text-anchor="middle">6</text>
+        <text class="lhp7aA" x="235" y="316" text-anchor="middle">true expected events in the miles driven</text>
+
+        <text class="lhp7aH" x="470" y="56">IF THE TRUE MEAN WERE 2.996 EVENTS</text>
+        <text class="lhp7aS" x="470" y="74">chance of each count you might see</text>
+        <text class="lhp7aB" x="500" y="236" text-anchor="middle">5%</text>
+        <text class="lhp7aA" x="500" y="298" text-anchor="middle">0</text>
+        <text class="lhp7aA" x="540" y="298" text-anchor="middle">1</text>
+        <text class="lhp7aA" x="580" y="298" text-anchor="middle">2</text>
+        <text class="lhp7aA" x="620" y="298" text-anchor="middle">3</text>
+        <text class="lhp7aA" x="660" y="298" text-anchor="middle">4</text>
+        <text class="lhp7aA" x="700" y="298" text-anchor="middle">5</text>
+        <text class="lhp7aA" x="740" y="298" text-anchor="middle">6</text>
+        <text class="lhp7aA" x="780" y="298" text-anchor="middle">7</text>
+        <text class="lhp7aA" x="820" y="298" text-anchor="middle">8</text>
+        <text class="lhp7aA" x="655" y="316" text-anchor="middle">events seen</text>
+
+        <text class="lhp7aN" x="30" y="346">Saw 0 events? The 95% upper bound is the mean at which 0 becomes a 5% outcome: -ln(0.05) = 2.996 events.</text>
+        <text class="lhp7aN" x="30" y="364">Divide by the miles: 2.996 / 150M = 2.00 per 100M for constructed Lanehart, still above the human 1.33.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the bound is found by asking which true means would make your clean record a fluke; the yellow dot and the yellow bar are the same 5%.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Reading the bound off the curve<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>For zero events the chance of a clean record is exp(-mean), so the bound solves exp(-U) = 0.05, which gives U = -ln(0.05) = 2.996 expected events. That is the whole calculation. Turn it into a rate by dividing by the exposure: 2.996 events over 150 million miles is 2.00 per 100 million.</p>
+        <p>For k events the same idea holds with "k or fewer" in place of "none", and the answer is the exact (Garwood) form: U = chi-square quantile(C, 2k + 2) / 2, the gamma quantile with shape k + 1. With 180 crashes of any severity in the same constructed miles, the point rate is 120.00 per 100 million and the 95% upper bound is 135.79. Notice the shape of that: with many events the bound sits close to the point; with zero events the point is meaningless and the bound is everything.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Why one-sided, and why exact<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>A safety claim says "at most this bad". Only the upper side can sink it, so all 5% of the doubt goes on that side. A two-sided 95% interval puts 2.5% on each side and gives a different number; say which one you used.</p>
+        <p>The usual normal approximation, point plus 1.645 standard errors, collapses at zero: the standard error of a zero count is zero, so the "bound" is zero too. The RAND report makes the same point in its own terms, noting that with fewer than 30 events an exact interval can be used, citing Ulm (1990). The engine behind every widget here uses the exact form and checks itself on load.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>Kalra and Paddock's RAND report applies exactly this zero-failure calculation to the human fatality rate it used, 1.09 per 100 million miles in 2013. Showing a rate at most that low at 95% confidence takes 275 million failure-free miles, which the report puts at about 12.5 years for 100 vehicles driving 24 hours a day, every day, at 25 mph.</p>
+        </div>
+      </div>
+    </details>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 284" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn three-row chart of the rule of three and its cousins. With zero events, the upper bound in events is 2.303 at 90%, 2.996 at 95% (yellow) and 4.605 at 99%. For constructed Lanehart's 150 million miles those become 1.535, 2.00 and 3.070 per 100 million, all above the human 1.33 line. Miles needed with zero events to get under 1.33: 173.1 million, 225.2 million and 346.3 million.">
+        <defs>
+          <filter id="lhp7bSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="73" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp7bHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp7bAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp7bH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp7bL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp7bS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp7bB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lhp7bA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp7bV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lhp7bN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp7bH" x="30" y="30">THE RULE OF THREE AND ITS COUSINS: ZERO EVENTS, THREE CONFIDENCE LEVELS</text>
+        <text class="lhp7bA" x="130" y="64">events the bound allows</text>
+        <text class="lhp7bA" x="420" y="64">Lanehart, 0 in 150M, per 100M</text>
+        <text class="lhp7bA" x="740" y="64">miles needed, 0 events</text>
+
+        <g filter="url(#lhp7bSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="130" y="98" width="92" height="18" rx="4" transform="rotate(-1 176 107)" fill="url(#lhp7bHc)"/>
+          <rect x="130" y="148" width="120" height="18" rx="4" transform="rotate(1 190 157)" fill="#F2C230"/>
+          <rect x="130" y="198" width="184" height="18" rx="4" transform="rotate(-1 222 207)" fill="url(#lhp7bHc)"/>
+          <rect x="420" y="98" width="123" height="18" rx="4" transform="rotate(1 481 107)" fill="#F1F3F4"/>
+          <rect x="420" y="148" width="160" height="18" rx="4" transform="rotate(-1 500 157)" fill="#F1F3F4"/>
+          <rect x="420" y="198" width="246" height="18" rx="4" transform="rotate(1 543 207)" fill="#F1F3F4"/>
+          <path d="M526 92 L526 226" stroke="#2F3A42" stroke-width="2" stroke-dasharray="5 4"/>
+          <path d="M130 242 L170 242 M200 242 L240 242 M270 242 L310 242" stroke="#CED4D9" stroke-width="3"/>
+        </g>
+
+        <text class="lhp7bA" x="526" y="86" text-anchor="middle">human 1.33</text>
+        <text class="lhp7bL" x="30" y="111">90%</text>
+        <text class="lhp7bS" x="30" y="125">rule of 2.3</text>
+        <text class="lhp7bL" x="30" y="161">95%</text>
+        <text class="lhp7bS" x="30" y="175">rule of three</text>
+        <text class="lhp7bL" x="30" y="211">99%</text>
+        <text class="lhp7bS" x="30" y="225">rule of 4.6</text>
+        <text class="lhp7bL" x="230" y="111">2.303</text>
+        <text class="lhp7bB" x="258" y="161">2.996</text>
+        <text class="lhp7bL" x="322" y="211">4.605</text>
+        <text class="lhp7bL" x="551" y="111">1.535</text>
+        <text class="lhp7bL" x="588" y="161">2.00</text>
+        <text class="lhp7bL" x="674" y="211">3.070</text>
+        <text class="lhp7bV" x="740" y="113">173.1M</text>
+        <text class="lhp7bV" x="740" y="163">225.2M</text>
+        <text class="lhp7bV" x="740" y="213">346.3M</text>
+
+        <text class="lhp7bN" x="30" y="262">Rule of three: 0 events in n miles gives a 95% upper bound of about 3 / n, since -ln(0.05) = 2.996.</text>
+        <text class="lhp7bN" x="30" y="278">Every row stays right of the human 1.33: no confidence level turns 0 in 150M miles into proof.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow bar is the rule of three; raising the confidence raises the count of events the bound allows, and the miles grow in proportion.</figcaption>
+    </figure>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>The rule of three, and where it comes from<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Hanley and Lippman-Hand (1983) put the shortcut in a medical journal under the title "If nothing goes wrong, is everything all right?": with 0 events in n trials, the 95% upper limit is about 3 / n (reported; we did not read the abstract at source, and the result is derivable). The derivation is the curve above: -ln(0.05) = 2.996, which rounds to 3.</p>
+        <p>The cousins follow the same formula, -ln(1 - C). At 90% the count is 2.303, at 99% it is 4.605 (derived). For Lanehart's 150 million constructed miles the zero-event bounds are 1.535, 2.00 and 3.070 per 100 million. The shortcut is only for zero; with any events, use the exact form.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>When the Poisson model itself is wrong<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Every bound here assumes events arrive independently at a steady rate over the miles. Three ways that breaks, none of which the bound can see: crashes that cluster (one software release, one stretch of road, one weather week), a rate that changes over the miles because the system was updated mid-way, and miles that are not alike (a highway mile and a rain mile are different exposures). The last one is fixed in Part 2 by matching exposure. The first two need the miles split by release and period, and a bound per split.</p>
+        <p>A Bayesian treatment of the same rate, with a prior over it, is owned by <a href="https://phoebefu6.github.io/learn-bayesian-with-phoebe/courses/p1-beta-binomial-by-hand.html">learn Bayesian</a> (beta-binomial). The side picked here is the frequentist exact bound over miles of exposure, because that is the form the RAND arithmetic uses.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="section" id="part-2">
+    <div class="section-kicker">
+      <span class="klabel">Part 2 · covers miles needed and the exposure-matched bound</span>
+      <h2>How many miles a zero must cover, and on which roads</h2>
+      <span class="tag concept">10 min live</span>
+    </div>
+    <p class="lede">Flip the bound around. If a fleet sees no fatal crashes at all, its 95% bound is 2.996 divided by its miles, so the bound slides down as the miles grow. The miles needed are where it crosses the human rate. Then a second problem: a fleet's miles are not the human population's miles. Compare on the same mix of roads, or the comparison measures where each one drove.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 430" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn curve of the 95% zero-event upper bound per 100 million miles against miles driven. It falls as miles grow and crosses the human 2022 rate of 1.33 at 225.2 million miles, marked in yellow, and the RAND 2013 rate of 1.09 at 275 million. Constructed Lanehart at 150 million miles sits at 2.00. A side panel lists Lanehart with zero fatal crashes: 60 million miles 4.99, 150 million 2.00, 400 million 0.749, proven. At 90% the miles needed are 173.1 million, at 99% 346.3 million.">
+        <defs>
+          <filter id="lhp7cSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="79" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp7cHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp7cAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp7cH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp7cL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp7cS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp7cB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lhp7cA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp7cV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lhp7cN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp7cH" x="30" y="26">THE ZERO-EVENT BOUND SLIDES DOWN AS MILES GROW (95%)</text>
+        <text class="lhp7cA" x="90" y="52">upper bound, fatal crashes per 100M miles</text>
+
+        <g filter="url(#lhp7cSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M90 64 L90 340 L600 340"/>
+          <path d="M84 220 L90 220 M84 100 L90 100 M201 340 L201 346 M534 340 L534 346"/>
+          <path d="M90 260 L590 260" stroke="#2F3A42" stroke-width="2" stroke-dasharray="6 4"/>
+          <path d="M90 275 L590 275" stroke="#8C979F" stroke-width="1.5" stroke-dasharray="3 4"/>
+          <path d="M173 100 C188 135 196 152 201 160 C222 192 238 210 257 220 C290 238 315 251 340 260 C370 268 400 276 423 280 C470 288 510 294 590 300" stroke="#2F3A42" stroke-width="2.6"/>
+          <path d="M340 266 L340 340 M396 281 L396 340" stroke="#8C979F" stroke-width="1.2" stroke-dasharray="3 3"/>
+          <circle cx="340" cy="260" r="6.5" fill="#F2C230"/>
+          <circle cx="396" cy="275" r="5" fill="#FFFFFF"/>
+          <circle cx="257" cy="220" r="5" fill="url(#lhp7cHc)"/>
+          <rect x="630" y="70" width="226" height="176" rx="10" transform="rotate(0.6 743 158)" fill="#F1F3F4"/>
+          <circle cx="826" cy="304" r="16" fill="#FFFFFF"/>
+          <circle cx="826" cy="304" r="5" fill="#CED4D9"/>
+        </g>
+
+        <text class="lhp7cA" x="80" y="224" text-anchor="end">2</text>
+        <text class="lhp7cA" x="80" y="104" text-anchor="end">4</text>
+        <text class="lhp7cA" x="90" y="358" text-anchor="middle">0</text>
+        <text class="lhp7cA" x="201" y="358" text-anchor="middle">100M</text>
+        <text class="lhp7cB" x="340" y="358" text-anchor="middle">225.2M</text>
+        <text class="lhp7cA" x="396" y="358" text-anchor="middle">275M</text>
+        <text class="lhp7cA" x="534" y="358" text-anchor="middle">400M</text>
+        <text class="lhp7cA" x="345" y="378" text-anchor="middle">miles driven with zero fatal crashes</text>
+        <text class="lhp7cL" x="270" y="206">Lanehart, 150M: 2.00</text>
+        <text class="lhp7cB" x="352" y="242">crossing = miles needed</text>
+        <text class="lhp7cA" x="598" y="264">human 2022: 1.33</text>
+        <text class="lhp7cS" x="598" y="282">RAND 2013 rate: 1.09</text>
+
+        <text class="lhp7cH" x="646" y="96">LANEHART, 0 FATAL, 95%</text>
+        <text class="lhp7cL" x="646" y="128">60M miles</text>
+        <text class="lhp7cV" x="842" y="130" text-anchor="end">4.99</text>
+        <text class="lhp7cL" x="646" y="160">150M miles</text>
+        <text class="lhp7cV" x="842" y="162" text-anchor="end">2.00</text>
+        <text class="lhp7cL" x="646" y="192">400M miles</text>
+        <text class="lhp7cV" x="842" y="194" text-anchor="end">0.749</text>
+        <text class="lhp7cS" x="646" y="216">of these three, only 400M proves it</text>
+        <text class="lhp7cS" x="646" y="234">needed: 173.1M at 90%, 346.3M at 99%</text>
+
+        <text class="lhp7cN" x="30" y="404">Zero events buy a bound of 2.996 / miles. It crosses the human 1.33 at 225.2M miles (derived from NHTSA 2022);</text>
+        <text class="lhp7cN" x="30" y="422">RAND's lower 2013 bar of 1.09 needed 275M. A lower human rate moves the crossing to the right.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow dot is the only place a clean record starts to mean "better than human"; every mile before it is a bound, not a verdict.</figcaption>
+    </figure>
+
+    <div class="wk" id="lhp7-calc">
+      <div class="wk-head">
+        <b>Live</b>
+        <span class="wk-hint">Exact Poisson bounds computed in this page by the same engine as the prove-it-safe bench. You choose the count, the miles, the confidence and the benchmark. Real: the maths, the NHTSA 2022 rates (1.33 fatal, 185.55 crashes derived) and RAND's 1.09 benchmark. Constructed: Lanehart's fleet in the second table.</span>
+      </div>
+      <div class="wk-body">
+        <label class="sql-label" for="lhp7-k">Events observed</label>
+        <select class="sql-code" id="lhp7-k">
+          <option value="0" selected>0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="180">180, Lanehart's constructed crash count</option>
+        </select>
+        <label class="sql-label" for="lhp7-miles">Miles driven</label>
+        <select class="sql-code" id="lhp7-miles">
+          <option value="60000000">60 million</option>
+          <option value="150000000" selected>150 million, the canon</option>
+          <option value="225243028">225.2 million</option>
+          <option value="275000000">275 million</option>
+          <option value="400000000">400 million</option>
+        </select>
+        <label class="sql-label" for="lhp7-conf">Confidence, one-sided</label>
+        <select class="sql-code" id="lhp7-conf">
+          <option value="0.9">90%</option>
+          <option value="0.95" selected>95%, the canon</option>
+          <option value="0.99">99%</option>
+        </select>
+        <label class="sql-label" for="lhp7-bench">Human benchmark, per 100M miles</label>
+        <select class="sql-code" id="lhp7-bench">
+          <option value="1.33" selected>1.33 fatalities, NHTSA 2022</option>
+          <option value="1.09">1.09 fatalities, RAND's 2013 figure</option>
+          <option value="crash">185.55 police-reported crashes, derived from NHTSA 2022</option>
+        </select>
+        <div class="lhp7-btns">
+          <button class="btn primary" id="lhp7-lanehart" type="button">Run Lanehart's exposure-matched bound at these miles</button>
+          <button class="btn" id="lhp7-reset" type="button">Back to the canon settings</button>
+        </div>
+        <div id="lhp7-out"></div>
+        <div id="lhp7-lh-out"></div>
+        <p class="sql-note" id="lhp7-verdict">...</p>
+      </div>
+      <div class="wk-foot" id="lhp7-self">...</div>
+    </div>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Miles needed, read off the widget<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>0 events, 95%, 1.33:</strong> the bound is 2.00 at 150 million miles and the miles needed are 225.2 million. Set the miles to 225.2 million and the bound sits on the line.</li>
+          <li><strong>Switch to RAND's 1.09:</strong> the miles needed rise to 275 million, the report's own figure. The 2022 rate is higher than the 2013 one, so the bar fell; nothing about the cars changed.</li>
+          <li><strong>Switch to 90% or 99%:</strong> 173.1 million or 346.3 million. Whoever picks the confidence level moves the finish line, so it is picked before the data, and written down.</li>
+          <li><strong>Now observe 1 event:</strong> the miles needed jump, because the bound must now cover "1 or fewer". A single event late in a programme costs more miles than most people expect. Your numbers will differ with every setting; the widget prints them.</li>
+        </ul>
+        <p>RAND goes further: estimating the fatality rate to within 20% takes about 8.8 billion miles, and showing it is 20% better than humans with 80% power takes about 11 billion. Those are precision and superiority questions, which leader session 3 walks through. The bound tonight answers only "is it at most the human rate?".</p>
+      </div>
+    </details>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn exposure match for constructed Lanehart. Four road contexts with Lanehart's crash rates per 100 million miles: highway 69.09 from 57 crashes, urban day 155.56 from 70, night 186.67 from 28, rain 333.33 from 25. Paired bars show Lanehart's share of miles, 55, 30, 10 and 5 percent, against the human share used as weights, in yellow, 35, 40, 15 and 10 percent. A number line below: own-mix rate 120.00 with bound 135.79; matched rate 147.74 with Fay-Feuer bound 169.04; human 185.55; at 60 million miles the matched bound would be 205.62.">
+        <defs>
+          <filter id="lhp7dSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="83" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp7dHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp7dAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp7dH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp7dL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp7dS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp7dB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lhp7dA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp7dV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lhp7dN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp7dH" x="30" y="28">SAME CRASHES, REWEIGHTED TO THE HUMAN MIX OF ROADS (CONSTRUCTED LANEHART, 150M MILES)</text>
+
+        <g filter="url(#lhp7dSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="210" y="140" width="34" height="110" rx="3" transform="rotate(-1 227 195)" fill="url(#lhp7dHc)"/>
+          <rect x="256" y="180" width="34" height="70" rx="3" transform="rotate(1 273 215)" fill="#F2C230"/>
+          <rect x="360" y="190" width="34" height="60" rx="3" transform="rotate(1 377 220)" fill="url(#lhp7dHc)"/>
+          <rect x="406" y="170" width="34" height="80" rx="3" transform="rotate(-1 423 210)" fill="#F2C230"/>
+          <rect x="510" y="230" width="34" height="20" rx="3" transform="rotate(-1 527 240)" fill="url(#lhp7dHc)"/>
+          <rect x="556" y="220" width="34" height="30" rx="3" transform="rotate(1 573 235)" fill="#F2C230"/>
+          <rect x="660" y="240" width="34" height="10" rx="2" fill="url(#lhp7dHc)"/>
+          <rect x="706" y="230" width="34" height="20" rx="3" transform="rotate(-1 723 240)" fill="#F2C230"/>
+          <path d="M190 250 L760 250"/>
+          <rect x="30" y="158" width="16" height="14" rx="2" fill="url(#lhp7dHc)"/>
+          <rect x="30" y="196" width="16" height="14" rx="2" fill="#F2C230"/>
+          <path d="M792 246 L806 210 L820 246 Z M786 247 L826 247" fill="#FFFFFF"/>
+          <path d="M190 306 L830 306"/>
+          <path d="M444.6 306 L558.2 306" stroke="#2F3A42" stroke-width="6"/>
+          <path d="M296.7 306 L380.9 306" stroke="#8C979F" stroke-width="6"/>
+          <circle cx="296.7" cy="306" r="5" fill="#FFFFFF"/>
+          <circle cx="444.6" cy="306" r="5" fill="#FFFFFF"/>
+          <path d="M646.2 294 L646.2 318" stroke-width="3"/>
+          <circle cx="753.3" cy="306" r="5" fill="#FFFFFF" stroke-dasharray="2 2"/>
+        </g>
+
+        <text class="lhp7dA" x="30" y="64">road context</text>
+        <text class="lhp7dA" x="30" y="92">Lanehart rate</text>
+        <text class="lhp7dS" x="30" y="108">per 100M miles</text>
+        <text class="lhp7dL" x="250" y="64" text-anchor="middle">Highway</text>
+        <text class="lhp7dL" x="400" y="64" text-anchor="middle">Urban, day</text>
+        <text class="lhp7dL" x="550" y="64" text-anchor="middle">Night</text>
+        <text class="lhp7dL" x="700" y="64" text-anchor="middle">Rain</text>
+        <text class="lhp7dV" x="250" y="94" text-anchor="middle">69.09</text>
+        <text class="lhp7dV" x="400" y="94" text-anchor="middle">155.56</text>
+        <text class="lhp7dV" x="550" y="94" text-anchor="middle">186.67</text>
+        <text class="lhp7dV" x="700" y="94" text-anchor="middle">333.33</text>
+        <text class="lhp7dS" x="250" y="110" text-anchor="middle">k = 57</text>
+        <text class="lhp7dS" x="400" y="110" text-anchor="middle">k = 70</text>
+        <text class="lhp7dS" x="550" y="110" text-anchor="middle">k = 28</text>
+        <text class="lhp7dS" x="700" y="110" text-anchor="middle">k = 25</text>
+
+        <text class="lhp7dS" x="227" y="134" text-anchor="middle">55%</text>
+        <text class="lhp7dB" x="273" y="174" text-anchor="middle">35%</text>
+        <text class="lhp7dS" x="377" y="184" text-anchor="middle">30%</text>
+        <text class="lhp7dB" x="423" y="164" text-anchor="middle">40%</text>
+        <text class="lhp7dS" x="527" y="224" text-anchor="middle">10%</text>
+        <text class="lhp7dB" x="573" y="214" text-anchor="middle">15%</text>
+        <text class="lhp7dS" x="677" y="234" text-anchor="middle">5%</text>
+        <text class="lhp7dB" x="723" y="224" text-anchor="middle">10%</text>
+
+        <text class="lhp7dL" x="54" y="170">Lanehart's</text>
+        <text class="lhp7dS" x="54" y="184">own mix</text>
+        <text class="lhp7dL" x="54" y="208">human mix</text>
+        <text class="lhp7dS" x="54" y="222">the weights</text>
+        <text class="lhp7dA" x="30" y="254">share of miles</text>
+
+        <text class="lhp7dL" x="296.7" y="290" text-anchor="middle">120.00</text>
+        <text class="lhp7dL" x="380.9" y="290" text-anchor="middle">135.79</text>
+        <text class="lhp7dL" x="444.6" y="290" text-anchor="middle">147.74</text>
+        <text class="lhp7dL" x="558.2" y="290" text-anchor="middle">169.04</text>
+        <text class="lhp7dL" x="646.2" y="288" text-anchor="middle">185.55</text>
+        <text class="lhp7dL" x="753.3" y="290" text-anchor="middle">205.62</text>
+        <text class="lhp7dS" x="296.7" y="326" text-anchor="middle">own mix</text>
+        <text class="lhp7dS" x="380.9" y="326" text-anchor="middle">own bound</text>
+        <text class="lhp7dS" x="444.6" y="326" text-anchor="middle">matched</text>
+        <text class="lhp7dS" x="558.2" y="326" text-anchor="middle">matched bound</text>
+        <text class="lhp7dS" x="646.2" y="330" text-anchor="middle">human</text>
+        <text class="lhp7dS" x="753.3" y="326" text-anchor="middle">bound at 60M</text>
+
+        <text class="lhp7dN" x="30" y="352">Same per-context rates, human weights: 120.00 becomes 147.74, because Lanehart drove mostly easy highway miles.</text>
+        <text class="lhp7dN" x="30" y="370">The Fay-Feuer bound, 169.04, is under 185.55: proven at 150M. At 60M miles the matched bound is 205.62: not proven.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow bars are the only thing that changed; reweighting to the human roads costs Lanehart 27.74 per 100M of apparent advantage.</figcaption>
+    </figure>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>The matched rate and its bound<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Directly standardising is a weighted sum: take Lanehart's rate in each road context and weight it by the human share of miles in that context, 35% highway, 40% urban day, 15% night, 10% rain (a constructed mix). Lanehart's own mix is 55 / 30 / 10 / 5, heavy on highway, where its rate is lowest, so the plain rate of 120.00 flatters it. Matched, it is 147.74.</p>
+        <p>The bound on a weighted sum of Poisson counts is not the exact Poisson bound any more. Fay and Feuer (1997) give a gamma interval for it (reported for the citation; the method is implemented in the engine and checked by simulation in the reference script, where its one-sided 95% coverage at 60 million miles came out 0.9575 over 2,000 constructed draws). The upper bound is 169.04 at 150 million miles, under the derived human 185.55: proven, with a narrower margin. At 60 million miles the matched rate is 168.23 and the bound 205.62: not proven, because the thin night and rain miles carry big weights and few events. The widget's Lanehart button prints both.</p>
+        <p>A useful identity, which the engine's self-check tests: weight by the fleet's own mix and the Fay-Feuer bound returns exactly the plain Poisson bound, 135.79. The matched bound only differs because the weights differ.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>NHTSA's 2022 summary gives the mismatch in one line: rural areas held 20% of the population and 32% of the miles but 41% of the deaths. Derived from those shares, the rural fatality rate is about 1.69 per 100 million miles against about 1.15 urban, approximate because the 32% is rounded. Two fleets with the same drivers and different road mixes would post different rates.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>What the matched bound still cannot settle<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>The numerator is not like for like.</strong> The 185.55 is police-reported crashes, which undercount all crashes; RAND keeps separate "reported" and "estimated total" rates for that reason. A fleet with full telemetry records more of its minor crashes than a human population reports. Some reviewers read that as making a fleet's crash count look worse than it is; others read the police baseline as the only audited number available. Whether the two are comparable is contested, and the bound does not decide it.</p>
+        <p><strong>The context list is a choice.</strong> Four contexts is a constructed simplification. Real exposure differs by speed, junction density, time of day, weather and more, and each extra stratum thins the miles in every cell, which widens the bound. Matching on more is not free.</p>
+        <p><strong>The rare tail is missing.</strong> Logged miles barely sample the rare scenarios, so a bound on logged crashes says little about them. Practitioner session 8 estimates that tail by importance sampling; the bench in session 10 adds it and the verdict turns.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 3 ============ -->
+  <section class="section" id="part-3">
+    <div class="section-kicker">
+      <span class="klabel">Part 3 · build-along</span>
+      <h2>Build the bounds in Python and match the canon</h2>
+      <span class="tag build">17 min hands on</span>
+    </div>
+    <p class="lede">Four small functions, every output checked against a number already on this page. Use a notebook with scipy and numpy. The figure is the plan, and the yellow chip is the bug that matters: the wrong weights still return a tidy number.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 254" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn plan of four functions. exact_upper uses the chi-square quantile and returns 2.996 for zero events at 95%. The rate step divides by miles and gives 2.00 per 100 million and 225.2 million miles needed. ff_upper takes the four context counts, miles and weights and returns 147.74 and 169.04; a yellow chip says the weights are the human shares 0.35, 0.40, 0.15, 0.10; a red chip says the fleet's own shares give 135.79, too kind. A coverage check simulates draws and counts how often the bound covers the truth, near 0.95.">
+        <defs>
+          <filter id="lhp7eSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="89" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp7eHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp7eAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp7eH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp7eL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp7eS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp7eK { font: 700 11px Inter, sans-serif; fill: #1A1F23; }
+          .lhp7eR { font: 700 11px Inter, sans-serif; fill: #991B1B; }
+          .lhp7eV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lhp7eN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <g filter="url(#lhp7eSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="40" width="190" height="100" rx="10" transform="rotate(-0.6 125 90)" fill="#FFFFFF"/>
+          <rect x="245" y="40" width="190" height="100" rx="10" transform="rotate(0.5 340 90)" fill="#FFFFFF"/>
+          <rect x="460" y="40" width="190" height="100" rx="10" transform="rotate(-0.5 555 90)" fill="url(#lhp7eHc)"/>
+          <rect x="470" y="52" width="170" height="78" rx="6" fill="#FFFFFF"/>
+          <rect x="675" y="40" width="190" height="100" rx="10" transform="rotate(0.6 770 90)" fill="#F1F3F4"/>
+          <path d="M224 90 L241 90 M439 90 L456 90 M654 90 L671 90" marker-end="url(#lhp7eAr)"/>
+          <rect x="440" y="160" width="230" height="30" rx="15" transform="rotate(-0.6 555 175)" fill="#F2C230"/>
+          <rect x="680" y="160" width="185" height="30" rx="15" transform="rotate(0.6 772 175)" fill="#FEF2F2" stroke="#FCA5A5"/>
+          <path d="M30 202 L80 202 M110 202 L160 202 M190 202 L240 202" stroke="#CED4D9" stroke-width="3"/>
+        </g>
+
+        <text class="lhp7eH" x="30" y="26">FOUR FUNCTIONS, EACH CHECKED AGAINST THE CANON</text>
+        <text class="lhp7eL" x="44" y="66">exact_upper(k, C)</text>
+        <text class="lhp7eS" x="44" y="86">chi2.ppf(C, 2k+2) / 2</text>
+        <text class="lhp7eS" x="44" y="102">k = 0, C = 0.95</text>
+        <text class="lhp7eV" x="44" y="128">2.996</text>
+        <text class="lhp7eL" x="259" y="66">rate and miles needed</text>
+        <text class="lhp7eS" x="259" y="86">bound / miles x 1e8</text>
+        <text class="lhp7eS" x="259" y="102">0 in 150M; human 1.33</text>
+        <text class="lhp7eV" x="259" y="128">2.00 · 225.2M</text>
+        <text class="lhp7eL" x="478" y="68">ff_upper(ks, miles, w)</text>
+        <text class="lhp7eS" x="478" y="86">gamma.ppf, Fay-Feuer</text>
+        <text class="lhp7eS" x="478" y="102">4 contexts, 180 crashes</text>
+        <text class="lhp7eV" x="478" y="124">147.74 · 169.04</text>
+        <text class="lhp7eL" x="689" y="66">coverage check</text>
+        <text class="lhp7eS" x="689" y="86">simulate, count covers</text>
+        <text class="lhp7eS" x="689" y="102">seeded draws at 60M</text>
+        <text class="lhp7eV" x="689" y="128">near 0.95</text>
+        <text class="lhp7eK" x="555" y="179" text-anchor="middle">w = human shares .35 .40 .15 .10</text>
+        <text class="lhp7eR" x="772" y="179" text-anchor="middle">own shares: 135.79, too kind</text>
+
+        <text class="lhp7eN" x="30" y="226">Every output has a canon value to hit: 2.996, 2.00, 225.2M, 135.79, 147.74, 169.04. Coverage is yours: it will differ.</text>
+        <text class="lhp7eN" x="30" y="244">The yellow chip is the bug that matters: the fleet's own weights still return a clean, smaller, wrong number.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow chip decides whether you compared on the human roads or on your own.</figcaption>
+    </figure>
+
+    <div class="steps">
+      <div class="step"><div>
+        <h4>The exact upper bound</h4>
+        <p>One line from the chi-square quantile. Check the zero case against -ln(0.05) before trusting it with anything else; both print 2.9957.</p>
+        <div class="prompt-box good"><span class="label">python</span>import math
+import numpy as np
+from scipy import stats
+
+def exact_upper(k, conf=0.95):
+    return stats.chi2.ppf(conf, 2 * k + 2) / 2
+
+exact_upper(0), -math.log(0.05)</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Turn counts into rates and miles</h4>
+        <p>Divide by miles, scale to 100 million. You should see 2.00 and 135.79 for Lanehart, then 225.2, 173.1 and 346.3 million miles needed.</p>
+        <div class="prompt-box good"><span class="label">python</span>def upper_per_100m(k, miles, conf=0.95):
+    return exact_upper(k, conf) / miles * 1e8
+
+def miles_needed(rate_per_100m, k=0, conf=0.95):
+    return exact_upper(k, conf) / (rate_per_100m / 1e8)
+
+print(upper_per_100m(0, 150e6), upper_per_100m(180, 150e6))
+print([round(miles_needed(1.33, conf=c) / 1e6, 1) for c in (0.90, 0.95, 0.99)])</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>The Fay-Feuer matched bound</h4>
+        <p>Weights per mile in each context, a weighted sum, and a gamma quantile whose shape and scale carry the largest weight as a correction. Feed it Lanehart's four constructed context counts: 147.74 and 169.04.</p>
+        <div class="prompt-box good"><span class="label">python</span>def ff_upper(ks, miles, w, conf=0.95):
+    wi = [wj / m for wj, m in zip(w, miles)]
+    y = sum(a * k for a, k in zip(wi, ks))
+    v = sum(a * a * k for a, k in zip(wi, ks))
+    wm = max(wi)
+    shape = (y + wm) ** 2 / (v + wm ** 2)
+    scale = (v + wm ** 2) / (y + wm)
+    return y * 1e8, stats.gamma.ppf(conf, shape, scale=scale) * 1e8
+
+share = [0.55, 0.30, 0.10, 0.05]
+miles = [150e6 * s for s in share]
+ks = [57, 70, 28, 25]
+ff_upper(ks, miles, [0.35, 0.40, 0.15, 0.10])</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Break it on purpose: the wrong weights</h4>
+        <p>Pass Lanehart's own shares as the weights. You get 120.00 and 135.79, exactly the plain Poisson answer from step 2. No error, no warning, a smaller number: this is the mistake the engine's self-check exists to catch.</p>
+        <div class="prompt-box good"><span class="label">python</span>ff_upper(ks, miles, share)</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Check the bound covers the truth</h4>
+        <p>A bound is a claim about repeated draws, so test it that way. Draw constructed counts at 60 million miles from the known true context rates, compute the bound each time, and count how often it covers the true matched rate. It should land near 0.95; the reference script reports 0.9575 over 2,000 draws. Your numbers will differ with your seed.</p>
+        <div class="prompt-box good"><span class="label">python</span>rng = np.random.default_rng(1016)
+true = np.array([60, 150, 200, 330])
+w = [0.35, 0.40, 0.15, 0.10]
+m60 = 60e6 * np.array(share)
+target = float(np.dot(w, true))
+covers = sum(ff_upper(rng.poisson(m60 * true / 1e8), m60, w)[1] &gt;= target
+             for _ in range(2000))
+target, covers / 2000</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Write the claim sentence</h4>
+        <p>One sentence with every part named: the count, the miles, the confidence, which side, the method, the reference mix and the benchmark. "180 crashes in 150 million constructed miles; exposure-matched to the human road mix, 147.74 per 100 million, one-sided 95% Fay-Feuer upper bound 169.04, against 185.55 police-reported crashes derived from NHTSA 2022." Anything shorter hides a choice.</p>
+      </div></div>
+    </div>
+
+    <div class="callout tip">
+      <p><strong>The habit to keep.</strong> Never report a rare-event rate without its exposure and its upper bound, and never compare two rates measured on different mixes of roads. Pick the confidence level and the reference mix before you look at the counts, and test the bound against a case where you know the truth.</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="section" id="quiz">
+    <div class="section-kicker">
+      <span class="klabel">Check yourself</span>
+      <h2>Three questions</h2>
+    </div>
+
+    <div class="quiz-q" data-answer="1">
+      <p class="qtext">Constructed Lanehart has 0 fatal crashes in 150 million miles. What does a 95% one-sided analysis say against the human 1.33 per 100 million?</p>
+      <button class="qopt" type="button">A · The rate is 0.00, so it is safer than human drivers</button>
+      <button class="qopt" type="button">B · The upper bound is 2.00 per 100 million, above 1.33, so better than human is not proven; it needs about 225.2 million clean miles</button>
+      <button class="qopt" type="button">C · The rate cannot be computed until there is at least one crash</button>
+      <p class="qwhy">With zero events the point estimate is zero at any mileage, so it carries no information. The bound is -ln(0.05) = 2.996 events over the miles, and it reaches 1.33 only at 225.2 million miles.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="0">
+      <p class="qtext">Lanehart's plain crash rate is 120.00 per 100 million; matched to the human road mix it is 147.74, from the same crashes. Why does it rise?</p>
+      <button class="qopt" type="button">A · Lanehart drove 55% of its miles on highway, where its rate is lowest; the human mix puts more weight on urban, night and rain miles, where its rate is higher</button>
+      <button class="qopt" type="button">B · The Fay-Feuer method adds a safety margin to the point estimate</button>
+      <button class="qopt" type="button">C · Matching counts extra crashes the fleet did not report</button>
+      <p class="qwhy">The counts and per-context rates are unchanged; only the weights moved. The margin lives in the upper bound (169.04), not in the point.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="2">
+      <p class="qtext">Raising the confidence from 95% to 99% moves the zero-event miles needed from 225.2 million to 346.3 million. Why?</p>
+      <button class="qopt" type="button">A · The human rate is lower at 99% confidence</button>
+      <button class="qopt" type="button">B · At 99% the Poisson model no longer applies, so a correction is added</button>
+      <button class="qopt" type="button">C · The bound allows -ln(0.01) = 4.605 events instead of 2.996, and the miles needed scale by the same ratio</button>
+      <p class="qwhy">Miles needed are -ln(1 - C) divided by the benchmark rate. The benchmark is fixed; only the count of events the bound allows changes. That is why the confidence level is chosen before the data.</p>
+    </div>
+
+    <div class="quiz-score"></div>
+  </section>
+
+  <!-- ============ HOMEWORK ============ -->
+  <section class="section" id="homework">
+    <div class="section-kicker">
+      <span class="klabel">Before session 8</span>
+      <h2>Homework</h2>
+    </div>
+    <p class="lede">Thirty minutes, in the same notebook.</p>
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Reproduce the 90% and 99% columns</h4>
+        <p>Rerun steps 2 and 3 at 90% and 99%. You should hit Lanehart's fatal bounds of 1.535 and 3.070 and matched bounds of 164.41 and 177.95. Then compare with the widget's Lanehart button at the same settings.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Find the mileage where the matched verdict flips</h4>
+        <p>Using the constructed context rates and shares, draw counts at several mileages between 60 and 150 million and find roughly where the matched bound drops under 185.55. Your numbers will differ with your seed; write down which one you used.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Bound a zero from your own work</h4>
+        <p>Pick any "zero incidents in n" claim you have seen at work: zero failed deploys, zero data breaches, zero outages. Compute its 95% upper bound with the rule of three, and write one sentence about what n would have to be for the claim to mean what it was used to mean.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ OFFICIAL ============ -->
+  <section class="section" id="official">
+    <div class="section-kicker">
+      <span class="klabel">Covered tonight</span>
+      <h2>What this session covers</h2>
+    </div>
+    <div class="covered">
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Exact Poisson upper bound</span><span class="note">Garwood form, chi-square quantile(C, 2k + 2) / 2. Standard maths; the engine checks it on load. 0 in 150M: 2.00; 180 in 150M: 135.79 (constructed counts).</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Rule of three and its cousins</span><span class="note">Hanley, J. A. and Lippman-Hand, A. (1983). JAMA 249(13):1743-1745. Reported. -ln(1 - C): 2.303, 2.996, 4.605 (derived).</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Miles needed with zero events</span><span class="note">Kalra, N. and Paddock, S. M. (2016). RAND RR-1478, read at source: 275M at 1.09. Derived at the 2022 rate: 225.2M (95%), 173.1M (90%), 346.3M (99%).</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Human baselines</span><span class="note">NHTSA NCSA (2024). Summary of Motor Vehicle Traffic Crashes: 2022 Data, DOT HS 813 643. Read at source: 1.33 fatal; 185.55 crashes derived; rural and urban shares.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Exposure-matched bound</span><span class="note">Fay, M. P. and Feuer, E. J. (1997). Statistics in Medicine 16(7):791-801. Reported (method implemented). Constructed Lanehart: 147.74, bound 169.04; at 60M, 205.62, not proven.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">RAND precision and superiority miles</span><span class="note">Named: about 8.8 billion and 11 billion miles. Leader session 3 works through them.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Comparability of fleet and police-reported crashes</span><span class="note">Contested, taught as a disagreement; not resolved. Leader session 4 reads claims built on it.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">The rare-scenario tail</span><span class="note">Named. Importance sampling is practitioner session 8; the full ladder is session 10.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Bayesian rates and priors</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-bayesian-with-phoebe/courses/p1-beta-binomial-by-hand.html">learn Bayesian</a> (beta-binomial).</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Confidence intervals in general</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-statistics-with-phoebe/courses/b7-confidence-intervals.html">learn statistics</a>.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Real fleet miles</span><span class="note">Out of scope by design. Every fleet count here is constructed; only the human rates are real.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section class="section" id="cheatsheet">
+    <div class="section-kicker">
+      <span class="klabel">Take this with you</span>
+      <h2>Cheat sheet</h2>
+    </div>
+    <div class="cheat">
+      <div class="cheat-item"><strong>The one sentence.</strong> A rare-event claim is a count, its miles and an upper bound; the point estimate of zero means nothing.</div>
+      <div class="cheat-item"><strong>Exact bound.</strong> U = chi-square quantile(C, 2k + 2) / 2 events; divide by miles for a rate.</div>
+      <div class="cheat-item"><strong>Rule of three.</strong> 0 in n: about 3 / n at 95%. Cousins: 2.303 at 90%, 4.605 at 99%.</div>
+      <div class="cheat-item"><strong>Miles needed.</strong> -ln(1 - C) / rate. At 1.33: 225.2M (95%), 173.1M (90%), 346.3M (99%).</div>
+      <div class="cheat-item"><strong>RAND.</strong> 275M clean miles at the 2013 rate of 1.09; about 8.8B for precision, 11B for superiority.</div>
+      <div class="cheat-item"><strong>Match exposure.</strong> Weight per-context rates by the human mix. Lanehart: 120.00 becomes 147.74 (constructed).</div>
+      <div class="cheat-item"><strong>Fay-Feuer.</strong> Gamma bound for a weighted rate: 169.04 at 150M, proven; 205.62 at 60M, not proven.</div>
+      <div class="cheat-item"><strong>Choose first.</strong> Confidence, side, reference mix and benchmark are fixed before the counts are seen.</div>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    <div class="wrap">
+      <p>Practitioner session 7 of 10 · learn-autonomous-driving-with-phoebe · by Phoebe Fu</p>
+      <nav class="pagenav">
+        <a href="p6-simulation-against-real-miles.html">← Practitioner session 6 · Simulation against real miles</a>
+        <a href="p8-importance-sampling-for-rare-scenarios.html">Practitioner session 8 · Importance sampling for rare scenarios →</a>
+      </nav>
+    </div>
+  </footer>
+
+</main>
+
+<script src="../assets/av-live.js?v=1"></script>
+<script src="../assets/app.js?v=1"></script>
+<script>
+(function () {
+  if (typeof AV === "undefined") return;
+  var kEl = document.getElementById("lhp7-k");
+  var milesEl = document.getElementById("lhp7-miles");
+  var confEl = document.getElementById("lhp7-conf");
+  var benchEl = document.getElementById("lhp7-bench");
+  var out = document.getElementById("lhp7-out");
+  var lhOut = document.getElementById("lhp7-lh-out");
+  var verdict = document.getElementById("lhp7-verdict");
+  var self = document.getElementById("lhp7-self");
+  var showLh = false;
+  var VERD = { proven: "proven at most the benchmark", notproven: "not proven", worse: "worse than the benchmark" };
+
+  function fmt(x, d) { return x.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function benchRate() { return benchEl.value === "crash" ? AV.HUMAN.crash : Number(benchEl.value); }
+  function isCanon(miles, conf) { return miles === 150e6 && Math.abs(conf - 0.95) < 1e-9; }
+
+  function render() {
+    var k = Number(kEl.value), miles = Number(milesEl.value), conf = Number(confEl.value), b = benchRate();
+    var U = AV.poissonUpper(k, conf), U0 = AV.poissonUpper(0, conf);
+    var point = k / miles * 1e8, upper = U / miles * 1e8;
+    var v = AV.verdict(point, upper, b);
+    var need = U / (b / 1e8), need0 = U0 / (b / 1e8);
+    var html = '<table class="sql-table"><thead><tr><th>Quantity</th><th>Value</th></tr></thead><tbody>';
+    html += "<tr><td>Events the bound allows, exact (Garwood)</td><td><b>" + fmt(U, 3) + "</b></td></tr>";
+    if (k === 0) html += "<tr><td>Rule-of-thumb check, -ln(1 - C)</td><td>" + fmt(-Math.log(1 - conf), 3) + "</td></tr>";
+    html += "<tr><td>Point rate per 100M miles</td><td>" + fmt(point, 2) + "</td></tr>";
+    html += '<tr class="lhp7-top"><td>Upper bound per 100M miles, one-sided ' + Math.round(conf * 100) + "%</td><td><b>" + fmt(upper, upper < 1 ? 3 : 2) + "</b></td></tr>";
+    html += "<tr><td>Benchmark per 100M miles</td><td>" + fmt(b, 2) + "</td></tr>";
+    html += "<tr><td>Miles needed to prove it with " + k + " event" + (k === 1 ? "" : "s") + "</td><td>" + fmt(need / 1e6, 1) + "M</td></tr>";
+    if (k !== 0) html += "<tr><td>Miles needed with 0 events</td><td>" + fmt(need0 / 1e6, 1) + "M</td></tr>";
+    html += "</tbody></table>";
+    out.innerHTML = html;
+
+    var msg = k + " event" + (k === 1 ? "" : "s") + " in " + fmt(miles / 1e6, 1) + "M miles: upper bound " + fmt(upper, upper < 1 ? 3 : 2) + " per 100M against " + fmt(b, 2) + ", " + VERD[v] + ". " +
+      (v === "proven" ? "The bound is under the benchmark." : "To prove it with this count would take " + fmt(need / 1e6, 1) + "M miles.") +
+      (isCanon(miles, conf) ? "" : " Not the canon settings: your numbers will differ from the figures in the prose.");
+
+    if (showLh) {
+      var L = AV.ladder({ miles: miles, conf: conf, withVariance: false, withAnti: false }), H = L.human;
+      var h2 = '<table class="sql-table"><thead><tr><th>Lanehart (constructed)</th><th>Point</th><th>Upper</th><th>Human</th><th>Verdict</th></tr></thead><tbody>';
+      h2 += "<tr><td>Fatal: " + L.fatal.k + " in " + fmt(miles / 1e6, 1) + "M miles</td><td>" + fmt(L.fatal.point, 2) + "</td><td><b>" + fmt(L.fatal.upper, L.fatal.upper < 1 ? 3 : 2) + "</b></td><td>" + H.fatal + "</td><td>" + VERD[L.fatal.verdict] + "</td></tr>";
+      h2 += "<tr><td>All crashes, own mix (" + L.own.k + ")</td><td>" + fmt(L.own.point, 2) + "</td><td><b>" + fmt(L.own.upper, 2) + "</b></td><td>" + fmt(H.crash, 2) + "</td><td>" + VERD[L.own.verdict] + "</td></tr>";
+      h2 += '<tr class="lhp7-top"><td>Exposure-matched, Fay-Feuer</td><td>' + fmt(L.matched.point, 2) + "</td><td><b>" + fmt(L.matched.upper, 2) + "</b></td><td>" + fmt(H.crash, 2) + "</td><td>" + VERD[L.matched.verdict] + "</td></tr>";
+      h2 += "</tbody></table>";
+      L.contexts.forEach(function (c, i) {
+        h2 += (i === 0 ? '<p class="sql-note">By context: ' : "; ") + c.label + " " + c.k + " crashes, " + fmt(c.rate, 2) + " per 100M";
+      });
+      h2 += ". The rare-scenario tail is not in these rows; practitioner session 8 adds it.</p>";
+      lhOut.innerHTML = h2;
+      msg += " Lanehart at these miles: matched " + fmt(L.matched.point, 2) + ", upper " + fmt(L.matched.upper, 2) + " against " + fmt(H.crash, 2) + ", " + VERD[L.matched.verdict] + ".";
+    } else {
+      lhOut.innerHTML = "";
+    }
+    verdict.textContent = msg;
+  }
+
+  document.getElementById("lhp7-lanehart").addEventListener("click", function () { showLh = true; render(); });
+  document.getElementById("lhp7-reset").addEventListener("click", function () {
+    kEl.value = "0"; milesEl.value = "150000000"; confEl.value = "0.95"; benchEl.value = "1.33"; showLh = false; render();
+  });
+  [kEl, milesEl, confEl, benchEl].forEach(function (el) { el.addEventListener("change", render); });
+
+  var st = AV.selfTestResult || AV.selfTest();
+  self.textContent = st.pass
+    ? "The engine's " + st.checks.length + " self-checks pass in this browser, including the zero-event bound equal to -ln(1 - C) and the one-stratum matched bound equal to the exact Poisson bound. Lanehart is constructed; the human rates are NHTSA's."
+    : "The engine's self-check did not pass in this browser, so nothing above should be believed.";
+  render();
+})();
+</script>
+<style>
+  #lhp7-calc .sql-code { border: 1px solid var(--hairline); border-radius: 8px; max-width: 24rem; }
+  #lhp7-calc table.sql-table { margin: .6rem 0 .2rem; font-size: .85rem; }
+  #lhp7-calc .lhp7-btns { display: flex; flex-wrap: wrap; gap: .5rem; margin: .7rem 0 .3rem; }
+  #lhp7-calc tr.lhp7-top td { background: var(--amber-50); }
+</style>
+</body>
+</html>

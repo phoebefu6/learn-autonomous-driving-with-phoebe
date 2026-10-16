@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- social:start -->
+<meta name="description" content="Practitioner session 8 of 10. A failure that happens 3 times in 1,000 encounters is almost never seen by plain Monte Carlo: 1 hit in 2,000 draws. Importance sampling skews the simulator toward failure and reweights each hit, and at the same budget its spread is 5.2 times tighter. Lanehart is a constructed fleet.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Learn with Phoebe">
+<meta property="og:title" content="Importance sampling for rare scenarios - learn autonomous driving with phoebe">
+<meta property="og:description" content="Practitioner session 8 of 10. Skew the simulator toward failure, reweight every hit, and get a rare-scenario rate you can bound at the same budget.">
+<meta property="og:url" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/courses/p8-importance-sampling-for-rare-scenarios.html">
+<meta property="og:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Importance sampling for rare scenarios - learn autonomous driving with phoebe">
+<meta name="twitter:description" content="Plain Monte Carlo: 1 hit in 2,000. Importance sampling: 743 hits, reweighted. Same budget, 5.2x tighter.">
+<meta name="twitter:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<!-- social:end -->
+<title>Practitioner session 8 · Importance sampling for rare scenarios - learn autonomous driving with phoebe</title>
+<link rel="stylesheet" href="../assets/style.css?v=2">
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="wrap">
+    <span class="crumb"><a href="../index.html">learn-autonomous-driving-with-phoebe</a> / Practitioner session 8 of 10</span>
+    <button class="btn" id="toggle-all" type="button">Expand all</button>
+    <button class="btn primary" id="zoom-toggle" type="button">Projector zoom: off</button>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Learn Autonomous Driving with Phoebe · Practitioner session 8 of 10</div>
+    <h1>Importance sampling for <span class="accent">rare scenarios</span></h1>
+    <p class="sub">Session 7 showed that real miles cannot bound a rare failure. A simulator can replay a scenario as often as you like, but if it draws encounters the way the road does, it almost never sees the failure either. Importance sampling draws them the way the failure happens, then gives every hit a weight that undoes the skew. Lanehart, a constructed robotaxi pilot fleet in a fictional city, supplies four rare scenario classes whose true failure rates are known exactly, so you can watch both samplers miss or hit the truth; every number on the page is computed in your browser.</p>
+    <div class="chip-row">
+      <span class="chip level">🟠 Advanced</span>
+      <span class="chip audience">Data scientists who evaluate in simulation</span>
+      <span class="chip audience">Engineers who own a scenario test budget</span>
+      <span class="chip time">45 min</span>
+    </div>
+    <div class="agenda">
+      <span class="a1" style="flex:1">0-3 · Welcome</span>
+      <span class="a2" style="flex:3">3-18 · Same budget, two samplers</span>
+      <span class="a3" style="flex:3">18-28 · The weight and why it is honest</span>
+      <span class="a4" style="flex:4">28-45 · Build-along and Q&amp;A</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ INTRO ============ -->
+  <section class="section" id="intro">
+    <div class="section-kicker">
+      <span class="klabel">Part 0</span>
+      <h2>Two thousand runs, one failure</h2>
+    </div>
+    <p class="lede">Lanehart, a constructed robotaxi pilot, has a simulator for a scenario its fleet meets about 4,000 times per 100 million miles: a pedestrian steps out from behind a parked van. The car fails 3 times in 1,000 such encounters, a true rate of 12 crashes per 100 million miles. The team ran 2,000 simulated encounters and saw one failure, so they reported 2.00. The number was wrong by a factor of six, and nothing in the output said so. The same 2,000 runs, drawn differently, give 11.52.</p>
+
+    <div class="legend">
+      <span class="pill">Live = worked through in the 45 minutes</span>
+      <span class="pill">Self-study = the full depth, after class</span>
+      <span class="pill">🔍 Every diagram zooms</span>
+    </div>
+
+    <div class="callout win">
+      <p><strong>★ What you walk out with tonight.</strong> A picture of why plain Monte Carlo starves on a rare failure, and what importance sampling does instead. The weight formula, worked on one draw. The proof, in one line, that the reweighted estimate is unbiased, and the self-check that catches it when the weight is forgotten. And numbers you produced: on Lanehart's four constructed rare classes, at 2,000 encounters per class over 200 runs, the spread of the total is 7.251 for plain Monte Carlo and 1.404 for importance sampling, 5.2 times tighter, with the importance-sampled mean at 46.05 against a true 46.</p>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>The four constructed rare classes<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Each class is an encounter rate times a failure probability per encounter, both constructed, so the truth is known exactly:</p>
+        <ul>
+          <li><strong>Pedestrian steps out from behind a parked van:</strong> 4,000 encounters per 100M miles x 0.003 = 12.</li>
+          <li><strong>Wrong-way vehicle on a divided road:</strong> 300 x 0.02 = 6.</li>
+          <li><strong>Debris in lane at highway speed:</strong> 2,500 x 0.004 = 10.</li>
+          <li><strong>Emergency vehicle crossing a junction:</strong> 1,200 x 0.015 = 18.</li>
+        </ul>
+        <p>The tail adds 46 crashes per 100 million miles. Real miles hand you the encounter rate; the failure probability per encounter is what a simulator has to estimate, and it is the small number that breaks plain sampling.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>RAND's "Driving to Safety" (Kalra and Paddock 2016) concluded that developers "cannot simply drive" their way to safety and that simulation and scenario testing are needed alongside road miles. This session is about making those simulated scenarios count: a simulator that samples like the road inherits the road's starvation.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>The words that keep coming back<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Severity x.</strong> In the constructed model, each simulated encounter draws a severity. The car fails when the severity passes a threshold t.</li>
+          <li><strong>Nominal distribution f.</strong> How severities occur on the road. Here Exp(1), so P(x &gt; t) = e^-t, and t = -ln(p) makes that exactly p.</li>
+          <li><strong>Proposal distribution g.</strong> The skewed sampler. Here Exp with mean t, which puts the threshold at the proposal's mean.</li>
+          <li><strong>Weight w.</strong> f(x) / g(x): how much more likely the draw was on the road than in the sampler.</li>
+          <li><strong>Budget.</strong> Simulated encounters per class. Both samplers get the same budget, so the comparison is fair.</li>
+          <li><strong>Constructed.</strong> The severity model, the thresholds and the classes are built for teaching; your simulator's will differ.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="section" id="part-1">
+    <div class="section-kicker">
+      <span class="klabel">Part 1 · covers plain Monte Carlo against importance sampling at equal budget</span>
+      <h2>Same budget, two samplers</h2>
+      <span class="tag concept">15 min live</span>
+    </div>
+    <p class="lede">Plain Monte Carlo draws each simulated encounter the way the road would, then counts failures. With p = 0.003, 2,000 draws expect 6 failures and saw 1. Importance sampling draws from a distribution centred on the failure threshold, so about 37 percent of draws are failures, and each one is counted at its weight instead of at 1.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 406" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn two-panel sketch for the constructed occluded pedestrian class, failure probability 0.003. Top: plain Monte Carlo draws severity from Exp(1); the tail beyond the threshold 5.81 is too thin to see, and 2,000 draws gave 1 failure, a rate of 2.00 per 100 million miles against a true 12. Bottom: importance sampling draws from an exponential with mean 5.81; the tail beyond the threshold, highlighted in yellow, holds about 37 percent of draws, and 2,000 draws gave 743 failures, reweighted to 11.52 per 100 million miles.">
+        <defs>
+          <filter id="lhp8aSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="81" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp8aHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp8aAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp8aH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp8aL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp8aS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp8aA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp8aV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lhp8aN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp8aH" x="80" y="46">PLAIN MONTE CARLO: SEVERITY DRAWN AS ON THE ROAD, EXP(1)</text>
+
+        <g filter="url(#lhp8aSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M366.6 330 L366.6 296.9 L376.0 298.0 L400.7 300.6 L425.3 303.0 L450.0 305.3 L474.7 307.3 L499.3 309.2 L524.0 310.9 L548.7 312.5 L573.3 313.9 L598.0 315.2 L622.7 316.5 L647.3 317.6 L672.0 318.6 L696.7 319.5 L721.3 320.4 L746.0 321.2 L770.7 321.9 L795.3 322.6 L820.0 323.2 L820 330 Z" fill="#F2C230" stroke="none"/>
+          <path d="M80 170 L820 170 M80 330 L820 330"/>
+          <path d="M80 326 L80 336 M326.7 326 L326.7 336 M573.3 326 L573.3 336 M820 326 L820 336"/>
+          <path d="M80.0 70.0 L104.7 109.3 L129.3 133.2 L154.0 147.7 L178.7 156.5 L203.3 161.8 L228.0 165.0 L252.7 167.0 L277.3 168.2 L302.0 168.9 L326.7 169.3 L351.3 169.6 L376.0 169.8 L400.7 169.8 L425.3 169.9 L450.0 169.9 L474.7 170.0 L80 170 Z" fill="url(#lhp8aHc)"/>
+          <path d="M80.0 240.0 L104.7 247.4 L129.3 254.2 L154.0 260.5 L178.7 266.2 L203.3 271.5 L228.0 276.3 L252.7 280.7 L277.3 284.8 L302.0 288.5 L326.7 291.9 L351.3 295.1 L376.0 298.0 L400.7 300.6 L425.3 303.0 L450.0 305.3 L474.7 307.3 L499.3 309.2 L524.0 310.9 L548.7 312.5 L573.3 313.9 L598.0 315.2 L622.7 316.5 L647.3 317.6 L672.0 318.6 L696.7 319.5 L721.3 320.4 L746.0 321.2 L770.7 321.9 L795.3 322.6 L820.0 323.2"/>
+          <path d="M366.6 62 L366.6 200 M366.6 232 L366.6 340" stroke="#2F3A42" stroke-dasharray="6 6"/>
+          <path d="M414 150 L392 165" marker-end="url(#lhp8aAr)"/>
+        </g>
+
+        <text class="lhp8aL" x="376" y="84">failure when x &gt; t</text>
+        <text class="lhp8aS" x="376" y="100">t = -ln(0.003) = 5.81</text>
+        <text class="lhp8aV" x="560" y="100">1 hit in 2,000</text>
+        <text class="lhp8aS" x="560" y="120">rate 2.00 per 100M; true 12</text>
+        <text class="lhp8aS" x="420" y="152">real tail: 0.3% of area</text>
+
+        <text class="lhp8aH" x="80" y="222">IMPORTANCE SAMPLING: SKEWED TO EXP(MEAN 5.81)</text>
+        <text class="lhp8aV" x="560" y="262">743 hits in 2,000</text>
+        <text class="lhp8aS" x="560" y="282">reweighted rate 11.52 per 100M; true 12</text>
+
+        <text class="lhp8aA" x="80" y="352" text-anchor="middle">0</text>
+        <text class="lhp8aA" x="326.7" y="352" text-anchor="middle">5</text>
+        <text class="lhp8aA" x="460" y="352" text-anchor="middle">severity x</text>
+        <text class="lhp8aA" x="573.3" y="352" text-anchor="middle">10</text>
+        <text class="lhp8aA" x="820" y="352" text-anchor="end">15</text>
+
+        <text class="lhp8aN" x="30" y="378">Constructed occluded-pedestrian class, seed 1016, 2,000 draws each. Heights are not to one scale;</text>
+        <text class="lhp8aN" x="30" y="396">read the share beyond the dashed threshold: 0.3% on the road, about 37% in the sampler.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the failure region is the yellow area; plain sampling spends its budget where nothing happens.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Why plain Monte Carlo starves<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>A plain estimate of p is hits divided by draws. With p = 0.003 and 2,000 draws, the expected count is 6, and a Poisson count with mean 6 lands on 1 or 2 often enough to matter. Each single failure moves the estimate by 1 / 2,000 of an encounter, which is 2.00 crashes per 100 million miles for this class. The estimate can only take a few coarse values, and when it lands on zero it says the scenario is safe.</p>
+        <p>That is the same starvation session 7 found on real miles, moved into the simulator. A simulator that copies the road's distribution copies its rarity too.</p>
+      </div>
+    </details>
+
+    <div class="wk" id="lhp8-is">
+      <div class="wk-head">
+        <b>Live</b>
+        <span class="wk-hint">Constructed: Lanehart's four rare classes, their encounter rates and failure probabilities, and the severity model. Real: the maths. Choose a budget and a seed; each class is estimated both ways at the same budget, then the whole tail is rerun 200 times to measure the spread. At seed 1016 and 2,000 per class the table prints the canon figures; other settings are yours, and your numbers will differ.</span>
+      </div>
+      <div class="wk-body">
+        <label class="sql-label" for="lhp8-budget">Simulated encounters per rare class</label>
+        <select class="sql-code" id="lhp8-budget">
+          <option value="500">500</option>
+          <option value="2000" selected>2,000</option>
+          <option value="8000">8,000</option>
+        </select>
+        <label class="sql-label" for="lhp8-seed">Seed</label>
+        <input class="sql-code" id="lhp8-seed" type="number" value="1016" step="1">
+        <button class="btn" id="lhp8-run" type="button">Run again</button>
+        <div id="lhp8-out"></div>
+        <p class="sql-note" id="lhp8-verdict">...</p>
+      </div>
+      <div class="wk-foot" id="lhp8-self">...</div>
+    </div>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 354" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn spread chart of the total rare-scenario rate over 200 constructed runs, each bar the true 46 plus or minus two standard deviations. At 2,000 encounters per class: plain Monte Carlo SD 7.251, importance sampling SD 1.404, highlighted in yellow, 5.2 times tighter. At 500 per class: plain Monte Carlo SD 13.495, importance sampling SD 2.848, 4.7 times tighter; plain Monte Carlo saw zero failures in at least one class in 35 percent of runs.">
+        <defs>
+          <filter id="lhp8bSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="83" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp8bHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp8bAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp8bH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp8bL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp8bS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp8bB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lhp8bA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp8bN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp8bH" x="30" y="30">TOTAL TAIL RATE OVER 200 RUNS, PER 100M MILES: TRUE 46, PLUS OR MINUS 2 SD</text>
+        <text class="lhp8bA" x="30" y="72">BUDGET 2,000 PER CLASS</text>
+        <text class="lhp8bA" x="498" y="76">true 46</text>
+        <text class="lhp8bA" x="30" y="184">BUDGET 500 PER CLASS</text>
+
+        <g filter="url(#lhp8bSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="390.5" y="87" width="203" height="18" rx="4" transform="rotate(-0.5 492 96)" fill="url(#lhp8bHc)"/>
+          <rect x="472.3" y="127" width="39.4" height="18" rx="4" transform="rotate(0.6 492 136)" fill="#F2C230"/>
+          <rect x="303.1" y="197" width="377.8" height="18" rx="4" transform="rotate(0.3 492 206)" fill="url(#lhp8bHc)"/>
+          <rect x="452.1" y="237" width="79.8" height="18" rx="4" transform="rotate(-0.6 492 246)" fill="#F2C230"/>
+          <path d="M492 84 L492 170 M492 194 L492 268" stroke="#2F3A42" stroke-dasharray="5 5"/>
+          <path d="M170 278 L800 278"/>
+          <path d="M170 274 L170 284 M310 274 L310 284 M450 274 L450 284 M590 274 L590 284 M730 274 L730 284"/>
+        </g>
+
+        <text class="lhp8bL" x="160" y="100" text-anchor="end">Plain Monte Carlo</text>
+        <text class="lhp8bL" x="160" y="140" text-anchor="end">Importance sampling</text>
+        <text class="lhp8bL" x="160" y="210" text-anchor="end">Plain Monte Carlo</text>
+        <text class="lhp8bL" x="160" y="250" text-anchor="end">Importance sampling</text>
+        <text class="lhp8bS" x="606" y="100">SD 7.251</text>
+        <text class="lhp8bB" x="524" y="140">SD 1.404, 5.2x tighter</text>
+        <text class="lhp8bS" x="692" y="210">SD 13.495</text>
+        <text class="lhp8bB" x="544" y="250">SD 2.848, 4.7x tighter</text>
+
+        <text class="lhp8bA" x="170" y="298" text-anchor="middle">0</text>
+        <text class="lhp8bA" x="310" y="298" text-anchor="middle">20</text>
+        <text class="lhp8bA" x="450" y="298" text-anchor="middle">40</text>
+        <text class="lhp8bA" x="590" y="298" text-anchor="middle">60</text>
+        <text class="lhp8bA" x="730" y="298" text-anchor="middle">80</text>
+
+        <text class="lhp8bN" x="30" y="324">Constructed, seed 1016. At 500 per class, plain Monte Carlo missed some class entirely in 35% of runs.</text>
+        <text class="lhp8bN" x="30" y="342">Same budget, same truth: the only difference is where the draws were spent.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow bars are what a fixed simulation budget buys when it is spent near the failure.</figcaption>
+    </figure>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Reading the widget at the canon settings<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Hits.</strong> Plain Monte Carlo sees 1, 42, 5 and 34 failures in the four classes; importance sampling sees 743, 756, 706 and 749. Every class lands near 37 percent of draws, because the proposal is centred on each class's own threshold.</li>
+          <li><strong>Rates.</strong> Plain: 2.00, 6.30, 6.25, 20.40, total 34.95. Importance-sampled: 11.52, 6.42, 9.72, 16.84, total 44.50 with a standard error of 1.321. The truth is 12, 6, 10, 18 and 46.</li>
+          <li><strong>Spread.</strong> Over 200 runs the plain total has SD 7.251 and the importance-sampled total 1.404, a ratio of 5.17.</li>
+        </ul>
+        <p>Now set the budget to 500. The single run reads 42.20 plain against 44.95 importance-sampled, the SDs become 13.495 and 2.848, and in 35 percent of runs plain Monte Carlo saw no failure at all in at least one class. At 8,000 the SDs are 3.539 and 0.645. Buying four times the budget halves the spread for both methods; the ratio between them barely moves.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Why the gain is largest on the rarest class<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>The relative error of a plain estimate grows like 1 / sqrt(n p): the smaller p, the more draws it takes to see the event at all. The wrong-way class has p = 0.02, the commonest failure here, and plain Monte Carlo already saw it 42 times; its two estimates are close (6.30 against 6.42). The occluded pedestrian has p = 0.003 and plain sampling saw it once. Importance sampling keeps the hit share near 37 percent whatever p is, so its relative error stays roughly flat as the event gets rarer. That is the property you want for the tail.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="section" id="part-2">
+    <div class="section-kicker">
+      <span class="klabel">Part 2 · covers the weight formula and unbiasedness</span>
+      <h2>The weight, and why the answer stays honest</h2>
+      <span class="tag concept">10 min live</span>
+    </div>
+    <p class="lede">Skewing the sampler toward failure would inflate the rate if each hit still counted as one. The weight undoes the skew draw by draw: it is the ratio of how likely that severity is on the road to how likely it was in the sampler. Deep in the tail, where the sampler oversamples most, the weight is smallest.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 308" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn sketch of the weight formula. The road density f of x is e to the minus x, with probability 0.003 beyond the threshold. The sampler density g of x is one over t times e to the minus x over t, with about 0.37 beyond the threshold. The weight, highlighted in yellow, is f over g, equal to t times e to the minus x plus x over t. On a severity line, a draw at 3 is a miss and counts 0; a draw at the threshold 5.81 has weight 0.047; at 8, 0.0077; at 10, 0.0015. Worked: 743 hits, their weights summed and divided by 2,000, give 0.00288, times 4,000 encounters, 11.52 per 100 million miles.">
+        <defs>
+          <filter id="lhp8cSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="85" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp8cHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp8cAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp8cH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp8cL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp8cS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp8cB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lhp8cA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp8cN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp8cH" x="30" y="30">ONE WEIGHT PER DRAW: ROAD LIKELIHOOD OVER SAMPLER LIKELIHOOD</text>
+
+        <g filter="url(#lhp8cSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="48" width="250" height="86" rx="10" transform="rotate(-0.8 155 91)" fill="#FFFFFF"/>
+          <rect x="315" y="48" width="250" height="86" rx="10" transform="rotate(0.6 440 91)" fill="#F1F3F4"/>
+          <rect x="600" y="48" width="250" height="86" rx="10" transform="rotate(-0.6 725 91)" fill="#F2C230"/>
+          <path d="M80 210 L820 210"/>
+          <path d="M80 205 L80 215 M326.7 205 L326.7 215 M573.3 205 L573.3 215 M820 205 L820 215"/>
+          <path d="M366.6 194 L366.6 226" stroke="#2F3A42" stroke-dasharray="4 4"/>
+          <circle cx="228" cy="210" r="6" fill="#FFFFFF"/>
+          <circle cx="366.6" cy="210" r="6" fill="#F2C230"/>
+          <circle cx="474.7" cy="210" r="6" fill="#F2C230"/>
+          <circle cx="573.3" cy="210" r="6" fill="#F2C230"/>
+        </g>
+
+        <text class="lhp8cL" x="46" y="74">On the road, f(x)</text>
+        <text class="lhp8cS" x="46" y="96">f(x) = e^-x</text>
+        <text class="lhp8cS" x="46" y="114">P(x &gt; t) = p = 0.003</text>
+        <text class="lhp8cL" x="331" y="74">In the sampler, g(x)</text>
+        <text class="lhp8cS" x="331" y="96">g(x) = (1/t) e^(-x/t)</text>
+        <text class="lhp8cS" x="331" y="114">P(x &gt; t) = e^-1, about 0.37</text>
+        <text class="lhp8cL" x="616" y="74">Weight w = f(x) / g(x)</text>
+        <text class="lhp8cL" x="616" y="96">w = t e^(-x + x/t)</text>
+        <text class="lhp8cL" x="616" y="114">a hit counts w, not 1</text>
+        <text class="lhp8cH" x="297.5" y="96" text-anchor="middle">÷</text>
+        <text class="lhp8cH" x="582.5" y="96" text-anchor="middle">=</text>
+
+        <text class="lhp8cS" x="228" y="186" text-anchor="middle">miss, 0</text>
+        <text class="lhp8cB" x="366.6" y="186" text-anchor="middle">w = 0.047</text>
+        <text class="lhp8cB" x="474.7" y="186" text-anchor="middle">w = 0.0077</text>
+        <text class="lhp8cB" x="573.3" y="186" text-anchor="middle">w = 0.0015</text>
+        <text class="lhp8cA" x="80" y="232" text-anchor="middle">0</text>
+        <text class="lhp8cA" x="326.7" y="232" text-anchor="middle">5</text>
+        <text class="lhp8cA" x="573.3" y="244" text-anchor="middle">10</text>
+        <text class="lhp8cA" x="820" y="232" text-anchor="end">15</text>
+        <text class="lhp8cA" x="410" y="248" text-anchor="middle">t = 5.81</text>
+
+        <text class="lhp8cN" x="30" y="278">Seed 1016, occluded class: 743 hits, weights summed / 2,000 = 0.00288; x 4,000 = 11.52 per 100M.</text>
+        <text class="lhp8cN" x="30" y="296">Weights derived from the formula at t = -ln(0.003). Deeper draws weigh less: the skew is undone draw by draw.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow box is the whole method: count each failure by how surprised the road would be to see it.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>The weight, worked on one draw<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>For the occluded pedestrian, p = 0.003, so t = -ln(0.003) = 5.81. A sampled severity of exactly 5.81 has road likelihood e^-5.81 and sampler likelihood (1/5.81) e^-1. Their ratio is 5.81 x 0.003 x e, about 0.047: on the road that draw is about twenty times rarer than the sampler made it, so it counts as 0.047 of a failure. A draw at 8 counts 0.0077; at 10, 0.0015. A draw below the threshold is a miss and counts 0, whatever its weight.</p>
+        <p>The estimate is the sum of the weights on hits, divided by the number of draws. The engine's line is short enough to read: <code>w = t * Math.exp(-x + x / t)</code>, then add w when x &gt; t.</p>
+      </div>
+    </details>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 430" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn grouped bars, one constructed run at seed 1016 and 2,000 encounters per class, in crashes per 100 million miles. Occluded pedestrian: plain 2.00, importance-sampled 11.52, true 12. Wrong-way vehicle: 6.30, 6.42, true 6. Debris: 6.25, 9.72, true 10. Emergency vehicle: 20.40, 16.84, true 18. Over 200 runs the importance-sampled total averages 46.05 against a true 46. A red panel shows the wrong way: with the weights dropped every class reads about 37 percent of encounters as failures.">
+        <defs>
+          <filter id="lhp8dSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="87" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp8dHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp8dAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp8dH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp8dL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp8dS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp8dB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lhp8dA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp8dR { font: 800 12px Inter, sans-serif; fill: #991B1B; }
+          .lhp8dN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp8dH" x="30" y="30">ONE RUN, FOUR CLASSES, CRASHES PER 100M MILES</text>
+        <text class="lhp8dS" x="56" y="60">plain Monte Carlo</text>
+        <text class="lhp8dS" x="226" y="60">importance-sampled</text>
+        <text class="lhp8dS" x="420" y="60">true rate</text>
+
+        <g filter="url(#lhp8dSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="49" width="18" height="14" rx="2" fill="url(#lhp8dHc)"/>
+          <rect x="200" y="49" width="18" height="14" rx="2" fill="#F2C230"/>
+          <path d="M380 56 L410 56" stroke="#2F3A42" stroke-width="2.6"/>
+          <path d="M120 270 L820 270"/>
+          <rect x="163" y="256" width="40" height="14" rx="2" transform="rotate(-1 183 263)" fill="url(#lhp8dHc)"/>
+          <rect x="211" y="189.4" width="40" height="80.6" rx="2" transform="rotate(0.8 231 230)" fill="#F2C230"/>
+          <rect x="338" y="225.9" width="40" height="44.1" rx="2" transform="rotate(0.9 358 248)" fill="url(#lhp8dHc)"/>
+          <rect x="386" y="225.1" width="40" height="44.9" rx="2" transform="rotate(-0.8 406 248)" fill="#F2C230"/>
+          <rect x="513" y="226.3" width="40" height="43.7" rx="2" transform="rotate(-0.7 533 248)" fill="url(#lhp8dHc)"/>
+          <rect x="561" y="202" width="40" height="68" rx="2" transform="rotate(0.7 581 236)" fill="#F2C230"/>
+          <rect x="688" y="127.2" width="40" height="142.8" rx="2" transform="rotate(0.5 708 199)" fill="url(#lhp8dHc)"/>
+          <rect x="736" y="152.1" width="40" height="117.9" rx="2" transform="rotate(-0.6 756 211)" fill="#F2C230"/>
+          <path d="M157 186 L257 186 M332 228 L432 228 M507 200 L607 200 M682 144 L782 144" stroke="#2F3A42" stroke-width="2.6"/>
+          <rect x="30" y="358" width="820" height="62" rx="10" transform="rotate(-0.3 440 389)" fill="#FEF2F2" stroke="#FCA5A5"/>
+        </g>
+
+        <text class="lhp8dA" x="263" y="190">true 12</text>
+        <text class="lhp8dA" x="438" y="232">true 6</text>
+        <text class="lhp8dA" x="613" y="204">true 10</text>
+        <text class="lhp8dA" x="788" y="148">true 18</text>
+
+        <text class="lhp8dS" x="183" y="288" text-anchor="middle">2.00</text>
+        <text class="lhp8dB" x="231" y="288" text-anchor="middle">11.52</text>
+        <text class="lhp8dS" x="358" y="288" text-anchor="middle">6.30</text>
+        <text class="lhp8dB" x="406" y="288" text-anchor="middle">6.42</text>
+        <text class="lhp8dS" x="533" y="288" text-anchor="middle">6.25</text>
+        <text class="lhp8dB" x="581" y="288" text-anchor="middle">9.72</text>
+        <text class="lhp8dS" x="708" y="288" text-anchor="middle">20.40</text>
+        <text class="lhp8dB" x="756" y="288" text-anchor="middle">16.84</text>
+        <text class="lhp8dL" x="207" y="308" text-anchor="middle">Occluded pedestrian</text>
+        <text class="lhp8dL" x="382" y="308" text-anchor="middle">Wrong-way vehicle</text>
+        <text class="lhp8dL" x="557" y="308" text-anchor="middle">Debris at speed</text>
+        <text class="lhp8dL" x="732" y="308" text-anchor="middle">Emergency vehicle</text>
+
+        <text class="lhp8dN" x="30" y="338">Constructed, seed 1016. Over 200 runs: importance-sampled mean 46.05, plain mean 45.68, true 46.</text>
+        <text class="lhp8dR" x="50" y="384">✗ Drop the weights and every hit counts 1</text>
+        <text class="lhp8dS" x="50" y="404">Each class then reads about 37% of encounters as failures. Plant this fault and the engine's check fails.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - unbiased means right on average; the yellow bars are also close on this one run, the hatched ones are not.</figcaption>
+    </figure>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Unbiasedness in one line<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Average w(x) times "x is a failure" over the sampler g. Because w = f / g, the g cancels: the average is the integral of f over the failure region, which is p exactly. So the reweighted estimate is right on average for any proposal that puts some probability everywhere the road does. Plain Monte Carlo is also unbiased: its 200-run mean is 45.68, close to 46. Unbiasedness is not the gain; spread is. A single plain run can land anywhere from a missed class to a doubled one, while the importance-sampled runs cluster at 46.05.</p>
+        <p>The engine checks both halves on every page load: the importance-sampled mean must sit within 6 percent of the true rate over 300 replicates, and the weights must average 1 over the proposal. Plant the dropped-weight fault with <code>AV.selfTest("isNoWeight")</code> in the console and the unbiasedness check fails.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>Zhao, Lam, Peng and colleagues (IEEE Transactions on Intelligent Transportation Systems, 2017) applied this idea to lane-change cut-ins built from naturalistic driving data: they skewed the statistics toward riskier behaviour, used the cross-entropy method to choose the skew, and reweighted results to real-world rates. The authors report an acceleration of 2,000 to 20,000 times: about 1,000 simulated miles exposing the vehicle to challenges that take 2 to 20 million real miles.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>When importance sampling makes things worse<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>A proposal that misses part of the failure region.</strong> If g puts no probability where failures happen on the road, those failures are never drawn and no weight can recover them. The estimate is then biased low, quietly. Two different failure modes in one scenario need a proposal that reaches both.</li>
+          <li><strong>A proposal skewed too far.</strong> A few draws land where g is tiny and f is not; their weights are huge and dominate the sum. The estimate is still unbiased, but its variance can exceed plain Monte Carlo's. Watch the largest weight and the mean weight (it should be near 1).</li>
+          <li><strong>The simulator itself.</strong> Importance sampling is unbiased for the simulator's model of the scenario, not for the road. Whether the simulated failure probability matches a real one is the sim-to-real question of session 6, and it stays open: no amount of reweighting closes it.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>From a rate to a bound, and into the bench<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Each class's estimate comes with a standard error from the spread of its weighted terms. The engine sums the four variances, takes the square root, and adds 1.645 standard errors for a one-sided 95 percent upper bound: tail 44.50, SE 1.321, upper 46.67 at the canon settings. In session 10 that tail is added to the exposure-matched crash rate, 147.74, giving 192.24 with an upper bound of 215.71, above the human 185.55 derived from NHTSA 2022. Without the importance-sampled tail the same fleet looks proven better. Session 10's break button shows exactly that.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 3 ============ -->
+  <section class="section" id="part-3">
+    <div class="section-kicker">
+      <span class="klabel">Part 3 · build-along</span>
+      <h2>Build both samplers and race them</h2>
+      <span class="tag build">17 min hands on</span>
+    </div>
+    <p class="lede">Reproduce the canon run in the browser console, then rebuild both samplers in numpy and race them over 200 runs. numpy's random numbers are not the engine's, so your numbers will differ from the canon in the decimals; the pattern will not.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 262" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn plan of the build. Draw n severities from an exponential with mean t; weight each with t times e to the minus x plus x over t; the estimate, highlighted in yellow, is the mean of the weights on hits times encounters; repeat 200 times and compare the spread with plain Monte Carlo. A check chip says the mean weight should be near 1.">
+        <defs>
+          <filter id="lhp8eSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="89" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp8eHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp8eAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp8eH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp8eL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp8eS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp8eK { font: 700 11px Inter, sans-serif; fill: #1A1F23; }
+          .lhp8eN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp8eH" x="30" y="30">THE BUILD, ONE CLASS AT A TIME, THEN ALL FOUR</text>
+
+        <g filter="url(#lhp8eSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="56" width="180" height="92" rx="10" transform="rotate(-1 120 102)" fill="#FFFFFF"/>
+          <rect x="245" y="56" width="180" height="92" rx="10" transform="rotate(0.8 335 102)" fill="#FFFFFF"/>
+          <rect x="460" y="56" width="180" height="92" rx="10" transform="rotate(-0.7 550 102)" fill="#F2C230"/>
+          <rect x="675" y="56" width="180" height="92" rx="10" transform="rotate(0.9 765 102)" fill="#F1F3F4"/>
+          <path d="M212 102 L240 102" marker-end="url(#lhp8eAr)"/>
+          <path d="M427 102 L455 102" marker-end="url(#lhp8eAr)"/>
+          <path d="M642 102 L670 102" marker-end="url(#lhp8eAr)"/>
+          <rect x="250" y="176" width="170" height="28" rx="14" transform="rotate(-0.6 335 190)" fill="#FDF6DA"/>
+          <path d="M335 150 L335 172"/>
+        </g>
+
+        <text class="lhp8eL" x="44" y="82">1 · Draw</text>
+        <text class="lhp8eS" x="44" y="102">n severities from</text>
+        <text class="lhp8eS" x="44" y="118">Exp(mean t),</text>
+        <text class="lhp8eS" x="44" y="134">t = -ln(p)</text>
+        <text class="lhp8eL" x="259" y="82">2 · Weight</text>
+        <text class="lhp8eS" x="259" y="102">w = t e^(-x + x/t)</text>
+        <text class="lhp8eS" x="259" y="118">hit when x &gt; t</text>
+        <text class="lhp8eL" x="474" y="82">3 · Estimate</text>
+        <text class="lhp8eS" x="474" y="102">mean of w on hits</text>
+        <text class="lhp8eS" x="474" y="118">x encounters per 100M</text>
+        <text class="lhp8eL" x="689" y="82">4 · Race</text>
+        <text class="lhp8eS" x="689" y="102">200 runs each way,</text>
+        <text class="lhp8eS" x="689" y="118">compare the SDs</text>
+        <text class="lhp8eK" x="335" y="194" text-anchor="middle">check: mean of w near 1</text>
+
+        <text class="lhp8eN" x="30" y="234">The yellow box is the one line that differs from plain Monte Carlo: average w on hits, not a count.</text>
+        <text class="lhp8eN" x="30" y="252">The chip is the cheapest test you have that the weights are right.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - four boxes, and only the yellow one differs from the sampler you already know.</figcaption>
+    </figure>
+
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Reproduce the canon class in the console</h4>
+        <p>Open the browser console on this page. The engine is loaded as <code>AV</code>. This is the exact call the bench makes for the occluded class at seed 1016: it should report 1 plain hit, 743 importance-sampled hits and a mean weight near 1. Multiply <code>is</code> by 4,000 and you get the canon 11.52.</p>
+        <div class="prompt-box good"><span class="label">console</span>var r = AV.rareEstimate(AV.RARE[0], 2000, AV.mulberry32(1016 * 31 + 1000));
+[r.mcHits, r.isHits, r.wMean, r.is * 4000]</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Rebuild one class in numpy</h4>
+        <p>Plain Monte Carlo counts draws past the threshold. Importance sampling draws from Exp(mean t), weights each draw and averages the weights on hits. Your three numbers will differ from the engine's; the reweighted one should sit near the true 12 and the mean weight near 1.</p>
+        <div class="prompt-box good"><span class="label">python</span>import numpy as np
+rng = np.random.default_rng(1016)
+enc, p, n = 4000, 0.003, 2000
+t = -np.log(p)
+x = rng.exponential(1.0, n)                 # plain: as on the road
+mc = (x &gt; t).mean()
+y = rng.exponential(t, n)                   # skewed toward failure
+w = t * np.exp(-y + y / t)
+est = np.mean(w * (y &gt; t))
+enc * mc, enc * est, w.mean()</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Break it on purpose: forget the weight</h4>
+        <p>Count the skewed hits as if each were one failure. The answer is roughly 37 percent of 4,000 encounters, a rate in the thousands. The engine can plant the same fault: <code>AV.selfTest("isNoWeight")</code> in the console returns a failed unbiasedness check. Seeing it once makes the weight unforgettable.</p>
+        <div class="prompt-box good"><span class="label">python</span>enc * (y &gt; t).mean()</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>All four classes, 200 runs, race the spread</h4>
+        <p>Each run estimates the whole tail both ways at the same budget. Compare means and standard deviations. Expect both means near 46 and the importance-sampled SD several times smaller; the engine's canon is 7.251 against 1.404, and your numbers will differ.</p>
+        <div class="prompt-box good"><span class="label">python</span>classes = [(4000, 0.003), (300, 0.02), (2500, 0.004), (1200, 0.015)]
+
+def one_run(rng, n):
+    m = s = 0.0
+    for enc, p in classes:
+        t = -np.log(p)
+        m += enc * (rng.exponential(1.0, n) &gt; t).mean()
+        y = rng.exponential(t, n)
+        s += enc * np.mean(t * np.exp(-y + y / t) * (y &gt; t))
+    return m, s
+
+runs = np.array([one_run(rng, 2000) for _ in range(200)])
+runs.mean(axis=0), runs.std(axis=0, ddof=1)</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Change the budget and read the ratio</h4>
+        <p>Rerun with n = 500 and n = 8,000. Both SDs shrink as the budget grows, roughly halving for each fourfold increase; the ratio between the methods barely moves. Count how often a plain run sees zero failures in the occluded class at n = 500. That count is how a simulated scenario gets reported as safe.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Write the estimator down</h4>
+        <p>One line per class: the nominal distribution, the proposal, the weight, the budget, and the mean weight you observed. A rare-scenario rate without its proposal and weight written next to it cannot be checked by anyone else.</p>
+      </div></div>
+    </div>
+
+    <div class="callout tip">
+      <p><strong>The habit to keep.</strong> Whenever a simulated scenario reports zero or a handful of failures, ask how many draws landed in the failure region, not how many draws ran. If the answer is a handful, skew the sampler toward the failure, weight every hit by f over g, and check that the weights average 1 before you trust the rate.</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="section" id="quiz">
+    <div class="section-kicker">
+      <span class="klabel">Check yourself</span>
+      <h2>Three questions</h2>
+    </div>
+
+    <div class="quiz-q" data-answer="1">
+      <p class="qtext">Plain Monte Carlo with 2,000 encounters saw 1 failure in the occluded pedestrian class and reported 2.00 per 100 million miles; the truth is 12. What went wrong?</p>
+      <button class="qopt" type="button">A · The simulator has a bug that hides pedestrians</button>
+      <button class="qopt" type="button">B · With p = 0.003, 2,000 draws expect only 6 failures, so the count is tiny and the estimate can only move in coarse steps; landing on 1 is ordinary bad luck</button>
+      <button class="qopt" type="button">C · Plain Monte Carlo is biased low for rare events</button>
+      <p class="qwhy">Plain Monte Carlo is unbiased (its 200-run mean is 45.68 against 46). Its problem is spread: with so few expected hits, any single run can be far off, including zero.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="2">
+      <p class="qtext">A colleague skews the simulator toward risky cut-ins and reports the share of failures among the skewed runs as the real-world failure rate. What is missing?</p>
+      <button class="qopt" type="button">A · Nothing; skewing toward risk is conservative, so the rate is a safe upper bound</button>
+      <button class="qopt" type="button">B · More runs; the share converges to the real rate as the budget grows</button>
+      <button class="qopt" type="button">C · The weight: each failure must count f(x) / g(x), how likely that draw was on the road relative to the sampler, or the rate measures the sampler instead of the road</button>
+      <p class="qwhy">Without weights the estimate converges to the proposal's failure share, about 37 percent here, not to p. More runs make that wrong number more precise.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="0">
+      <p class="qtext">The importance-sampled rare-scenario rate is unbiased. What does that guarantee about Lanehart's real-world tail risk?</p>
+      <button class="qopt" type="button">A · Only that the estimate is right on average for the simulator's model of each scenario; whether the simulator's failure probability matches the road is a separate, open question</button>
+      <button class="qopt" type="button">B · That the real-world rate is 46 per 100 million miles</button>
+      <button class="qopt" type="button">C · That no further road testing is needed for those scenarios</button>
+      <p class="qwhy">Reweighting corrects the sampler, not the simulator. The sim-to-real gap (session 6) sits underneath every simulated rate.</p>
+    </div>
+
+    <div class="quiz-score"></div>
+  </section>
+
+  <!-- ============ HOMEWORK ============ -->
+  <section class="section" id="homework">
+    <div class="section-kicker">
+      <span class="klabel">Before session 9</span>
+      <h2>Homework</h2>
+    </div>
+    <p class="lede">Thirty minutes, in your own notebook.</p>
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Try a worse proposal</h4>
+        <p>Replace the proposal mean t with 3t, then with t / 2. For each, record the mean weight, the largest weight and the SD over 200 runs. Find the setting where importance sampling does worse than plain Monte Carlo, and write one sentence on why. Your numbers will differ; the direction should not.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Audit one simulated result you rely on</h4>
+        <p>Pick a simulated pass rate or failure rate from any system you know. Find out how many runs landed in the failure region, whether the sampler was skewed, and if so whether the result was reweighted. Write the answer next to the number.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ OFFICIAL ============ -->
+  <section class="section" id="official">
+    <div class="section-kicker">
+      <span class="klabel">Covered tonight</span>
+      <h2>What this session covers</h2>
+    </div>
+    <div class="covered">
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Plain Monte Carlo against importance sampling at equal budget</span><span class="note">Constructed canon: SD 7.251 against 1.404 at 2,000 per class (5.2x); 13.495 against 2.848 at 500, with zero failures in some class in 35% of runs.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The weight formula</span><span class="note">w = f(x) / g(x) = t e^(-x + x/t) for an Exp(1) road and an Exp(mean t) proposal; worked values derived.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Unbiasedness and its self-check</span><span class="note">Importance-sampled mean 46.05 against a true 46 over 200 runs; planting the dropped-weight fault fails the engine's check.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Accelerated evaluation in the literature</span><span class="note">Zhao, D., Lam, H., Peng, H., Bao, S., LeBlanc, D. J., Nobukawa, K. and Pan, C. S. (2017). Accelerated Evaluation of Automated Vehicles Safety in Lane-Change Scenarios Based on Importance Sampling Techniques. IEEE T-ITS 18(3):595-607. Read at source (abstract); acceleration as the authors report.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Why simulation is needed at all</span><span class="note">Kalra, N. and Paddock, S. M. (2016). Driving to Safety. RAND Corporation, RR-1478. doi:10.7249/RR1478. Read at source.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Choosing the proposal</span><span class="note">Named only: the cross-entropy method used by Zhao et al.; here the proposal is fixed at mean t.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Adding the tail to the safety claim</span><span class="note">Previewed tonight; the full ladder and the break button are practitioner session 10.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Standard errors and confidence intervals in general</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-statistics-with-phoebe/courses/b7-confidence-intervals.html">learn statistics</a>.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Whether simulated failure rates match the road</span><span class="note">Out of scope tonight: the sim-to-real gap is practitioner session 6, and it is not settled by reweighting.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section class="section" id="cheatsheet">
+    <div class="section-kicker">
+      <span class="klabel">Take this with you</span>
+      <h2>Cheat sheet</h2>
+    </div>
+    <div class="cheat">
+      <div class="cheat-item"><strong>The one sentence.</strong> Draw where the failure is, then weight every hit by how likely it was on the road.</div>
+      <div class="cheat-item"><strong>Why plain starves.</strong> p = 0.003, 2,000 draws: 6 expected hits, 1 seen, 2.00 reported against a true 12.</div>
+      <div class="cheat-item"><strong>The weight.</strong> w = f(x) / g(x). Here t e^(-x + x/t), with t = -ln(p).</div>
+      <div class="cheat-item"><strong>The estimate.</strong> Sum of w on hits / draws, x encounters per 100M miles. Occluded: 11.52.</div>
+      <div class="cheat-item"><strong>Same budget.</strong> 200 runs at 2,000 per class: SD 7.251 plain, 1.404 importance-sampled, 5.2x.</div>
+      <div class="cheat-item"><strong>Unbiased.</strong> Mean 46.05 against a true 46. Plain is unbiased too; the gain is spread.</div>
+      <div class="cheat-item"><strong>Self-checks.</strong> Mean weight near 1; drop the weight and the rate reads about 37% of encounters.</div>
+      <div class="cheat-item"><strong>Limit.</strong> Unbiased for the simulator, not the road; a proposal that misses a failure mode cannot recover it.</div>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    <div class="wrap">
+      <p>Practitioner session 8 of 10 · learn-autonomous-driving-with-phoebe · by Phoebe Fu</p>
+      <nav class="pagenav">
+        <a href="p7-rare-event-statistics.html">← Practitioner session 7 · Rare-event statistics</a>
+        <a href="p9-the-fleet-feedback-loop.html">Practitioner session 9 · The fleet feedback loop →</a>
+      </nav>
+    </div>
+  </footer>
+
+</main>
+
+<script src="../assets/av-live.js?v=1"></script>
+<script src="../assets/app.js?v=1"></script>
+<script>
+(function () {
+  if (typeof AV === "undefined") return;
+  var budget = document.getElementById("lhp8-budget");
+  var seed = document.getElementById("lhp8-seed");
+  var run = document.getElementById("lhp8-run");
+  var out = document.getElementById("lhp8-out");
+  var verdict = document.getElementById("lhp8-verdict");
+  var self = document.getElementById("lhp8-self");
+  function fmt(v, d) { return Number(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function render() {
+    var b = Number(budget.value);
+    var s = parseInt(seed.value, 10);
+    if (!isFinite(s)) s = 1016;
+    var L = AV.ladder({ budget: b, seed: s, withAnti: false });
+    var T = L.tail, V = L.variance;
+    var html = '<div class="lhp8-scroll"><table class="sql-table"><thead><tr><th>Rare class (constructed)</th><th>True</th><th>Plain hits</th><th>Plain rate</th><th>IS hits</th><th>IS rate (SE)</th><th>Mean w</th></tr></thead><tbody>';
+    T.classes.forEach(function (c) {
+      html += "<tr><td>" + c.label + "</td><td>" + fmt(c.trueRate, 0) + "</td><td>" + c.mcHits + "</td><td>" + fmt(c.mcRate, 2) + "</td><td>" + c.isHits + "</td><td><b>" + fmt(c.isRate, 2) + "</b> (" + fmt(c.isRateSE, 2) + ")</td><td>" + fmt(c.wMean, 3) + "</td></tr>";
+    });
+    html += '<tr class="lhp8-tot"><td>Tail total, per 100M miles</td><td>' + fmt(T.truePoint, 0) + "</td><td></td><td><b>" + fmt(T.mcPoint, 2) + "</b></td><td></td><td><b>" + fmt(T.point, 2) + "</b> (SE " + fmt(T.se, 3) + ", upper " + fmt(T.upper, 2) + ")</td><td></td></tr></tbody></table></div>";
+    html += '<p class="sql-note">Same budget, ' + V.reps + " runs of the whole tail: SD " + fmt(V.mcSD, 3) + " plain Monte Carlo against " + fmt(V.isSD, 3) + " importance sampling (" + fmt(V.ratio, 2) + "x tighter). Means: importance-sampled " + fmt(V.isMean, 2) + ", plain " + fmt(V.mcMean, 2) + ", true " + V.trueTotal + ". Plain Monte Carlo saw zero failures in at least one class in " + fmt(V.mcZeroAnyShare * 100, 0) + "% of runs." + (V.mcZeroAnyShare > 0 ? "" : " (none at this budget)") + "</p>";
+    out.innerHTML = html;
+    var worst = T.classes.slice().sort(function (a, c) { return a.mcHits - c.mcHits; })[0];
+    verdict.textContent = "Budget " + fmt(b, 0) + " per class, seed " + s + ": in the rarest-seen class (" + worst.label.toLowerCase() + "), plain Monte Carlo saw " + worst.mcHits + " failure" + (worst.mcHits === 1 ? "" : "s") + " and estimated " + fmt(worst.mcRate, 2) + " against a true " + fmt(worst.trueRate, 0) + "; importance sampling saw it " + worst.isHits + " times and, after weighting, estimated " + fmt(worst.isRate, 2) + "." +
+      (b === 2000 && s === 1016 ? " These are the canon settings." : " Your numbers will differ from the canon; the pattern should not.");
+  }
+  var st = AV.selfTestResult || AV.selfTest();
+  self.textContent = st.pass
+    ? "The engine's " + st.checks.length + " self-checks pass in this browser, including importance sampling within 6% of the truth and weights averaging 1. Classes, rates and severities are constructed; the maths is real."
+    : "The engine's self-check did not pass in this browser, so nothing above should be believed.";
+  budget.addEventListener("change", render);
+  run.addEventListener("click", render);
+  seed.addEventListener("keydown", function (e) { if (e.key === "Enter") render(); });
+  render();
+})();
+</script>
+<style>
+  #lhp8-is .sql-code { border: 1px solid var(--hairline); border-radius: 8px; max-width: 24rem; }
+  #lhp8-is #lhp8-run { margin: .4rem 0 .2rem; }
+  #lhp8-is .lhp8-scroll { overflow-x: auto; }
+  #lhp8-is table.sql-table { margin: .6rem 0 .2rem; font-size: .85rem; }
+  #lhp8-is tr.lhp8-tot td { background: var(--indigo-50); }
+</style>
+</body>
+</html>

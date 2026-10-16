@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- social:start -->
+<meta name="description" content="Practitioner session 6 of 10. Road miles alone cannot prove a fatality rate (RAND: 275 million failure-free miles), so simulation carries the tail. Log replay stops being evidence the moment the car acts differently; synthetic scenarios stop at the edge of their models. A tail rate is encounters from real miles times a failure probability from simulation, and the sim-to-real gap lives in the second factor. Lanehart is a constructed fleet.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Learn with Phoebe">
+<meta property="og:title" content="Simulation against real miles - learn autonomous driving with phoebe">
+<meta property="og:description" content="Practitioner session 6 of 10. Log replay vs synthetic scenarios, and where the sim-to-real gap enters a safety number.">
+<meta property="og:url" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/courses/p6-simulation-against-real-miles.html">
+<meta property="og:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Simulation against real miles - learn autonomous driving with phoebe">
+<meta name="twitter:description" content="Encounters come from real miles, failure probability from simulation. Halve every simulated p and a worse-than-human car looks better.">
+<meta name="twitter:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<!-- social:end -->
+<title>Practitioner session 6 · Simulation against real miles - learn autonomous driving with phoebe</title>
+<link rel="stylesheet" href="../assets/style.css?v=2">
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="wrap">
+    <span class="crumb"><a href="../index.html">learn-autonomous-driving-with-phoebe</a> / Practitioner session 6 of 10</span>
+    <button class="btn" id="toggle-all" type="button">Expand all</button>
+    <button class="btn primary" id="zoom-toggle" type="button">Projector zoom: off</button>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Learn Autonomous Driving with Phoebe · Practitioner session 6 of 10</div>
+    <h1>Simulation against <span class="accent">real miles</span></h1>
+    <p class="sub">Nobody can drive enough miles to prove a fatality rate, so the rare situations get tested in simulation. That moves the question rather than answering it: which part of a safety number came from the road, which part came from a simulator, and how far can the simulator be trusted? Two kinds of simulation answer different questions, and the gap between simulated and real behaviour hides inside one factor of the tail rate. Lanehart, a constructed robotaxi pilot fleet in a fictional city, supplies every fleet number; only the human baselines are real.</p>
+    <div class="chip-row">
+      <span class="chip level">🟠 Advanced</span>
+      <span class="chip audience">ML and data engineers who run evaluation</span>
+      <span class="chip audience">Anyone asked whether a simulation result counts</span>
+      <span class="chip time">45 min</span>
+    </div>
+    <div class="agenda">
+      <span class="a1" style="flex:1">0-3 · Welcome</span>
+      <span class="a2" style="flex:3">3-18 · Two kinds of simulation</span>
+      <span class="a3" style="flex:3">18-28 · The sim-to-real gap</span>
+      <span class="a4" style="flex:4">28-45 · Build-along and Q&amp;A</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ INTRO ============ -->
+  <section class="section" id="intro">
+    <div class="section-kicker">
+      <span class="klabel">Part 0</span>
+      <h2>Lanehart's simulation report, and the one question it could not answer</h2>
+    </div>
+    <p class="lede">Lanehart is a constructed robotaxi pilot. Its simulation team brought a tidy report to the safety review: the new planner had been run through thousands of synthetic scenarios, including a pedestrian stepping out from behind a parked van. The safety lead asked two things. How often does that situation happen on our own roads? And would the car really fail in it as rarely as the simulator says? The first is a question about real miles. The second is a question about the simulator. A safety number needs both answers, and they come from different places.</p>
+
+    <div class="legend">
+      <span class="pill">Live = worked through in the 45 minutes</span>
+      <span class="pill">Self-study = the full depth, after class</span>
+      <span class="pill">🔍 Every diagram zooms</span>
+    </div>
+
+    <div class="callout win">
+      <p><strong>★ What you walk out with tonight.</strong> Why road miles alone cannot carry the tail (RAND: 275 million failure-free miles just to show a fatality rate at the 2013 human level). The difference between log replay, which is real until the car acts differently, and synthetic scenarios, which react but are made of models. The tail rate as a product, encounters per mile from real logs times a failure probability from simulation, using Lanehart's constructed classes (12 + 6 + 10 + 18 = 46 per 100 million miles). And a pandas table that shows a simulator which is optimistic by half turning a worse-than-human point estimate (193.74 against 185.55) into one that looks better (170.74).</p>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Why simulation is not optional<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Session 3 on the leader track did the arithmetic: to show with 95% confidence that a fleet's fatality rate is at most the human rate, with zero fatal crashes, takes about 225.2 million miles at the 2022 US rate of 1.33 per 100 million. Estimating the rate precisely, or showing it is better by a margin, takes billions. The rare scenarios that cause those crashes are rarer still per mile.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>RAND's "Driving to Safety" (Kalra and Paddock, 2016) put the numbers at 275 million failure-free miles to demonstrate a fatality rate of at most 1.09 per 100 million, about 8.8 billion miles to estimate it within 20%, and 11 billion miles to show it is 20% better, which the report puts at about 500 years for a 100-vehicle fleet driving around the clock. Its conclusion: developers cannot simply drive their way to safety, and other methods, among them simulation, scenario testing and staged deployment, are needed.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>The words that keep coming back<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Log replay.</strong> Feeding recorded sensor frames from real drives back into a new version of the software, and watching what it decides.</li>
+          <li><strong>Open loop.</strong> The world does not respond to the software's decisions; it plays as recorded.</li>
+          <li><strong>Synthetic scenario.</strong> A generated situation (actors, road, timing) with rendered or modelled sensor input, where other actors react.</li>
+          <li><strong>Closed loop.</strong> The software's decisions change what happens next, and the simulation follows.</li>
+          <li><strong>Encounter rate.</strong> How often a situation occurs per 100 million miles of real driving.</li>
+          <li><strong>Failure probability.</strong> The chance the car fails, given it is in that situation.</li>
+          <li><strong>Sim-to-real gap.</strong> Any difference between how the car behaves in simulation and how it would behave on the road in the same situation.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="section" id="part-1">
+    <div class="section-kicker">
+      <span class="klabel">Part 1 · covers log replay vs synthetic scenarios</span>
+      <h2>Two kinds of simulation, two different promises</h2>
+      <span class="tag concept">15 min live</span>
+    </div>
+    <p class="lede">"We tested it in simulation" can mean two very different things. Log replay re-runs real recorded drives through new software: real sensors, real people, real oddities, but the recording cannot react. Synthetic scenarios build the situation from scratch: the other car reacts to yours, and the rare case can be generated a thousand times, but every sensor reading and every reaction is a model somebody wrote. Each stops being evidence at a different place.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two hand drawn panels. Left, log replay: a recorded road scene played back through new software. The logged car's path runs straight; the new planner's path follows it, then diverges into the other lane at a point highlighted in yellow, while a recorded car keeps its taped path. After divergence the replay can no longer say what would have happened. Right, synthetic scenario: a generated car cuts in from the next lane and reacts to the ego car; gap and speed are parameters, and both the sensor input and the behaviour come from models.">
+        <defs>
+          <filter id="lhp6aSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="61" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp6aHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp6aAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp6aH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp6aL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp6aS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp6aB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lhp6aN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <g filter="url(#lhp6aSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="40" y="40" width="390" height="270" rx="12" transform="rotate(-0.4 235 175)" fill="#FFFFFF"/>
+          <rect x="450" y="40" width="390" height="270" rx="12" transform="rotate(0.4 645 175)" fill="#F1F3F4"/>
+          <path d="M62 140 L412 140 M62 230 L412 230 M472 140 L822 140 M472 230 L822 230" stroke="#8C979F"/>
+          <path d="M70 185 L100 185 M120 185 L150 185 M170 185 L200 185 M220 185 L250 185 M270 185 L300 185 M320 185 L350 185 M370 185 L400 185 M480 185 L510 185 M530 185 L560 185 M580 185 L610 185 M630 185 L660 185 M680 185 L710 185 M730 185 L760 185 M780 185 L810 185" stroke="#CED4D9" stroke-width="3"/>
+          <path d="M70 208 L404 208" stroke="#8C979F" stroke-dasharray="4 6"/>
+          <path d="M70 208 L210 208 C252 208 270 166 312 163" marker-end="url(#lhp6aAr)"/>
+          <circle cx="210" cy="208" r="7" fill="#F2C230"/>
+          <rect x="336" y="151" width="46" height="22" rx="4" transform="rotate(-2 359 162)" fill="url(#lhp6aHc)"/>
+          <rect x="492" y="197" width="44" height="22" rx="4" transform="rotate(1.5 514 208)" fill="#FFFFFF"/>
+          <rect x="640" y="151" width="46" height="22" rx="4" transform="rotate(-2 663 162)" fill="#FDF6DA"/>
+          <path d="M690 164 C726 168 744 196 776 204" marker-end="url(#lhp6aAr)"/>
+          <path d="M548 208 L608 208" marker-end="url(#lhp6aAr)"/>
+        </g>
+
+        <text class="lhp6aH" x="58" y="72">LOG REPLAY: THE RECORDED WORLD, RE-RUN</text>
+        <text class="lhp6aS" x="58" y="92">real sensor frames and real actors, played back</text>
+        <text class="lhp6aS" x="58" y="108">through new software</text>
+        <text class="lhp6aS" x="412" y="132" text-anchor="end">recorded car: keeps its taped path</text>
+        <text class="lhp6aB" x="210" y="252" text-anchor="middle">divergence</text>
+        <text class="lhp6aS" x="210" y="268" text-anchor="middle">after this, the tape cannot react</text>
+        <text class="lhp6aS" x="404" y="252" text-anchor="end">dashed: what the</text>
+        <text class="lhp6aS" x="404" y="266" text-anchor="end">logged car did</text>
+        <text class="lhp6aL" x="58" y="294">Real until the car acts differently</text>
+
+        <text class="lhp6aH" x="468" y="72">SYNTHETIC SCENARIO: A WORLD THAT REACTS</text>
+        <text class="lhp6aS" x="468" y="92">generated actors and modelled sensors; the</text>
+        <text class="lhp6aS" x="468" y="108">rare case can be run as often as you like</text>
+        <text class="lhp6aS" x="822" y="132" text-anchor="end">cut-in car: gap and speed are knobs</text>
+        <text class="lhp6aS" x="514" y="252" text-anchor="middle">ego car</text>
+        <text class="lhp6aS" x="822" y="252" text-anchor="end">the cut-in reacts to the ego car,</text>
+        <text class="lhp6aS" x="822" y="266" text-anchor="end">by a behaviour model</text>
+        <text class="lhp6aL" x="468" y="294">Reacts, but only as far as its models do</text>
+
+        <text class="lhp6aN" x="30" y="340">Replay stops being evidence at divergence; synthetic stops at the edge of its models.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow dot is where log replay stops being a measurement and starts being a guess.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>What log replay can and cannot tell you<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Log replay is the most honest simulation there is, up to a point. The camera frames, lidar sweeps and radar returns are the ones the car really recorded, with the glare, the dirty lens and the pedestrian who hesitated. Feed them to a new perception model and you learn exactly how it would have seen that moment. For perception, that is close to a real measurement.</p>
+        <p>The point is divergence. The recording holds what the logged car did and how everyone else responded to it. The moment the new planner brakes earlier or changes lane, the other actors on the tape keep doing what they did in response to the old car. The car behind does not slow down for the new brake. From that instant, the outcome of the replay is not a measurement of anything. It is still useful (did the planner choose sensibly at the divergence?), but a "no collision" after divergence is not evidence of safety.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>What a synthetic scenario buys, and what it costs<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>A synthetic scenario is closed loop: the cut-in car reacts to yours, so outcomes after a new decision mean something. And it is generative: the rare situation that a fleet meets a few thousand times per 100 million miles can be set up on demand, with its parameters swept (gap, speed, timing, occlusion) to find where the car starts to fail.</p>
+        <p>The cost is that every input is a model. The camera image is rendered, not seen. The lidar returns come from a sensor model. The cut-in driver's reaction comes from a behaviour model, which is only as good as the real driving it was fitted to. And the scenario exists only because somebody thought to write it. Each of those is a place where the simulated car can do better than the real one would.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Why teams run both, and still need real miles<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>The two kinds cover each other's weak side. Replay keeps perception honest against real sensor data; synthetic scenarios test decisions in closed loop and reach the tail. A common pattern is to mine real logs for a rare situation (practitioner session 3), replay it for perception, then rebuild it synthetically so the planner can be tested with the other actors reacting and the parameters swept.</p>
+        <p>Neither replaces the road for one job: saying how often a situation happens. A simulator can tell you what the car does in a cut-in; only logged miles can tell you how many cut-ins a fleet meets. That split is Part 2.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="section" id="part-2">
+    <div class="section-kicker">
+      <span class="klabel">Part 2 · covers the sim-to-real gap</span>
+      <h2>The tail rate is a product, and the gap hides in one factor</h2>
+      <span class="tag concept">10 min live</span>
+    </div>
+    <p class="lede">For one rare situation, the crash rate it contributes is how often the situation happens times how often the car fails in it. Lanehart's constructed occluded-pedestrian class: 4,000 encounters per 100 million miles, times a failure probability of 0.003, gives 12 crashes per 100 million miles. The first factor is a count from real logs. The second is what simulation and scenario testing estimate. Any sim-to-real gap lands in the second factor, and it almost always pushes in the flattering direction.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 316" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn equation. Box one, real miles from fleet logs: 4,000 encounters per 100 million miles. Times box two, highlighted in yellow, simulation and scenario tests: failure probability 0.003 per encounter. Equals box three: a tail rate of 12 per 100 million miles for the occluded pedestrian class, constructed. Three arrows enter box two from below, labelled sensor model, behaviour model and scenario coverage: the places a sim-to-real gap leaks in. All four constructed classes sum to 12 plus 6 plus 10 plus 18, 46 per 100 million miles.">
+        <defs>
+          <filter id="lhp6bSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="67" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp6bHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp6bAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp6bH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp6bL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp6bS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp6bB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lhp6bV { font: 800 18px Inter, sans-serif; fill: #1C2328; }
+          .lhp6bN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp6bH" x="30" y="30">THE TAIL RATE IS A PRODUCT, AND ONLY ONE FACTOR COMES FROM REAL MILES</text>
+
+        <g filter="url(#lhp6bSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="40" y="52" width="210" height="104" rx="10" transform="rotate(-0.6 145 104)" fill="#F1F3F4"/>
+          <rect x="40" y="52" width="210" height="104" rx="10" transform="rotate(-0.6 145 104)" fill="url(#lhp6bHc)" opacity=".35"/>
+          <rect x="330" y="52" width="230" height="104" rx="10" transform="rotate(0.5 445 104)" fill="#F2C230"/>
+          <rect x="640" y="52" width="200" height="104" rx="10" transform="rotate(-0.4 740 104)" fill="#FFFFFF"/>
+          <path d="M340 214 L340 164 M445 214 L445 164 M555 214 L555 164" marker-end="url(#lhp6bAr)"/>
+          <path d="M60 236 L90 236 M110 236 L140 236 M160 236 L190 236 M210 236 L240 236" stroke="#CED4D9" stroke-width="3"/>
+        </g>
+
+        <text class="lhp6bL" x="56" y="80">Real miles: fleet logs</text>
+        <text class="lhp6bS" x="56" y="98">how often the situation happens</text>
+        <text class="lhp6bV" x="56" y="128">4,000</text>
+        <text class="lhp6bS" x="56" y="146">encounters per 100M miles</text>
+
+        <text class="lhp6bV" x="290" y="112" text-anchor="middle">x</text>
+
+        <text class="lhp6bL" x="346" y="80">Simulation, scenario tests</text>
+        <text class="lhp6bS" x="346" y="98">how often the car fails in it</text>
+        <text class="lhp6bV" x="346" y="128">0.003</text>
+        <text class="lhp6bS" x="346" y="146">failure probability</text>
+
+        <text class="lhp6bV" x="600" y="112" text-anchor="middle">=</text>
+
+        <text class="lhp6bL" x="656" y="80">Tail rate, one class</text>
+        <text class="lhp6bS" x="656" y="98">occluded pedestrian</text>
+        <text class="lhp6bV" x="656" y="128">12</text>
+        <text class="lhp6bS" x="656" y="146">per 100M miles, constructed</text>
+
+        <text class="lhp6bS" x="145" y="182" text-anchor="middle">measured, with its own</text>
+        <text class="lhp6bS" x="145" y="198" text-anchor="middle">sampling error (session 7)</text>
+        <text class="lhp6bS" x="740" y="182" text-anchor="middle">4 classes: 12 + 6 + 10 + 18</text>
+        <text class="lhp6bS" x="740" y="198" text-anchor="middle">= 46 per 100M, constructed</text>
+
+        <text class="lhp6bS" x="340" y="232" text-anchor="middle">sensor model</text>
+        <text class="lhp6bS" x="445" y="232" text-anchor="middle">behaviour model</text>
+        <text class="lhp6bS" x="555" y="232" text-anchor="middle">scenario coverage</text>
+        <text class="lhp6bB" x="445" y="262" text-anchor="middle">each leak can shrink p, and a small p reads as safe</text>
+
+        <text class="lhp6bN" x="30" y="296">Halve every p and the tail falls from 46 to 23: half the risk vanishes inside the simulator.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow box is the only factor a simulator supplies, and the only one the sim-to-real gap can touch.</figcaption>
+    </figure>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>The product, one factor at a time<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Lanehart's four constructed rare classes, each as encounters per 100 million miles times failure probability per encounter: pedestrian stepping out from behind a parked van, 4,000 x 0.003 = 12; wrong-way vehicle on a divided road, 300 x 0.02 = 6; debris in lane at highway speed, 2,500 x 0.004 = 10; emergency vehicle crossing a junction, 1,200 x 0.015 = 18. The true tail is 46 crashes per 100 million miles.</p>
+        <p>The encounter rates are counts over logged miles, so they carry ordinary sampling error that session 7 knows how to bound. The failure probabilities cannot be read off the road: Lanehart meets the occluded pedestrian a few thousand times per 100 million miles and fails in it a handful of times. So they come from simulation and scenario testing. Even there the plain approach struggles: in the constructed run, 2,000 straightforward simulated tries of the occluded pedestrian produced exactly 1 failure. Session 8 fixes that with importance sampling.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Three leaks, and which way they push<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Sensor model.</strong> A rendered pedestrian behind a rendered van is usually cleaner than a real one: no glare, no rain on the lens, no half-reflective jacket. If perception does better on clean input, the simulated p is too small.</li>
+          <li><strong>Behaviour model.</strong> The pedestrian steps out the way the model says people step out. Real people hesitate, run, turn back. If the model's people are more predictable than real ones, p is too small again.</li>
+          <li><strong>Scenario coverage.</strong> A situation nobody wrote is never simulated, so its contribution to the tail is zero by omission. That is practitioner session 4's break button arriving through the simulator: drop the tail slices and Lanehart's matched rate of 147.74 looks "proven" (upper bound 169.04 against 185.55).</li>
+        </ul>
+        <p>How big the gap is has no general answer in the sources this session uses; it is specific to a simulator, a sensor model and a scenario. That is the honest position, and it is why the gap has to be measured case by case: replay real logged instances of a scenario and compare with its synthetic twin.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Accelerated evaluation, and the hinge it turns on<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Simulation does not only make rare cases available; it can make them common on purpose and then correct for it. That is the idea session 8 builds: sample the dangerous versions more often, then reweight every result back to how often it happens in real driving.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>Zhao et al. (2017), in IEEE Transactions on Intelligent Transportation Systems, modelled lane-change cut-ins from naturalistic driving data, skewed the statistics toward riskier behaviour (choosing the skew with the cross-entropy method), and reweighted the estimates to real-world rates. The authors report acceleration of 2,000 to 20,000 times: about 1,000 simulated miles exposing the vehicle to challenges that take 2 to 20 million real miles to meet.</p>
+        </div>
+        <p>Notice the hinge. The reweighting needs the real-world distribution of cut-ins, which came from recorded driving. Accelerated evaluation multiplies the value of real miles; it does not remove the need for them. If the real distribution is wrong, the reweighted answer is wrong by exactly as much.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>What the standards ask for, reported<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Two standards frame where simulation evidence fits, both reported here at concept level only because the full texts are paid. ISO 21448 (safety of the intended functionality) covers hazards with no fault at all: a sensor that works as designed and still misses, which is exactly the case a too-clean sensor model under-tests. UL 4600 asks for a safety case, a structured set of claims, arguments and evidence; a simulation result enters it as evidence, together with an argument for why the simulator is valid for that claim. Neither standard quotes a number for the sim-to-real gap.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 3 ============ -->
+  <section class="section" id="part-3">
+    <div class="section-kicker">
+      <span class="klabel">Part 3 · build-along</span>
+      <h2>Build the tail table and break it with an optimistic simulator</h2>
+      <span class="tag build">17 min hands on</span>
+    </div>
+    <p class="lede">Put Lanehart's four constructed classes in a pandas table, label which column came from logs and which from simulation, then apply a sim-to-real gap to the simulated column and watch the verdict move. Every number here is constructed arithmetic on Lanehart's parameters, compared with the one real baseline: 185.55 police-reported crashes per 100 million miles, derived from NHTSA's 2022 figures. Change the gap factors and your numbers will differ.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn plan of the build. A scenarios table of four constructed rows, encounters from logs and failure probability from the simulator, flows into rate equals encounters times p, summing to 46 per 100 million miles. A yellow chip, a gap factor on p, also flows into a results box comparing Lanehart's matched rate 147.74 plus the tail with the human baseline 185.55: no gap gives 193.74, worse; every p halved gives 170.74, which looks better; one class never built gives 175.74, which also looks better.">
+        <defs>
+          <filter id="lhp6cSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="71" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp6cHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp6cAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp6cH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp6cL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp6cS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp6cK { font: 700 11px Inter, sans-serif; fill: #1A1F23; }
+          .lhp6cV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lhp6cN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <g filter="url(#lhp6cSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="40" width="190" height="104" rx="8" transform="rotate(-0.8 125 92)" fill="#F1F3F4"/>
+          <rect x="30" y="40" width="190" height="104" rx="8" transform="rotate(-0.8 125 92)" fill="url(#lhp6cHc)" opacity=".35"/>
+          <path d="M224 92 L296 92" marker-end="url(#lhp6cAr)"/>
+          <rect x="300" y="52" width="200" height="80" rx="10" transform="rotate(-0.4 400 92)" fill="#FFFFFF"/>
+          <rect x="300" y="158" width="200" height="28" rx="14" transform="rotate(0.6 400 172)" fill="#F2C230"/>
+          <path d="M504 92 L556 92 M504 172 L556 150" marker-end="url(#lhp6cAr)"/>
+          <rect x="560" y="40" width="290" height="178" rx="8" transform="rotate(0.5 705 129)" fill="#FFFFFF"/>
+          <path d="M576 110 L834 110 M576 140 L834 140 M576 170 L834 170" stroke="#E2E6E9" stroke-width="1.5"/>
+        </g>
+
+        <text class="lhp6cL" x="46" y="68">scenarios</text>
+        <text class="lhp6cS" x="46" y="88">4 rows, constructed</text>
+        <text class="lhp6cS" x="46" y="106">enc_per_100M: from logs</text>
+        <text class="lhp6cS" x="46" y="124">p_sim: from the simulator</text>
+
+        <text class="lhp6cL" x="400" y="86" text-anchor="middle">rate = enc x p</text>
+        <text class="lhp6cS" x="400" y="106" text-anchor="middle">sum: 46 per 100M</text>
+        <text class="lhp6cK" x="400" y="177" text-anchor="middle">gap factor on p</text>
+
+        <text class="lhp6cL" x="576" y="66">matched 147.74 + tail, vs 185.55</text>
+        <text class="lhp6cS" x="576" y="94">no gap (worse)</text>
+        <text class="lhp6cV" x="834" y="96" text-anchor="end">193.74</text>
+        <text class="lhp6cS" x="576" y="128">every p halved (looks better)</text>
+        <text class="lhp6cV" x="834" y="130" text-anchor="end">170.74</text>
+        <text class="lhp6cS" x="576" y="158">one class never built (looks better)</text>
+        <text class="lhp6cV" x="834" y="160" text-anchor="end">175.74</text>
+        <text class="lhp6cS" x="576" y="200">185.55: derived from NHTSA 2022</text>
+
+        <text class="lhp6cN" x="30" y="258">Constructed what-ifs on point estimates; sessions 7 and 10 add the bounds. Your numbers will differ.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow chip is the simulator's honesty, and it moves the verdict more than anything the car does.</figcaption>
+    </figure>
+
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Make the scenario table, and say where each column came from</h4>
+        <p>Four constructed classes. Name the columns by their source: encounters come from logged miles, failure probability from the simulator. The sum should be 46.</p>
+        <div class="prompt-box good"><span class="label">python</span>import pandas as pd
+t = pd.DataFrame({
+    "scenario": ["occluded pedestrian", "wrong-way vehicle",
+                 "debris in lane", "emergency vehicle"],
+    "enc_per_100M": [4000, 300, 2500, 1200],     # from logged miles
+    "p_sim": [0.003, 0.02, 0.004, 0.015],        # from simulation
+})
+t["rate"] = t.enc_per_100M * t.p_sim
+t, t.rate.sum()</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Add the tail to the road-measured rate</h4>
+        <p>Lanehart's exposure-matched crash rate (leader session 4) is 147.74 per 100 million miles (constructed). Add the tail and compare with the human baseline. You should get 193.74 against 185.55: on these constructed numbers, worse than humans.</p>
+        <div class="prompt-box good"><span class="label">python</span>MATCHED, HUMAN = 147.74, 185.55
+def verdict(tail):
+    total = MATCHED + tail
+    return round(total, 2), "worse" if total &gt;= HUMAN else "looks better"
+verdict(t.rate.sum())</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Apply a gap to one class</h4>
+        <p>Suppose the rendered pedestrian is cleaner than a real one and the simulator reports half the true failure probability for that class. The tail falls to 40, the total to 187.74. Still worse, by a margin of a little over 2.</p>
+        <div class="prompt-box good"><span class="label">python</span>gap = {"occluded pedestrian": 0.5}
+t["p_reported"] = t.p_sim * t.scenario.map(gap).fillna(1.0)
+tail = (t.enc_per_100M * t.p_reported).sum()
+tail, verdict(tail)</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Make the simulator optimistic everywhere</h4>
+        <p>Set every factor to 0.5. The tail falls to 23 and the total to 170.74, below 185.55. The car did not change. Only the simulator's honesty did.</p>
+        <div class="prompt-box good"><span class="label">python</span>tail = (t.enc_per_100M * t.p_sim * 0.5).sum()
+tail, verdict(tail)</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Break it on purpose: a scenario nobody built</h4>
+        <p>Drop the emergency vehicle class, as if no one had written that scenario. The tail falls to 28 and the total to 175.74: "better", by omission. A missing row raises no error.</p>
+        <div class="prompt-box good"><span class="label">python</span>kept = t[t.scenario != "emergency vehicle"]
+tail = kept.rate.sum()
+tail, verdict(tail)</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Write the claim card</h4>
+        <p>For each class, one line: where the encounter rate came from (which logged miles), which simulator produced p, and what check compares that p with real logged instances of the scenario. A class with no such check gets a flag, not a number.</p>
+      </div></div>
+    </div>
+
+    <div class="callout tip">
+      <p><strong>The habit to keep.</strong> Whenever a safety number contains simulation, split it into the factor that came from real miles and the factor that came from the simulator, and write down how the simulator was checked against real instances of that scenario. A simulator that is never compared with the road will look better every year, because every leak points the same way.</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="section" id="quiz">
+    <div class="section-kicker">
+      <span class="klabel">Check yourself</span>
+      <h2>Three questions</h2>
+    </div>
+
+    <div class="quiz-q" data-answer="1">
+      <p class="qtext">A new planner, run on a replayed log, brakes two seconds earlier than the logged car did and no collision follows. What does the replay show?</p>
+      <button class="qopt" type="button">A · That the new planner is safe in this scenario, because the sensor data was real</button>
+      <button class="qopt" type="button">B · Up to the divergence it is evidence; after it, the other actors follow their taped paths and cannot react, so "no collision" is not a measurement</button>
+      <button class="qopt" type="button">C · Nothing at all, because replayed data is always out of date</button>
+      <p class="qwhy">Log replay is open loop. Real sensor input makes the moment of the decision real; what happens after the car acts differently is not on the tape. Perception results before divergence remain useful.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="0">
+      <p class="qtext">In "tail rate = encounters per 100M miles x failure probability", which factor has to come from real driving?</p>
+      <button class="qopt" type="button">A · The encounter rate: only logged miles say how often a situation happens; the failure probability comes from simulation and scenario tests, reweighted to real rates</button>
+      <button class="qopt" type="button">B · Neither; a good simulator can supply both</button>
+      <button class="qopt" type="button">C · The failure probability, because failures must be seen on the road to count</button>
+      <p class="qwhy">A simulator can set up a cut-in a thousand times but cannot say how many cut-ins a fleet meets. Failures are too rare on the road to estimate p directly, which is why simulation exists at all.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="2">
+      <p class="qtext">On Lanehart's constructed numbers, the matched rate plus the true tail is 193.74 against a human 185.55. A simulator that reports every failure probability at half its true value gives 170.74. What changed?</p>
+      <button class="qopt" type="button">A · The car became safer once the simulator was tuned</button>
+      <button class="qopt" type="button">B · Nothing that matters, because the encounter rates were real</button>
+      <button class="qopt" type="button">C · Only the simulator's honesty: the tail fell from 46 to 23 inside the simulator, and a worse-than-human car looks better</button>
+      <p class="qwhy">The sim-to-real gap enters one factor of the product and scales the tail directly. Real encounter rates do not protect the result if the failure probability beside them is flattering.</p>
+    </div>
+
+    <div class="quiz-score"></div>
+  </section>
+
+  <!-- ============ HOMEWORK ============ -->
+  <section class="section" id="homework">
+    <div class="section-kicker">
+      <span class="klabel">Before session 7</span>
+      <h2>Homework</h2>
+    </div>
+    <p class="lede">Thirty minutes, in your own notebook.</p>
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Find the break-even gap</h4>
+        <p>In the build-along, apply one uniform gap factor to every p and find the value at which matched plus tail drops below 185.55. Then do it for a single class at a time: which class, if its simulator were optimistic, could flip the verdict on its own? Your numbers will differ if you change the classes; write the factor down first.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Write one claim card for a simulation result you have seen</h4>
+        <p>Any simulation result from your own work, in any field: which factor came from real data, which from the model, and what check compared the model with real cases. If no such check exists, write that down too.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Read RAND's conclusion in its own words</h4>
+        <p>Kalra and Paddock (2016), RR-1478, is free. Read the conclusion and note which alternatives to road testing it names and what it says each one still needs.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ OFFICIAL ============ -->
+  <section class="section" id="official">
+    <div class="section-kicker">
+      <span class="klabel">Covered tonight</span>
+      <h2>What this session covers</h2>
+    </div>
+    <div class="covered">
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Why road miles alone fall short</span><span class="note">275 million / 8.8 billion / 11 billion miles; "cannot simply drive". Kalra and Paddock (2016), RAND RR-1478, read at source.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Log replay vs synthetic scenarios</span><span class="note">Open loop until divergence vs closed loop made of models. Concepts, no statistic.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Tail rate as encounters x failure probability</span><span class="note">Lanehart constructed classes: 12 + 6 + 10 + 18 = 46 per 100M miles.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Accelerated evaluation</span><span class="note">2,000 to 20,000 times, the authors report. Zhao et al. (2017), IEEE T-ITS 18(3):595-607, read at source (abstract).</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The sim-to-real gap as a leak in p</span><span class="note">Constructed what-ifs: 193.74 with no gap, 170.74 with every p halved, 175.74 with a class missing, against 185.55 derived from NHTSA 2022.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Importance sampling mechanics</span><span class="note">Named tonight. Practitioner session 8.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">ISO 21448 and UL 4600</span><span class="note">Reported, concept level only; the full standards are paid.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Simulator internals</span><span class="note">Out of scope by design: rendering, physics and behaviour model architectures are named only. No published size of the sim-to-real gap is quoted.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">General evaluation metrics</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-model-evaluation-with-phoebe/courses/a1-why-one-number-lies.html">learn model evaluation</a>.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section class="section" id="cheatsheet">
+    <div class="section-kicker">
+      <span class="klabel">Take this with you</span>
+      <h2>Cheat sheet</h2>
+    </div>
+    <div class="cheat">
+      <div class="cheat-item"><strong>The one sentence.</strong> Real miles say how often; simulation says how badly; the gap lives in the second.</div>
+      <div class="cheat-item"><strong>Why sim.</strong> RAND: 275M failure-free miles to show 1.09 per 100M; "cannot simply drive".</div>
+      <div class="cheat-item"><strong>Log replay.</strong> Real sensors, open loop. Evidence until the car acts differently.</div>
+      <div class="cheat-item"><strong>Synthetic.</strong> Closed loop, rare cases on demand; every sensor and reaction is a model.</div>
+      <div class="cheat-item"><strong>The product.</strong> Tail = encounters x p. Lanehart: 12 + 6 + 10 + 18 = 46 (constructed).</div>
+      <div class="cheat-item"><strong>Three leaks.</strong> Sensor model, behaviour model, scenario coverage. All push p down.</div>
+      <div class="cheat-item"><strong>Optimism flips verdicts.</strong> Halve every p: 193.74 becomes 170.74 against 185.55.</div>
+      <div class="cheat-item"><strong>Acceleration needs real rates.</strong> Reweighting to real-world rates (2,000 to 20,000x, reported) still rests on logged driving.</div>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    <div class="wrap">
+      <p>Practitioner session 6 of 10 · learn-autonomous-driving-with-phoebe · by Phoebe Fu</p>
+      <nav class="pagenav">
+        <a href="p5-perception-metrics-that-hide-failures.html">← Practitioner session 5 · Perception metrics that hide failures</a>
+        <a href="p7-rare-event-statistics.html">Practitioner session 7 · Rare-event statistics →</a>
+      </nav>
+    </div>
+  </footer>
+
+</main>
+
+<script src="../assets/app.js?v=1"></script>
+</body>
+</html>

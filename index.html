@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- social:start -->
+<meta name="description" content="Sixteen sessions on autonomous driving as a data problem: drive logs on many clocks, labels bought by the frame, the long tail, how many miles prove a car is safe, exposure-matched safety claims, importance sampling, and a bench with an anti-lever and a break button. Lanehart is a constructed fleet; the human rates are NHTSA's. Free. Not investment advice.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Learn with Phoebe">
+<meta property="og:title" content="Learn Autonomous Driving with Phoebe">
+<meta property="og:description" content="Zero fatal crashes in 150 million miles is not proof. A fleet's crash rate of 120.00 on easy miles becomes 192.24 once matched to people's roads and the rare scenarios are counted.">
+<meta property="og:url" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/">
+<meta property="og:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Learn Autonomous Driving with Phoebe">
+<meta name="twitter:description" content="Safety is a rare-event claim over exposure. Sixteen sessions for data people and the leaders who fund them.">
+<meta name="twitter:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<!-- social:end -->
+<title>Learn Autonomous Driving with Phoebe</title>
+<link rel="stylesheet" href="assets/style.css?v=2">
+<style>
+
+
+  .stats-row { display: flex; gap: 2.4rem; margin-top: 1.5rem; flex-wrap: wrap; }
+  .stat b { display: block; font-size: 2.1rem; font-weight: 800; line-height: 1.05; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: .72rem; opacity: 1; text-transform: uppercase; letter-spacing: .09em; font-weight: 600; }
+
+  .course-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+  .course-card {
+    border: 1px solid var(--hairline);
+    border-top: 4px solid var(--diff, var(--indigo));
+    border-radius: var(--radius);
+    padding: 1.2rem 1.3rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    text-decoration: none;
+    color: var(--ink);
+    background: #fff;
+    transition: box-shadow .15s ease, border-color .15s ease, transform .15s ease;
+    position: relative;
+  }
+  .course-card:hover { border-color: var(--indigo-soft); border-top-color: var(--diff, var(--indigo)); box-shadow: 0 8px 28px rgba(47,58,66,.16); transform: translateY(-3px); }
+  .course-card .cicon { font-size: 1.7rem; line-height: 1; }
+  .course-card .cnum { font-size: .72rem; font-weight: 700; color: var(--indigo); text-transform: uppercase; letter-spacing: .1em; }
+  .course-card h3 { font-size: 1.05rem; font-weight: 800; line-height: 1.3; }
+  .course-card p { font-size: .85rem; color: var(--muted); flex: 1; }
+  .course-card .meta { display: flex; gap: .4rem; flex-wrap: wrap; }
+
+  .diff-legend { display: flex; gap: 1rem; margin-top: 1.6rem; font-size: .74rem; color: var(--muted); font-weight: 600; flex-wrap: wrap; }
+  .diff-legend i { display: inline-block; width: .85rem; height: .35rem; border-radius: 999px; margin-right: .35rem; vertical-align: middle; }
+
+  .paths { margin-top: 2.6rem; }
+  .paths h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: .3rem; }
+  .paths .plede { color: var(--muted); font-size: .92rem; margin-bottom: .8rem; }
+  .path { display: flex; gap: .55rem; align-items: center; padding: .75rem 0; border-bottom: .5px solid var(--hairline); flex-wrap: wrap; }
+  .path:last-child { border-bottom: none; }
+  .path b { min-width: 15.5rem; font-size: .9rem; }
+  .path .pstep { background: var(--indigo-50); color: var(--indigo-deep); border-radius: 999px; padding: .16rem .68rem; font-weight: 700; font-size: .8rem; text-decoration: none; transition: all .12s ease; }
+  .path .pstep:hover { background: var(--indigo); color: #fff; }
+  .path .parr { color: var(--muted); font-weight: 700; }
+
+  .transfer { margin-top: 2.6rem; }
+  .transfer h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: .3rem; }
+  .transfer .plede { color: var(--muted); font-size: .92rem; margin-bottom: .9rem; }
+  .transfer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; }
+  .transfer-col { border: 1px solid var(--hairline); border-radius: var(--radius); background: #fff; padding: 1rem 1.1rem 1rem; }
+  .transfer-col h3 { font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: .6rem; padding-bottom: .5rem; border-bottom: 2px solid var(--indigo-soft); color: var(--indigo-deep); }
+  .transfer-col.keep h3 { border-bottom-color: var(--indigo); }
+  .transfer-col.learn h3 { border-bottom-color: var(--amber); color: var(--amber-ink-text); }
+  .transfer-col.unlearn h3 { border-bottom-color: var(--ink); color: var(--ink); }
+  .transfer-col ul { list-style: none; margin: 0; padding: 0; }
+  .transfer-col li { font-size: .86rem; color: var(--ink); padding: .35rem 0 .35rem 1rem; position: relative; line-height: 1.5; }
+  .transfer-col li::before { content: ""; position: absolute; left: 0; top: .85rem; width: .45rem; height: .45rem; border-radius: 999px; background: var(--indigo-mid); }
+  .transfer-col.learn li::before { background: var(--amber); }
+  .transfer-col.unlearn li::before { background: var(--ink); }
+
+  .mm-section { margin-top: 1.6rem; }
+  .mm-section h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: .2rem; }
+  .mm-section .mm-lede { color: var(--muted); font-size: .92rem; margin-bottom: .4rem; }
+  .mm-wrap { border: 1px solid var(--hairline); border-radius: var(--radius); background: linear-gradient(180deg,#fff,#F1F3F4); padding: .6rem; overflow-x: auto; }
+  .mm-svg { width: 100%; height: auto; display: block; max-width: 60rem; margin: 0 auto; min-width: 34rem; }
+  .mm-link { cursor: pointer; text-decoration: none; }
+  .mm-node rect { transition: opacity .15s ease, filter .15s ease; }
+  .mm-node text { pointer-events: none; }
+  .mm-link:hover .mm-node rect { filter: brightness(1.06); }
+  .mm-edge { transition: opacity .15s ease; }
+
+
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Learn with Phoebe · Emerging Tech</div>
+    <h1>Learn <span class="accent">Autonomous Driving</span> with Phoebe</h1>
+    <p class="sub">A warehouse row is a business event someone meant. A self-driving car writes frames from many sensors, each on its own clock: cheap to collect, expensive to label, and the cases that matter are the ones you almost never see. Safety is a rare-event claim over exposure, and the number most often quoted, disengagements, measures the operator's policy, not the car. Lanehart, a constructed robotaxi pilot fleet in a fictional city, runs through every session: zero fatal crashes in 150 million miles that do not yet prove anything, and a crash rate of 120.00 per 100 million that becomes 192.24 once it is matched to the roads people drive and the rare scenarios are counted, against a human 185.55. Six leader sessions on the decision, ten practitioner sessions on the build. The human rates are NHTSA's; every fleet number is constructed and computed in the page. Nothing here is investment advice or a view on any company.</p>
+    <div class="stats-row">
+      <div class="stat"><b data-count="16">16</b><span>sessions, two tracks</span></div>
+      <div class="stat"><b>225.2M</b><span>miles to prove it with zero deaths</span></div>
+      <div class="stat"><b>192.24</b><span>crashes per 100M, tail counted</span></div>
+      <div class="stat"><b>1.33</b><span>human deaths per 100M miles</span></div>
+      <div class="stat"><b data-count="45">45</b><span>min per session</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="section ihx-hero" aria-label="A hand-drawn exposure comparison and the tail experiment">
+    <figure class="zoomable" style="margin:0 0 1rem">
+      <svg viewBox="0 0 880 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Left, two stacked bars of miles by road context. Lanehart, constructed: 55 percent highway, 30 city, 10 night, 5 rain. The human mix, a constructed split: 35, 40, 15 and 10 percent. Right, the claim in crashes per 100 million miles: 120.00 on Lanehart's own mix, 147.74 matched to the human mix, and a yellow tile that adds the rare scenarios, taking it to 192.24 against the human 185.55.">
+        <defs>
+          <filter id="lhxSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="29" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhxHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhxAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhxH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhxL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhxS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhxK { font: 400 11px Inter, sans-serif; fill: #1A1F23; }
+          .lhxV { font: 800 20px Inter, sans-serif; fill: #1C2328; }
+          .lhxN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+          .lhx-tail { transition: opacity .3s ease; opacity: 0; }
+          .lhx-on .lhx-tail { opacity: 1; }
+          @media (prefers-reduced-motion: reduce) { .lhx-tail { transition: none; } }
+        </style>
+
+        <text class="lhxH" x="30" y="30">WHERE THE MILES ARE</text>
+        <text class="lhxH" x="440" y="30">THE CLAIM, CRASHES PER 100M MILES</text>
+
+        <g filter="url(#lhxSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="66" width="176" height="30" rx="4" fill="#FFFFFF"/>
+          <rect x="206" y="66" width="96" height="30" rx="4" fill="#F1F3F4"/>
+          <rect x="302" y="66" width="32" height="30" rx="4" fill="url(#lhxHc)"/>
+          <rect x="334" y="66" width="16" height="30" rx="4" fill="#8C979F"/>
+          <rect x="30" y="160" width="112" height="30" rx="4" fill="#FFFFFF"/>
+          <rect x="142" y="160" width="128" height="30" rx="4" fill="#F1F3F4"/>
+          <rect x="270" y="160" width="48" height="30" rx="4" fill="url(#lhxHc)"/>
+          <rect x="318" y="160" width="32" height="30" rx="4" fill="#8C979F"/>
+          <rect x="440" y="48" width="190" height="84" rx="10" transform="rotate(-0.5 535 90)" fill="#FFFFFF"/>
+          <rect x="650" y="48" width="200" height="84" rx="10" transform="rotate(0.5 750 90)" fill="#F1F3F4"/>
+          <rect x="440" y="150" width="410" height="96" rx="12" transform="rotate(0.3 645 198)" fill="#F2C230"/>
+          <!-- doodle: lane dashes -->
+          <path d="M30 278 L60 278 M76 278 L106 278 M122 278 L152 278" stroke="#8C979F" stroke-width="3"/>
+        </g>
+
+        <text class="lhxL" x="30" y="58">Lanehart, constructed</text>
+        <text class="lhxS" x="30" y="114">55% highway, 30% city, 10% night, 5% rain</text>
+        <text class="lhxL" x="30" y="152">Human mix, constructed split</text>
+        <text class="lhxS" x="30" y="208">35% highway, 40% city, 15% night, 10% rain</text>
+        <text class="lhxK" x="30" y="236">Lanehart is worse in rain and drives half the</text>
+        <text class="lhxK" x="30" y="252">human share of it: easy miles flatter the rate.</text>
+
+        <text class="lhxS" x="456" y="74">on its own mix</text>
+        <text class="lhxV" x="456" y="106">120.00</text>
+        <text class="lhxS" x="456" y="124">upper bound 135.79</text>
+        <text class="lhxS" x="666" y="74">matched to people's roads</text>
+        <text class="lhxV" x="666" y="106">147.74</text>
+        <text class="lhxS" x="666" y="124">upper bound 169.04</text>
+
+        <text class="lhxL" x="458" y="176" id="lhx-state">Rare scenarios: not counted yet</text>
+        <text class="lhxV" x="458" y="210" id="lhx-total">147.74</text>
+        <text class="lhxK" x="458" y="232" id="lhx-verdict">looks proven better than the human 185.55</text>
+
+        <text class="lhxN" x="440" y="280">Same crashes, same miles: the verdict moves with what is weighted</text>
+        <text class="lhxN" x="440" y="298">and what is counted. Computed in practitioner session 10's bench.</text>
+        <text class="lhxS" x="30" y="326">Human rate 185.55: police-reported crashes per 100M vehicle miles, derived from NHTSA 2022. Lanehart and both road mixes are constructed.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow tile is the part most safety claims leave out: the scenarios the fleet's own miles almost never meet.</figcaption>
+    </figure>
+    <div class="ihx-row">
+      <button type="button" class="btn primary" id="lhx-toggle">Count the rare scenarios the fleet never met</button>
+      <span class="ihx-hint" id="lhx-hint">Canon numbers from the bench, seed 1016. Press it and watch the yellow tile.</span>
+    </div>
+    <div class="ihx-guess" id="lhx-guess">
+      <p class="ihx-q"><b>Guess first.</b> Four rare scenarios, each met a few thousand times or fewer per 100 million miles. When they are scored in simulation and added, by how much does the matched crash rate rise?</p>
+      <div class="ihx-slider">
+        <input type="range" id="lhx-g" min="0" max="100" step="1" value="5" aria-label="your guess, percent">
+        <output for="lhx-g" id="lhx-gv">5%</output>
+        <button type="button" class="btn" id="lhx-reveal">Lock my guess</button>
+      </div>
+      <p class="ihx-answer" id="lhx-ans" hidden></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="paths" style="margin-top:0">
+      <h2>Leader track 🧭 <span style="font-size:.85rem;font-weight:600;color:var(--muted)">· six sessions, no code</span></h2>
+      <p class="plede">For anyone who funds, governs or signs off autonomous-driving data work. The car as a pipeline, the long tail, how many miles prove safety, how to read a safety claim, why the warehouse playbook breaks here, and a transfer map for anyone arriving from a data team.</p>
+    </div>
+    <div class="course-grid">
+      <a class="course-card" href="courses/a1-the-car-is-a-data-pipeline.html" style="--diff:#34D399">
+        <span class="cicon">🚗</span>
+        <span class="cnum">Leader session 1 · start here</span>
+        <h3>The car is a data pipeline on wheels</h3>
+        <p>Sense, perceive, predict, plan, act: five guesses, five seats for the data team, and SAE levels read from the chart.</p>
+        <span class="meta"><span class="pill amber">▶ Start here</span></span>
+      </a>
+      <a class="course-card" href="courses/a2-the-long-tail.html" style="--diff:#FBBF24">
+        <span class="cicon">🦓</span>
+        <span class="cnum">Leader session 2</span>
+        <h3>The long tail: where the work actually is</h3>
+        <p>Encounter rate times failure probability. The scenarios that decide safety are the ones the fleet almost never logs.</p>
+      </a>
+      <a class="course-card" href="courses/a3-how-many-miles-prove-a-car-is-safe.html" style="--diff:#FBBF24">
+        <span class="cicon">📏</span>
+        <span class="cnum">Leader session 3</span>
+        <h3>How many miles prove a car is safe?</h3>
+        <p>Zero deaths in 150 million miles is not yet proof. With the 2022 human rate, it takes 225.2 million.</p>
+      </a>
+      <a class="course-card" href="courses/a4-reading-a-safety-claim.html" style="--diff:#FB923C">
+        <span class="cicon">🔍</span>
+        <span class="cnum">Leader session 4</span>
+        <h3>Reading a safety claim</h3>
+        <p>Counts without miles, easy miles against all miles, and a disengagement rate that measures the operator's policy.</p>
+      </a>
+      <a class="course-card" href="courses/a5-why-the-warehouse-playbook-breaks-here.html" style="--diff:#FB923C">
+        <span class="cicon">🧩</span>
+        <span class="cnum">Leader session 5</span>
+        <h3>Why the warehouse playbook breaks here</h3>
+        <p>The source, the identity, the ground truth, the feedback loop and the cost of being wrong, each drawn as a mechanism.</p>
+      </a>
+      <a class="course-card" href="courses/a6-from-warehouse-to-autonomous-driving.html" style="--diff:#FB923C">
+        <span class="cicon">🗺️</span>
+        <span class="cnum">Leader session 6</span>
+        <h3>From warehouse to autonomous driving: the transfer map</h3>
+        <p>What carries over, what must be learned, what must be unlearned, and a 90-day self-study ladder on official sources.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="paths" style="margin-top:0">
+      <h2>Practitioner track 🛠️ <span style="font-size:.85rem;font-weight:600;color:var(--muted)">· ten sessions, hands on</span></h2>
+      <p class="plede">For whoever has to build on fleet data and defend its numbers. Drive logs and sensor sync, label economics, scenario mining, curating for the tail, sliced perception metrics, simulation, rare-event statistics, importance sampling, the fleet loop, and a bench with an anti-lever and a break button.</p>
+    </div>
+    <div class="course-grid">
+      <a class="course-card" href="courses/p1-anatomy-of-a-drive-log.html" style="--diff:#34D399">
+        <span class="cicon">🎞️</span>
+        <span class="cnum">Practitioner session 1 · start here</span>
+        <h3>Anatomy of a drive log</h3>
+        <p>Many sensors, own clocks. Nearest timestamp puts 28 of 72 camera frames on the right lidar scan; strictly after gets 72.</p>
+        <span class="meta"><span class="pill amber">▶ Start here</span></span>
+      </a>
+      <a class="course-card" href="courses/p2-labels-cost-by-the-frame.html" style="--diff:#34D399">
+        <span class="cicon">🏷️</span>
+        <span class="cnum">Practitioner session 2</span>
+        <h3>Labels cost by the frame</h3>
+        <p>Annotation economics: keyframes, auto-labelling and label QA, priced per frame on a constructed calculator.</p>
+      </a>
+      <a class="course-card" href="courses/p3-scenario-mining.html" style="--diff:#FBBF24">
+        <span class="cicon">⛏️</span>
+        <span class="cnum">Practitioner session 3</span>
+        <h3>Scenario mining: querying the fleet for rare events</h3>
+        <p>Find the cut-ins and step-outs in hours of driving with a query, then ask how many it missed.</p>
+      </a>
+      <a class="course-card" href="courses/p4-curating-for-the-tail.html" style="--diff:#FBBF24">
+        <span class="cicon">🧺</span>
+        <span class="cnum">Practitioner session 4</span>
+        <h3>Curating for the tail</h3>
+        <p>Balance the training set, keep the rare slices in evaluation, and see what dropping them does to a verdict.</p>
+      </a>
+      <a class="course-card" href="courses/p5-perception-metrics-that-hide-failures.html" style="--diff:#FBBF24">
+        <span class="cicon">🎯</span>
+        <span class="cnum">Practitioner session 5</span>
+        <h3>Perception metrics that hide failures</h3>
+        <p>One headline score against recall by distance band and scenario, where the misses actually live.</p>
+      </a>
+      <a class="course-card" href="courses/p6-simulation-against-real-miles.html" style="--diff:#FB923C">
+        <span class="cicon">🕹️</span>
+        <span class="cnum">Practitioner session 6</span>
+        <h3>Simulation against real miles</h3>
+        <p>Log replay, synthetic scenarios and the gap between simulated and real driving.</p>
+      </a>
+      <a class="course-card" href="courses/p7-rare-event-statistics.html" style="--diff:#FB923C">
+        <span class="cicon">🎲</span>
+        <span class="cnum">Practitioner session 7</span>
+        <h3>Rare-event statistics</h3>
+        <p>Poisson rates over miles, the rule of three, zero-event bounds and an exposure-matched rate.</p>
+      </a>
+      <a class="course-card" href="courses/p8-importance-sampling-for-rare-scenarios.html" style="--diff:#FB923C">
+        <span class="cicon">⚖️</span>
+        <span class="cnum">Practitioner session 8</span>
+        <h3>Importance sampling for rare scenarios</h3>
+        <p>Oversample the dangerous cases and reweight: 5.2 times tighter than plain Monte Carlo at the same budget.</p>
+      </a>
+      <a class="course-card" href="courses/p9-the-fleet-feedback-loop.html" style="--diff:#FB923C">
+        <span class="cicon">🔁</span>
+        <span class="cnum">Practitioner session 9</span>
+        <h3>The fleet feedback loop</h3>
+        <p>Shadow mode, triggers, the data flywheel and drift when the fleet moves to a new city.</p>
+      </a>
+      <a class="course-card" href="courses/p10-the-prove-it-safe-bench.html" style="--diff:#F87171">
+        <span class="cicon">🎛️</span>
+        <span class="cnum">Practitioner session 10 · capstone</span>
+        <h3>The prove-it-safe bench</h3>
+        <p>Every rung live: 120.00 on easy miles, 147.74 matched, 192.24 with the tail. Plus a metric that picks the worse policy.</p>
+      </a>
+    </div>
+    <div class="diff-legend">
+      <span><i style="background:#34D399"></i>Foundations</span>
+      <span><i style="background:#FBBF24"></i>Working depth</span>
+      <span><i style="background:#FB923C"></i>Advanced</span>
+      <span><i style="background:#F87171"></i>Hardest</span>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="paths">
+      <h2>Four ways through</h2>
+      <p class="plede">Everyone starts at session 1 of their track. These are the shortest useful routes if you cannot take all sixteen.</p>
+      <div class="path"><b>I sign off safety or expansion decisions</b>
+        <a class="pstep" href="courses/a1-the-car-is-a-data-pipeline.html">The pipeline</a><span class="parr">→</span>
+        <a class="pstep" href="courses/a3-how-many-miles-prove-a-car-is-safe.html">How many miles</a><span class="parr">→</span>
+        <a class="pstep" href="courses/a4-reading-a-safety-claim.html">Reading a claim</a>
+      </div>
+      <div class="path"><b>I build the data platform</b>
+        <a class="pstep" href="courses/p1-anatomy-of-a-drive-log.html">Drive logs</a><span class="parr">→</span>
+        <a class="pstep" href="courses/p2-labels-cost-by-the-frame.html">Labels</a><span class="parr">→</span>
+        <a class="pstep" href="courses/p3-scenario-mining.html">Scenario mining</a><span class="parr">→</span>
+        <a class="pstep" href="courses/p9-the-fleet-feedback-loop.html">The fleet loop</a>
+      </div>
+      <div class="path"><b>I evaluate models and safety</b>
+        <a class="pstep" href="courses/p5-perception-metrics-that-hide-failures.html">Sliced metrics</a><span class="parr">→</span>
+        <a class="pstep" href="courses/p7-rare-event-statistics.html">Rare events</a><span class="parr">→</span>
+        <a class="pstep" href="courses/p8-importance-sampling-for-rare-scenarios.html">Importance sampling</a><span class="parr">→</span>
+        <a class="pstep" href="courses/p10-the-prove-it-safe-bench.html">The bench</a>
+      </div>
+      <div class="path"><b>I am moving in from a data team</b>
+        <a class="pstep" href="courses/a5-why-the-warehouse-playbook-breaks-here.html">Why it breaks</a><span class="parr">→</span>
+        <a class="pstep" href="courses/a6-from-warehouse-to-autonomous-driving.html">The transfer map</a><span class="parr">→</span>
+        <a class="pstep" href="courses/p1-anatomy-of-a-drive-log.html">Drive logs</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="transfer">
+      <h2>If you come from a data team</h2>
+      <p class="plede">Leader session 6 in three columns. What a conventional analyst, engineer or scientist already has that is worth more here, what is new, and what is actively dangerous.</p>
+      <div class="transfer-grid">
+        <div class="transfer-col keep">
+          <h3>Carries over</h3>
+          <ul>
+            <li>Joins and time semantics, pointed at sensor streams: an as-of join with a direction and a tolerance</li>
+            <li>Slicing a metric by segment, now by distance band, scenario and road context</li>
+            <li>Rates with a denominator, and refusing a count that has none</li>
+            <li>Reproducible pipelines: seeds, and a reference implementation that must agree to the digit</li>
+          </ul>
+        </div>
+        <div class="transfer-col learn">
+          <h3>Must learn</h3>
+          <ul>
+            <li>Multi-sensor drive logs: frames, keyframes, and what each timestamp means</li>
+            <li>Label economics: labels are bought by the frame, and the rare frames cost most to find</li>
+            <li>Rare-event statistics: Poisson bounds over miles, the rule of three, exposure matching</li>
+            <li>Simulation and importance sampling for scenarios the fleet almost never meets</li>
+          </ul>
+        </div>
+        <div class="transfer-col unlearn">
+          <h3>Must unlearn</h3>
+          <ul>
+            <li>"Nearest timestamp" as the default join: on one constructed second it is right for 28 of 72 frames</li>
+            <li>"No events means safe": zero deaths in 150 million miles still bounds the rate above 1.33</li>
+            <li>Comparing totals across different mixes: easy miles flatter a crash rate</li>
+            <li>Ranking by the easy metric: disengagements per mile picked the policy with 21 extra crashes</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section mm-section">
+    <h2>The whole thing on one page</h2>
+    <p class="mm-lede">Every idea and the session that owns it. Click any node to jump there.</p>
+    <div class="mm-wrap"><div id="mindmap"></div></div>
+  </section>
+
+  <section class="section">
+    <div class="paths">
+      <h2>What is real here</h2>
+      <p class="plede">Every number was computed before any page quoted it. The human baselines are real and cited; the fleet around them is constructed.</p>
+      <table style="width:100%;border-collapse:collapse">
+        <tr><td style="padding:.5rem 0;font-weight:700">The baselines</td><td style="padding:.5rem 0;color:var(--muted)">NHTSA's 2022 crash summary: 1.33 deaths per 100 million vehicle miles, and 185.55 police-reported crashes per 100 million, derived from the same report. RAND's "Driving to Safety" method for the miles needed</td></tr>
+        <tr><td style="padding:.5rem 0;font-weight:700">The ladder</td><td style="padding:.5rem 0;color:var(--muted)">Zero fatal crashes in 150 million miles, bounded at 2.00; crashes 120.00 on the fleet's own mix, 147.74 matched, 192.24 with the rare scenarios added</td></tr>
+        <tr><td style="padding:.5rem 0;font-weight:700">The anti-lever and the break</td><td style="padding:.5rem 0;color:var(--muted)">Scoring by disengagements picks a policy with 21 extra crashes. Dropping the rare-scenario slices turns 192.24 "worse" into 147.74 "proven". Both modelled and declared on the widget</td></tr>
+        <tr><td style="padding:.5rem 0;font-weight:700">The engine checks itself</td><td style="padding:.5rem 0;color:var(--muted)">Six properties on every page load, each shown to fail when its fault is planted back. A Python copy reproduces every bench number with zero difference</td></tr>
+        <tr><td style="padding:.5rem 0;font-weight:700">Constructed</td><td style="padding:.5rem 0;color:var(--muted)">Lanehart, its city, its miles, its rates and its scenarios are invented so the truth is knowable. No real fleet, company, product or incident appears; nothing here is investment advice</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    <span class="meta">part of <a href="https://phoebefu6.github.io/learn-with-phoebe/">Learn with Phoebe ↗</a> · by Phoebe Fu · not investment advice · general label cleaning lives in <a href="https://phoebefu6.github.io/learn-data-centric-ai-with-phoebe/">learn data-centric AI ↗</a>, general evaluation metrics in <a href="https://phoebefu6.github.io/learn-model-evaluation-with-phoebe/">learn model evaluation ↗</a></span>
+  </footer>
+
+</main>
+
+<script>
+window.MINDMAP_DATA = {
+ "title": "Safety is a\nrare-event claim",
+ "centerColor": "#1C2328",
+ "sessions": [
+  {
+   "label": "A pipeline on wheels",
+   "href": "courses/a1-the-car-is-a-data-pipeline.html",
+   "concepts": [
+    {
+     "label": "A drive log, many clocks",
+     "href": "courses/p1-anatomy-of-a-drive-log.html"
+    },
+    {
+     "label": "Labels by the frame",
+     "href": "courses/p2-labels-cost-by-the-frame.html"
+    },
+    {
+     "label": "SAE levels, honestly",
+     "href": "courses/a1-the-car-is-a-data-pipeline.html"
+    }
+   ]
+  },
+  {
+   "label": "The long tail",
+   "href": "courses/a2-the-long-tail.html",
+   "concepts": [
+    {
+     "label": "Scenario mining",
+     "href": "courses/p3-scenario-mining.html"
+    },
+    {
+     "label": "Curating for the tail",
+     "href": "courses/p4-curating-for-the-tail.html"
+    },
+    {
+     "label": "Importance sampling",
+     "href": "courses/p8-importance-sampling-for-rare-scenarios.html"
+    }
+   ]
+  },
+  {
+   "label": "Miles to prove it",
+   "href": "courses/a3-how-many-miles-prove-a-car-is-safe.html",
+   "concepts": [
+    {
+     "label": "Rare-event statistics",
+     "href": "courses/p7-rare-event-statistics.html"
+    },
+    {
+     "label": "Zero-event bounds",
+     "href": "courses/p7-rare-event-statistics.html"
+    },
+    {
+     "label": "Simulation vs real miles",
+     "href": "courses/p6-simulation-against-real-miles.html"
+    }
+   ]
+  },
+  {
+   "label": "Reading a claim",
+   "href": "courses/a4-reading-a-safety-claim.html",
+   "concepts": [
+    {
+     "label": "Exposure mismatch",
+     "href": "courses/a4-reading-a-safety-claim.html"
+    },
+    {
+     "label": "Metrics that hide misses",
+     "href": "courses/p5-perception-metrics-that-hide-failures.html"
+    },
+    {
+     "label": "Disengagements",
+     "href": "courses/a4-reading-a-safety-claim.html"
+    }
+   ]
+  },
+  {
+   "label": "Why the playbook breaks",
+   "href": "courses/a5-why-the-warehouse-playbook-breaks-here.html",
+   "concepts": [
+    {
+     "label": "The fleet feedback loop",
+     "href": "courses/p9-the-fleet-feedback-loop.html"
+    },
+    {
+     "label": "Ground truth arrives rarely",
+     "href": "courses/a5-why-the-warehouse-playbook-breaks-here.html"
+    },
+    {
+     "label": "The cost of being wrong",
+     "href": "courses/a5-why-the-warehouse-playbook-breaks-here.html"
+    }
+   ]
+  },
+  {
+   "label": "The transfer map",
+   "href": "courses/a6-from-warehouse-to-autonomous-driving.html",
+   "concepts": [
+    {
+     "label": "Carries over, learn, unlearn",
+     "href": "courses/a6-from-warehouse-to-autonomous-driving.html"
+    },
+    {
+     "label": "The 90-day ladder",
+     "href": "courses/a6-from-warehouse-to-autonomous-driving.html"
+    },
+    {
+     "label": "The prove-it-safe bench",
+     "href": "courses/p10-the-prove-it-safe-bench.html"
+    }
+   ]
+  }
+ ]
+};
+</script>
+<script src="assets/mindmap.js?v=1"></script>
+<script>
+(function(){
+  var fig=document.querySelector('.ihx-hero svg'); if(!fig) return;
+  var on=false, tgl=document.getElementById('lhx-toggle');
+  var st=document.getElementById('lhx-state'), tot=document.getElementById('lhx-total'), vd=document.getElementById('lhx-verdict');
+  tgl.addEventListener('click', function(){
+    on=!on; fig.classList.toggle('lhx-on', on);
+    st.textContent = on ? 'Rare scenarios counted: +44.50' : 'Rare scenarios: not counted yet';
+    tot.textContent = on ? '192.24' : '147.74';
+    vd.textContent = on ? 'worse than the human 185.55, and by the point' : 'looks proven better than the human 185.55';
+    tgl.textContent = on ? 'Leave the rare scenarios out again' : 'Count the rare scenarios the fleet never met';
+  });
+  var g=document.getElementById('lhx-g'), gv=document.getElementById('lhx-gv'), rv=document.getElementById('lhx-reveal'), ans=document.getElementById('lhx-ans');
+  g.addEventListener('input', function(){ gv.textContent = g.value + '%'; });
+  rv.addEventListener('click', function(){
+    var v=+g.value, line;
+    if (v < 15) line = 'Most people guess low: the scenarios are rare, so they feel small. Rare times dangerous is not small.';
+    else if (v <= 45) line = 'Close. Each class is rare, but its failure probability per encounter is high enough to add up.';
+    else line = 'High, but in the right direction.';
+    ans.textContent = 'You said ' + v + '%. The bench says 30% (147.74 to 192.24). ' + line + ' Session 10 lets you rerun it with a different sampler budget.';
+    ans.hidden=false; rv.disabled=true; g.disabled=true;
+    if (!on) tgl.click();
+  });
+})();
+</script>
+<script src="assets/app.js?v=1"></script>
+</body>
+</html>

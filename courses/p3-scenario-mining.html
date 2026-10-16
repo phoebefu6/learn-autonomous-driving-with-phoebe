@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- social:start -->
+<meta name="description" content="Practitioner session 3 of 10. A rare scenario is found by a query over a drive log: filters on actor type, distance, occlusion and time to collision. Every filter trades precision for recall, and the clips a query never returns are the ones nobody reviews. Lanehart is a constructed fleet.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Learn with Phoebe">
+<meta property="og:title" content="Scenario mining: querying the fleet for rare events - learn autonomous driving with phoebe">
+<meta property="og:description" content="Practitioner session 3 of 10. Four filters, one mined set, and the precision and recall of what came back.">
+<meta property="og:url" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/courses/p3-scenario-mining.html">
+<meta property="og:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Scenario mining: querying the fleet for rare events - learn autonomous driving with phoebe">
+<meta name="twitter:description" content="A scenario query is four filters. Each one buys precision with recall, and the misses never show up in the result.">
+<meta name="twitter:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<!-- social:end -->
+<title>Practitioner session 3 · Scenario mining: querying the fleet for rare events - learn autonomous driving with phoebe</title>
+<link rel="stylesheet" href="../assets/style.css?v=2">
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="wrap">
+    <span class="crumb"><a href="../index.html">learn-autonomous-driving-with-phoebe</a> / Practitioner session 3 of 10</span>
+    <button class="btn" id="toggle-all" type="button">Expand all</button>
+    <button class="btn primary" id="zoom-toggle" type="button">Projector zoom: off</button>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Learn Autonomous Driving with Phoebe · Practitioner session 3 of 10</div>
+    <h1>Scenario mining: querying the fleet for <span class="accent">rare events</span></h1>
+    <p class="sub">The scenarios that decide whether a car is safe are rare, and nobody can watch every mile to find them. So they are found by a query: filters over the actor tracks a drive log already holds, the type of road user, how far away, whether something blocked the view, how many seconds until contact. A query returns a set, and that set has a precision you can measure and a recall you mostly cannot. Lanehart, a constructed robotaxi pilot fleet in a fictional city, supplies a 24-event drive-log table, constructed for this page, and every count is computed in your browser.</p>
+    <div class="chip-row">
+      <span class="chip level">🟡 Working depth</span>
+      <span class="chip audience">Data engineers and analysts who query fleet logs</span>
+      <span class="chip audience">ML engineers who need rare examples to train and test on</span>
+      <span class="chip time">45 min</span>
+    </div>
+    <div class="agenda">
+      <span class="a1" style="flex:1">0-3 · Welcome</span>
+      <span class="a2" style="flex:3">3-18 · Four filters</span>
+      <span class="a3" style="flex:3">18-28 · Precision of the mined set</span>
+      <span class="a4" style="flex:4">28-45 · Build-along and Q&amp;A</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ INTRO ============ -->
+  <section class="section" id="intro">
+    <div class="section-kicker">
+      <span class="klabel">Part 0</span>
+      <h2>Lanehart's request: "find me every pedestrian stepping out from behind a van"</h2>
+    </div>
+    <p class="lede">Lanehart is a constructed robotaxi pilot. Its safety team holds a list of rare scenario classes, and the first one is a pedestrian who steps out from behind a parked van. In Lanehart's constructed model that encounter happens about 4,000 times per 100 million miles, and the car fails on about 3 in every 1,000 of them. Nobody can watch 100 million miles to find 4,000 moments. The analyst writes a query instead, and the question for tonight is what came back, and what did not.</p>
+
+    <div class="legend">
+      <span class="pill">Live = worked through in the 45 minutes</span>
+      <span class="pill">Self-study = the full depth, after class</span>
+      <span class="pill">🔍 Every diagram zooms</span>
+    </div>
+
+    <div class="callout win">
+      <p><strong>★ What you walk out with tonight.</strong> A scenario query written as four filters (actor type, distance, occlusion, time to collision) over a drive-log table. The habit of reading its result as a mined set with two numbers attached: precision, the share of returned clips that really are the scenario, and recall, the share of real scenarios the query found. On Lanehart's constructed 24-event table, the four default filters return 5 events, 3 of them real: precision 60%, recall 3 of 6. And the uncomfortable rule behind it: the clips a query never returns are the clips nobody ever reviews.</p>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Why mine, instead of drive and watch<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>The arithmetic of the tail.</strong> Session a2 drew it: a rare scenario's crash rate is how often you meet it times how often you fail when you do. Lanehart's four constructed classes add up to 46 per 100 million miles. The occluded pedestrian alone is 4,000 encounters times 0.003 failures, 12 per 100 million.</p>
+        <p><strong>What mining looks for.</strong> Not the failure, the encounter. At 4,000 against 12 per 100 million miles, the encounter is about 333 times more common (derived), so it is the thing a query can find often enough to train on, test on and simulate from. Session 8 uses exactly these encounters to drive importance sampling.</p>
+        <p><strong>What the log offers.</strong> A drive log already holds tracks of every road user the car perceived: type, position, speed, and attributes such as "partly hidden". A scenario is a pattern over those tracks, so it can be written as a filter.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>The public multi-sensor research dataset from session 1 annotates 23 object classes and 8 attributes on keyframes sampled at 2 Hz, with 3D boxes giving position, size and heading. Those are exactly the columns a scenario filter runs on, and the 2 Hz rate is a warning: a filter on human labels sees only keyframes, while a filter on every frame runs on what the car's own perception inferred.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>The words that keep coming back<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Scenario.</strong> A pattern of road users and context the car has to handle, such as a pedestrian appearing from behind a parked vehicle.</li>
+          <li><strong>Event.</strong> One candidate moment in the log, around one actor track.</li>
+          <li><strong>Occlusion.</strong> Something blocks the sensors' view of the actor, wholly or partly.</li>
+          <li><strong>Time to collision (TTC).</strong> Seconds until contact if neither the car nor the actor changes speed or path: distance divided by closing speed.</li>
+          <li><strong>Mined set.</strong> The events a query returns.</li>
+          <li><strong>Precision.</strong> Of the events returned, the share that really are the scenario.</li>
+          <li><strong>Recall.</strong> Of the real scenarios in the log, the share the query returned.</li>
+          <li><strong>Constructed.</strong> Lanehart's 24 events are written for this page, not recorded.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="section" id="part-1">
+    <div class="section-kicker">
+      <span class="klabel">Part 1 · covers a scenario query as filters</span>
+      <h2>Four filters turn a description into a query</h2>
+      <span class="tag concept">15 min live</span>
+    </div>
+    <p class="lede">"A pedestrian stepping out from behind a van" is a sentence. The query is that sentence translated into columns: the actor is a pedestrian, the track was occluded, it was close, and contact was seconds away. Each filter narrows the pile. The figure follows Lanehart's constructed table of 24 events, 6 of which a reviewer confirmed as the real scenario.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn funnel of a scenario query over a constructed table of 24 events, 6 of them the real scenario. Filter actor equals pedestrian keeps 14 events, 6 real. Filter occluded keeps 9, 5 real. Filter distance at most 30 metres keeps 8, 4 real. Filter time to collision at most 3 seconds keeps 5, 3 real. The mined set, highlighted in yellow, is 5 events with 3 real: precision 60 percent, recall 3 of 6.">
+        <defs>
+          <filter id="lhp3aSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="31" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp3aHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp3aAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp3aH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp3aL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp3aS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp3aB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lhp3aV { font: 800 18px Inter, sans-serif; fill: #1C2328; }
+          .lhp3aA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp3aN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp3aH" x="30" y="30">ONE SCENARIO QUERY, FILTER BY FILTER, OVER A CONSTRUCTED 24-EVENT LOG</text>
+
+        <g filter="url(#lhp3aSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="70" width="110" height="150" rx="8" transform="rotate(-0.8 85 145)" fill="url(#lhp3aHc)"/>
+          <path d="M144 145 L166 145" marker-end="url(#lhp3aAr)"/>
+          <path d="M172 82 L282 82 L264 208 L190 208 Z" transform="rotate(-0.6 227 145)" fill="#FFFFFF"/>
+          <path d="M286 145 L304 145" marker-end="url(#lhp3aAr)"/>
+          <path d="M310 92 L410 92 L394 198 L326 198 Z" transform="rotate(0.6 360 145)" fill="#FFFFFF"/>
+          <path d="M414 145 L432 145" marker-end="url(#lhp3aAr)"/>
+          <path d="M438 100 L530 100 L516 190 L452 190 Z" transform="rotate(-0.5 484 145)" fill="#FFFFFF"/>
+          <path d="M534 145 L552 145" marker-end="url(#lhp3aAr)"/>
+          <path d="M558 108 L642 108 L630 182 L570 182 Z" transform="rotate(0.5 600 145)" fill="#FFFFFF"/>
+          <path d="M646 145 L670 145" marker-end="url(#lhp3aAr)"/>
+          <rect x="676" y="96" width="174" height="98" rx="10" transform="rotate(0.6 763 145)" fill="#F2C230"/>
+          <path d="M30 272 L850 272" stroke="#C8CED3" stroke-width="1.5"/>
+          <path d="M60 272 L90 272 M130 272 L160 272 M200 272 L230 272" stroke="#8C979F" stroke-width="3"/>
+        </g>
+
+        <text class="lhp3aL" x="85" y="62" text-anchor="middle">the log</text>
+        <text class="lhp3aV" x="85" y="242" text-anchor="middle">24</text>
+        <text class="lhp3aS" x="85" y="256" text-anchor="middle">events, 6 real</text>
+
+        <text class="lhp3aA" x="227" y="70" text-anchor="middle">actor = pedestrian</text>
+        <text class="lhp3aV" x="227" y="148" text-anchor="middle">14</text>
+        <text class="lhp3aS" x="227" y="228" text-anchor="middle">6 real kept</text>
+
+        <text class="lhp3aA" x="360" y="80" text-anchor="middle">occluded</text>
+        <text class="lhp3aV" x="360" y="148" text-anchor="middle">9</text>
+        <text class="lhp3aS" x="360" y="218" text-anchor="middle">5 real kept</text>
+
+        <text class="lhp3aA" x="484" y="88" text-anchor="middle">within 30 m</text>
+        <text class="lhp3aV" x="484" y="148" text-anchor="middle">8</text>
+        <text class="lhp3aS" x="484" y="210" text-anchor="middle">4 real kept</text>
+
+        <text class="lhp3aA" x="600" y="96" text-anchor="middle">TTC ≤ 3 s</text>
+        <text class="lhp3aV" x="600" y="148" text-anchor="middle">5</text>
+        <text class="lhp3aS" x="600" y="202" text-anchor="middle">3 real kept</text>
+
+        <text class="lhp3aL" x="763" y="124" text-anchor="middle">the mined set</text>
+        <text class="lhp3aV" x="763" y="150" text-anchor="middle">5 events</text>
+        <text class="lhp3aB" x="763" y="172" text-anchor="middle">3 real, 2 look-alikes</text>
+        <text class="lhp3aL" x="763" y="218" text-anchor="middle">precision 60%</text>
+        <text class="lhp3aL" x="763" y="236" text-anchor="middle">recall 3 of 6</text>
+
+        <text class="lhp3aN" x="30" y="290">Each gate drops look-alikes and, sometimes, a real event. The 3 real ones lost here never reach a reviewer.</text>
+        <text class="lhp3aN" x="30" y="308">Constructed table; the widget below runs the same filters, and your numbers will differ when you change them.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow box is all anyone downstream will ever see; the funnel's losses are silent.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>What each filter is really asking<span class="mini">6 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Actor type.</strong> A class from perception or from a label. Cheap and sharp, and as wrong as the classifier is: a pedestrian pushing a bicycle may be logged as a cyclist.</li>
+          <li><strong>Occlusion.</strong> Was the actor hidden for part of the track? This is the filter that carries the scenario's meaning ("from behind a van"), and it is itself an inference. On Lanehart's table, event e05 is a real step-out whose occlusion flag was never set, so no query that requires the flag can find it.</li>
+          <li><strong>Distance.</strong> How close the actor came. Distance is what makes a step-out dangerous, but a fixed cut-off is a guess: e06 is a real step-out at 34 m on a faster road, and "within 30 m" drops it.</li>
+          <li><strong>Time to collision.</strong> Distance over closing speed. It folds speed into distance, which is why it usually beats either alone, but it assumes nobody changes course. A reviewer looking at e04 (3.4 s) still called it the scenario.</li>
+        </ul>
+        <p>None of the four filters is wrong. Each one is a definition, and each definition has an edge where real scenarios fall off.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Query, not detector<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>A detector learns what "unusual" looks like and flags whatever surprises it. A scenario query starts from a named class someone wrote down, and returns what matches the definition. Mining by query is the right tool when the safety case lists the scenario in advance, as Lanehart's four classes do: the result can be counted, reviewed and rerun on next month's miles with the same meaning.</p>
+        <p>Generic detectors (isolation forests, statistical thresholds) belong to <a href="https://phoebefu6.github.io/learn-anomaly-detection-with-phoebe/courses/b2-statistical-detectors.html">learn anomaly detection</a>. They are good at finding the scenario nobody listed yet; they are a poor way to count one that is listed.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Where the columns come from<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Every column in a scenario query is produced upstream. Actor type and occlusion come from perception or from labels; distance comes from the box positions, which depend on the sensor sync from session 1; time to collision is computed from two tracks over several frames. A query is therefore only as good as the pipeline under it.</p>
+        <p>That gives a practical rule: when a mined set looks thin, check the columns before the thresholds. A missing occlusion flag (e05) cannot be fixed by loosening the distance.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="section" id="part-2">
+    <div class="section-kicker">
+      <span class="klabel">Part 2 · covers precision and recall of the mined set</span>
+      <h2>The mined set has a precision, and the misses have no row</h2>
+      <span class="tag concept">10 min live</span>
+    </div>
+    <p class="lede">Lay each stage of the query out as a bar of the events it returned: yellow for real scenarios, white for look-alikes, and to the right the real ones already lost. Precision climbs from 25% to 60% as the filters stack up; recall falls from 6 of 6 to 3 of 6. The mined set gets cleaner and smaller at the same time, and only one of those two shows up in the result.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn bars, one per query stage, on the constructed 24-event table. All events: 24 returned, 6 real, precision 25 percent, none lost. Pedestrian: 14 returned, 6 real, 43 percent. Plus occluded: 9 returned, 5 real, 56 percent, 1 real lost. Plus within 30 metres: 8 returned, 4 real, 50 percent, 2 lost. Plus time to collision at most 3 seconds: 5 returned, 3 real, 60 percent, 3 lost.">
+        <defs>
+          <filter id="lhp3bSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="37" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp3bHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp3bAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp3bH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp3bL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp3bS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp3bB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lhp3bV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lhp3bA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp3bN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp3bH" x="30" y="30">WHAT EACH STAGE RETURNS, AND WHAT IT HAS ALREADY LOST</text>
+        <text class="lhp3bA" x="190" y="56">returned events (one square each)</text>
+        <text class="lhp3bA" x="660" y="56">precision</text>
+        <text class="lhp3bA" x="760" y="56">real lost</text>
+
+        <g filter="url(#lhp3bSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="190" y="70" width="108" height="24" rx="3" transform="rotate(-0.4 244 82)" fill="#F2C230"/>
+          <rect x="298" y="70" width="324" height="24" rx="3" transform="rotate(0.3 460 82)" fill="#FFFFFF"/>
+          <rect x="190" y="114" width="108" height="24" rx="3" transform="rotate(0.4 244 126)" fill="#F2C230"/>
+          <rect x="298" y="114" width="144" height="24" rx="3" transform="rotate(-0.3 370 126)" fill="#FFFFFF"/>
+          <rect x="190" y="158" width="90" height="24" rx="3" transform="rotate(-0.4 235 170)" fill="#F2C230"/>
+          <rect x="280" y="158" width="72" height="24" rx="3" transform="rotate(0.3 316 170)" fill="#FFFFFF"/>
+          <rect x="760" y="158" width="18" height="24" rx="3" transform="rotate(2 769 170)" fill="url(#lhp3bHc)"/>
+          <rect x="190" y="202" width="72" height="24" rx="3" transform="rotate(0.4 226 214)" fill="#F2C230"/>
+          <rect x="262" y="202" width="72" height="24" rx="3" transform="rotate(-0.3 298 214)" fill="#FFFFFF"/>
+          <rect x="760" y="202" width="36" height="24" rx="3" transform="rotate(-2 778 214)" fill="url(#lhp3bHc)"/>
+          <rect x="190" y="246" width="54" height="24" rx="3" transform="rotate(-0.4 217 258)" fill="#F2C230"/>
+          <rect x="244" y="246" width="36" height="24" rx="3" transform="rotate(0.3 262 258)" fill="#FFFFFF"/>
+          <rect x="760" y="246" width="54" height="24" rx="3" transform="rotate(2 787 258)" fill="url(#lhp3bHc)"/>
+          <path d="M740 64 L740 278" stroke="#C8CED3" stroke-width="1.5"/>
+        </g>
+
+        <text class="lhp3bL" x="176" y="86" text-anchor="end">every event</text>
+        <text class="lhp3bL" x="176" y="130" text-anchor="end">pedestrian</text>
+        <text class="lhp3bL" x="176" y="174" text-anchor="end">+ occluded</text>
+        <text class="lhp3bL" x="176" y="218" text-anchor="end">+ within 30 m</text>
+        <text class="lhp3bL" x="176" y="262" text-anchor="end">+ TTC ≤ 3 s</text>
+
+        <text class="lhp3bV" x="660" y="88">25%</text>
+        <text class="lhp3bV" x="660" y="132">43%</text>
+        <text class="lhp3bV" x="660" y="176">56%</text>
+        <text class="lhp3bV" x="660" y="220">50%</text>
+        <text class="lhp3bV" x="660" y="264">60%</text>
+        <text class="lhp3bS" x="760" y="88">none</text>
+        <text class="lhp3bS" x="760" y="132">none</text>
+        <text class="lhp3bB" x="790" y="176">e05</text>
+        <text class="lhp3bB" x="804" y="220">+ e06</text>
+        <text class="lhp3bB" x="822" y="264">+ e04</text>
+
+        <text class="lhp3bN" x="30" y="300">Yellow = reviewer-confirmed scenario, white = look-alike, hatched = real scenario the query no longer returns.</text>
+        <text class="lhp3bN" x="30" y="318">Precision is read off the returned bar. Recall needs the hatched squares, and in a real log nobody has drawn them.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow shrinks along with the white; a cleaner mined set is not a more complete one.</figcaption>
+    </figure>
+
+    <div class="wk" id="lhp3-query">
+      <div class="wk-head">
+        <b>Live</b>
+        <span class="wk-hint">Constructed drive-log table of 24 Lanehart events, each marked by a reviewer as the real scenario (a pedestrian stepping out from behind a parked vehicle) or not. Choose the filters; the mined set, precision and recall are computed in this page. Your numbers will differ as you change them.</span>
+      </div>
+      <div class="wk-body">
+        <label class="sql-label" for="lhp3-actor">Actor type</label>
+        <select class="sql-code" id="lhp3-actor">
+          <option value="any">any</option>
+          <option value="pedestrian" selected>pedestrian</option>
+          <option value="cyclist">cyclist</option>
+          <option value="vehicle">vehicle</option>
+        </select>
+        <label class="sql-label" for="lhp3-occ">Occlusion</label>
+        <select class="sql-code" id="lhp3-occ">
+          <option value="any">any</option>
+          <option value="1" selected>occluded flag required</option>
+        </select>
+        <label class="sql-label" for="lhp3-dist">Distance at most</label>
+        <select class="sql-code" id="lhp3-dist">
+          <option value="999">any</option>
+          <option value="40">40 m</option>
+          <option value="30" selected>30 m</option>
+          <option value="20">20 m</option>
+        </select>
+        <label class="sql-label" for="lhp3-ttc">Time to collision at most</label>
+        <select class="sql-code" id="lhp3-ttc">
+          <option value="999">any</option>
+          <option value="4">4 s</option>
+          <option value="3" selected>3 s</option>
+          <option value="2">2 s</option>
+        </select>
+        <div id="lhp3-out"></div>
+        <p class="sql-note" id="lhp3-verdict">...</p>
+      </div>
+      <div class="wk-foot" id="lhp3-foot">Constructed table, plain filtering in this page. No row comes from a real fleet or dataset.</div>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Read the widget three ways<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Defaults (pedestrian, occluded, 30 m, 3 s):</strong> 5 returned, 3 real. Precision 60%, recall 3 of 6. Two look-alikes to review, three real step-outs lost.</li>
+          <li><strong>Loosen to 40 m and 4 s:</strong> 7 returned, 5 real. Precision 71%, recall 5 of 6. Both numbers went up. The first thresholds were set on instinct, and instinct is not a reason to believe a tighter filter is a better one.</li>
+          <li><strong>Drop the occlusion requirement:</strong> e05 can now come back, along with look-alikes that were never hidden. Watch which way precision moves at your settings.</li>
+        </ul>
+        <p>What no setting fixes: the hidden column on the widget is the reviewer's verdict. On a real log that column does not exist for the clips the query skipped.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Measuring each number<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>Precision is cheap.</strong> Review a random sample of the mined set and count the real ones. It also sets the review bill: at 60% precision a reviewer opens about 1.7 clips per real scenario, at 25% four.</p>
+        <p><strong>Recall is expensive.</strong> To estimate it, review a random sample of clips the query did NOT return and count real scenarios hiding there. Because the scenario is rare, that sample is mostly empty, and an empty sample is still a result: with 0 found in n reviewed clips, the 95% upper bound on the miss rate per clip is about 3 / n, the rule of three (reported, Hanley and Lippman-Hand 1983). Reviewing 300 skipped clips and finding none bounds the miss rate below about 1% per clip (derived). Session 7 does the exact version of that bound.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>RAND's "Driving to Safety" (Kalra and Paddock 2016) concludes that developers cannot simply drive their way to safety, and names scenario testing and simulation among the other methods needed. Scenario testing needs scenarios, and a mined set is where they come from. If the query's recall is unknown, the test library inherits that blind spot: the scenarios it never returned are never tested.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Why recall matters more for evaluation than for training<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>For training, a mined set with modest recall can still be useful: 300 real step-outs teach a model something even if 300 more were missed. For evaluation, recall is the whole question. If the step-outs the query misses are systematically different (faster roads, flags that perception failed to set), then a model scored on the mined set is scored on the easy half of the scenario.</p>
+        <p>That is the bridge to session 4: what goes in a training mix and what must stay in the evaluation slices. General precision and recall as metrics are owned by <a href="https://phoebefu6.github.io/learn-model-evaluation-with-phoebe/courses/a1-why-one-number-lies.html">learn model evaluation</a>; here they describe a query, not a model.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 3 ============ -->
+  <section class="section" id="part-3">
+    <div class="section-kicker">
+      <span class="klabel">Part 3 · build-along</span>
+      <h2>Write the scenario query in pandas</h2>
+      <span class="tag build">17 min hands on</span>
+    </div>
+    <p class="lede">Rebuild Lanehart's 24-event table in pandas, run the four filters, and get the widget's numbers. Then do the part that matters on a real log: list who you missed, and plan the audit that would find them. The figure is the plan.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn plan of the build-along. The events table, 24 rows, flows into one boolean mask of four conditions joined by and. The mask splits the table: the mined set of 5 rows, highlighted in yellow, goes to a precision review; the 19 skipped rows go to a recall audit. Precision 3 of 5; recall 3 of 6 on the constructed table.">
+        <defs>
+          <filter id="lhp3cSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="41" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp3cHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp3cAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp3cH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp3cL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp3cS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp3cK { font: 700 11px Inter, sans-serif; fill: #1A1F23; }
+          .lhp3cV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lhp3cN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <g filter="url(#lhp3cSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="80" width="180" height="96" rx="8" transform="rotate(-0.8 120 128)" fill="url(#lhp3cHc)"/>
+          <path d="M214 128 L262 128" marker-end="url(#lhp3cAr)"/>
+          <rect x="268" y="72" width="250" height="112" rx="10" transform="rotate(-0.4 393 128)" fill="#FFFFFF"/>
+          <path d="M522 108 L588 70" marker-end="url(#lhp3cAr)"/>
+          <path d="M522 148 L588 190" marker-end="url(#lhp3cAr)"/>
+          <rect x="594" y="30" width="256" height="80" rx="8" transform="rotate(0.6 722 70)" fill="#F2C230"/>
+          <rect x="594" y="150" width="256" height="80" rx="8" transform="rotate(-0.6 722 190)" fill="#F1F3F4"/>
+          <path d="M40 250 L80 250 M100 250 L140 250 M160 250 L200 250" stroke="#8C979F" stroke-width="3"/>
+        </g>
+
+        <text class="lhp3cL" x="46" y="108">log</text>
+        <text class="lhp3cS" x="46" y="128">actor, dist_m, occluded,</text>
+        <text class="lhp3cS" x="46" y="144">ttc_s, truth</text>
+        <text class="lhp3cS" x="46" y="162">24 rows, constructed</text>
+
+        <text class="lhp3cL" x="393" y="100" text-anchor="middle">one boolean mask</text>
+        <text class="lhp3cK" x="393" y="122" text-anchor="middle">pedestrian &amp; occluded</text>
+        <text class="lhp3cK" x="393" y="140" text-anchor="middle">&amp; dist_m ≤ 30 &amp; ttc_s ≤ 3</text>
+        <text class="lhp3cS" x="393" y="162" text-anchor="middle">&amp; means and; | would mean or</text>
+
+        <text class="lhp3cL" x="612" y="56">mined set: 5 rows</text>
+        <text class="lhp3cS" x="612" y="74">review a sample: precision</text>
+        <text class="lhp3cV" x="612" y="98">3 of 5</text>
+        <text class="lhp3cL" x="612" y="176">skipped: 19 rows</text>
+        <text class="lhp3cS" x="612" y="194">audit a sample: recall</text>
+        <text class="lhp3cV" x="612" y="218">3 of 6 found</text>
+
+        <text class="lhp3cN" x="30" y="272">Two reviews, two different piles. The second one is the one teams skip, and it is the only way to learn recall.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow pile is what the query hands you; the grey pile is where the missing scenarios live.</figcaption>
+    </figure>
+
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Make the constructed log</h4>
+        <p>Twenty-four candidate events, one row each: actor type, closest distance in metres, an occlusion flag, time to collision in seconds, and the reviewer's verdict in <code>truth</code>. The verdict column is the luxury a real log does not have; it is here so you can see what the query misses.</p>
+        <div class="prompt-box good"><span class="label">python</span>import pandas as pd
+rows = [
+    ("e01", "pedestrian", 12, 1, 1.4, 1), ("e02", "pedestrian", 18, 1, 1.9, 1),
+    ("e03", "pedestrian", 25, 1, 2.6, 1), ("e04", "pedestrian", 22, 1, 3.4, 1),
+    ("e05", "pedestrian", 15, 0, 1.7, 1), ("e06", "pedestrian", 34, 1, 2.2, 1),
+    ("e07", "pedestrian",  9, 1, 1.2, 0), ("e08", "pedestrian", 28, 1, 2.8, 0),
+    ("e09", "pedestrian", 16, 1, 9.0, 0), ("e10", "pedestrian", 14, 0, 1.5, 0),
+    ("e11", "pedestrian", 40, 0, 6.0, 0), ("e12", "pedestrian", 11, 0, 8.5, 0),
+    ("e13", "pedestrian", 30, 1, 4.5, 0), ("e14", "pedestrian", 19, 0, 2.4, 0),
+    ("e15", "cyclist",    13, 1, 1.6, 0), ("e16", "cyclist",    24, 1, 2.9, 0),
+    ("e17", "cyclist",    35, 0, 5.0, 0), ("e18", "vehicle",    20, 1, 1.8, 0),
+    ("e19", "vehicle",    45, 0, 3.0, 0), ("e20", "vehicle",     8, 0, 0.9, 0),
+    ("e21", "vehicle",    60, 1, 7.0, 0), ("e22", "vehicle",    27, 0, 2.1, 0),
+    ("e23", "vehicle",    33, 1, 3.8, 0), ("e24", "vehicle",    50, 0, 9.5, 0),
+]
+log = pd.DataFrame(rows, columns=["event", "actor", "dist_m", "occluded", "ttc_s", "truth"])
+log.truth.sum()</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Write the query as one mask</h4>
+        <p>Four conditions, joined with <code>&amp;</code>, each in its own brackets. You should get 5 rows, 3 of them real: the widget's default.</p>
+        <div class="prompt-box good"><span class="label">python</span>q = ((log.actor == "pedestrian") &amp; (log.occluded == 1)
+     &amp; (log.dist_m &lt;= 30) &amp; (log.ttc_s &lt;= 3))
+mined = log[q]
+len(mined), mined.truth.sum(), mined.truth.mean()</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Print the funnel</h4>
+        <p>Add one filter at a time and print rows kept and real kept: 24 and 6, 14 and 6, 9 and 5, 8 and 4, 5 and 3. This is figure 1, and it is the table to show anyone who asks why the mined set is so small.</p>
+        <div class="prompt-box good"><span class="label">python</span>stages = [("pedestrian", log.actor == "pedestrian"), ("occluded", log.occluded == 1),
+          ("within 30 m", log.dist_m &lt;= 30), ("ttc &lt;= 3 s", log.ttc_s &lt;= 3)]
+m = pd.Series(True, index=log.index)
+for name, cond in stages:
+    m &amp;= cond
+    print(f"{name:12} kept {m.sum():2}  real {log.truth[m].sum()}")</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>List who you missed</h4>
+        <p>Real scenarios outside the mask: e04 (TTC 3.4 s), e05 (occlusion flag never set) and e06 (34 m). Each one has a different cause, and only two of the three are a threshold.</p>
+        <div class="prompt-box good"><span class="label">python</span>log[(log.truth == 1) &amp; ~q]</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Break it on purpose: or instead of and</h4>
+        <p>Replace every <code>&amp;</code> in the mask with <code>|</code>. The query now returns 22 of 24 events, all 6 real ones among them: recall is perfect and precision is 27%. A mined set that big is not a query, it is the log again. Put the <code>&amp;</code> back.</p>
+        <div class="prompt-box good"><span class="label">python</span>q_or = ((log.actor == "pedestrian") | (log.occluded == 1)
+        | (log.dist_m &lt;= 30) | (log.ttc_s &lt;= 3))
+len(log[q_or]), log[q_or].truth.sum()</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Plan the recall audit</h4>
+        <p>Write one line: how many skipped clips you would review at random, and what bound an empty result buys you (about 3 / n at 95%). On a real log this sample is drawn from millions of skipped clips, not 19.</p>
+      </div></div>
+    </div>
+
+    <div class="callout tip">
+      <p><strong>The habit to keep.</strong> Ship every scenario query with three things attached: the filter definitions in plain words, the precision from a reviewed sample of what it returned, and either a recall audit of what it skipped or the sentence "recall not measured". A mined set without that third line looks complete and is not.</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="section" id="quiz">
+    <div class="section-kicker">
+      <span class="klabel">Check yourself</span>
+      <h2>Three questions</h2>
+    </div>
+
+    <div class="quiz-q" data-answer="1">
+      <p class="qtext">On Lanehart's constructed table, tightening the query from four filters at 40 m and 4 s to 30 m and 3 s moves precision from 71% to 60% and recall from 5 of 6 to 3 of 6. What does that show?</p>
+      <button class="qopt" type="button">A · Tighter thresholds always raise precision, so the table must be wrong</button>
+      <button class="qopt" type="button">B · Thresholds are definitions with edges; a tighter one can drop real scenarios faster than look-alikes, so it has to be checked, not assumed</button>
+      <button class="qopt" type="button">C · Recall does not matter as long as the mined set is not empty</button>
+      <p class="qwhy">The 30 m cut dropped a real step-out at 34 m, and the 3 s cut dropped one at 3.4 s, while the look-alikes stayed. Whether a filter helps is an empirical question about the rows it removes.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="2">
+      <p class="qtext">Event e05 is a real step-out whose occlusion flag was never set. Which change finds it?</p>
+      <button class="qopt" type="button">A · Loosen the distance to 40 m</button>
+      <button class="qopt" type="button">B · Loosen the time to collision to 4 s</button>
+      <button class="qopt" type="button">C · Fix or drop the occlusion requirement; no threshold on another column can bring back a row the flag excludes</button>
+      <p class="qwhy">A query inherits the misses of the pipeline that made its columns. When a real scenario is lost on a flag, the fix is upstream (or a looser definition), never a different threshold.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="0">
+      <p class="qtext">A team reports "our mined set is 95% precise". What is missing before anyone should trust it as a test library?</p>
+      <button class="qopt" type="button">A · Recall: an audit of a random sample of the clips the query skipped, or an honest "recall not measured"</button>
+      <button class="qopt" type="button">B · Nothing; 95% precision means it holds 95% of the scenarios</button>
+      <button class="qopt" type="button">C · A larger mined set, which always raises recall to 100%</button>
+      <p class="qwhy">Precision is measured on what came back; it says nothing about what did not. The or-query in the build-along has perfect recall and 27% precision, so size alone is not the fix either.</p>
+    </div>
+
+    <div class="quiz-score"></div>
+  </section>
+
+  <!-- ============ HOMEWORK ============ -->
+  <section class="section" id="homework">
+    <div class="section-kicker">
+      <span class="klabel">Before session 4</span>
+      <h2>Homework</h2>
+    </div>
+    <p class="lede">Thirty minutes, in your own notebook.</p>
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Write a second scenario as a query</h4>
+        <p>Pick another of Lanehart's constructed classes (a wrong-way vehicle on a divided road, debris in lane at highway speed, an emergency vehicle crossing a junction) and write the columns and filters it needs. Add six rows of your own to the table, three real and three look-alikes, and run it. Your numbers will differ; write the definition before the code.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Add a fuzzy version of the occlusion filter</h4>
+        <p>Replace the 0/1 flag with a share of the track hidden (0 to 1) for the 24 rows, using your own values, and filter on "hidden at least 20% of the time". Check whether e05 comes back and what it costs in look-alikes.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Find one query at work with no recall line</h4>
+        <p>Any saved query or dashboard filter that "finds the cases": write down what it would miss, and how you would sample the skipped rows to find out.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ OFFICIAL ============ -->
+  <section class="section" id="official">
+    <div class="section-kicker">
+      <span class="klabel">Covered tonight</span>
+      <h2>What this session covers</h2>
+    </div>
+    <div class="covered">
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Why mine the encounter, not the failure</span><span class="note">Lanehart's constructed rare classes: occluded pedestrian 4,000 x 0.003 = 12 per 100M miles; tail total 46. Encounter about 333 times more common (derived).</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">A scenario query as four filters</span><span class="note">Actor type, occlusion, distance, time to collision, over a constructed 24-event table: 24, 14, 9, 8, 5 rows kept.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Precision of the mined set</span><span class="note">60% at the defaults, 71% at 40 m and 4 s; measured by reviewing a sample of what came back.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Recall and the skipped pile</span><span class="note">3 of 6 at the defaults; measured only by auditing skipped clips. Rule of three, Hanley and Lippman-Hand (1983), reported.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">What a drive log can be filtered on</span><span class="note">23 classes, 8 attributes, 2 Hz keyframes. Caesar et al. (2020), a public multi-sensor research dataset paper, read at source.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Scenario testing as an alternative to driving</span><span class="note">Named from Kalra and Paddock (2016), RAND RR-1478, read at source. Simulation in practitioner session 6.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Training mix vs evaluation slices</span><span class="note">Named tonight. Practitioner session 4.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Generic anomaly detectors</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-anomaly-detection-with-phoebe/courses/b2-statistical-detectors.html">learn anomaly detection, statistical detectors</a>. Here, scenarios are found by query, not detected.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Real fleet logs</span><span class="note">Out of scope by design. Lanehart's 24 events are constructed; no dataset rows are shipped.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section class="section" id="cheatsheet">
+    <div class="section-kicker">
+      <span class="klabel">Take this with you</span>
+      <h2>Cheat sheet</h2>
+    </div>
+    <div class="cheat">
+      <div class="cheat-item"><strong>The one sentence.</strong> A rare scenario is found by a query, and the query's misses never appear in its result.</div>
+      <div class="cheat-item"><strong>Mine the encounter.</strong> Constructed: 4,000 occluded-pedestrian encounters vs 12 failures per 100M miles.</div>
+      <div class="cheat-item"><strong>Four filters.</strong> Actor type, occlusion, distance, time to collision. Each is a definition with an edge.</div>
+      <div class="cheat-item"><strong>The funnel.</strong> Constructed: 24, 14, 9, 8, 5 events kept; 6, 6, 5, 4, 3 real.</div>
+      <div class="cheat-item"><strong>Precision.</strong> Share of the mined set that is real. Cheap: review a sample of what came back.</div>
+      <div class="cheat-item"><strong>Recall.</strong> Share of real scenarios found. Expensive: audit a sample of what was skipped.</div>
+      <div class="cheat-item"><strong>Empty audit.</strong> 0 in n skipped clips: miss rate below about 3 / n at 95% (rule of three, reported).</div>
+      <div class="cheat-item"><strong>Upstream misses.</strong> A flag perception never set cannot be fixed by loosening another threshold.</div>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    <div class="wrap">
+      <p>Practitioner session 3 of 10 · learn-autonomous-driving-with-phoebe · by Phoebe Fu</p>
+      <nav class="pagenav">
+        <a href="p2-labels-cost-by-the-frame.html">← Practitioner session 2 · Labels cost by the frame</a>
+        <a href="p4-curating-for-the-tail.html">Practitioner session 4 · Curating for the tail →</a>
+      </nav>
+    </div>
+  </footer>
+
+</main>
+
+<script src="../assets/app.js?v=1"></script>
+<script>
+(function () {
+  var LOG = [
+    ["e01", "pedestrian", 12, 1, 1.4, 1], ["e02", "pedestrian", 18, 1, 1.9, 1],
+    ["e03", "pedestrian", 25, 1, 2.6, 1], ["e04", "pedestrian", 22, 1, 3.4, 1],
+    ["e05", "pedestrian", 15, 0, 1.7, 1], ["e06", "pedestrian", 34, 1, 2.2, 1],
+    ["e07", "pedestrian", 9, 1, 1.2, 0], ["e08", "pedestrian", 28, 1, 2.8, 0],
+    ["e09", "pedestrian", 16, 1, 9.0, 0], ["e10", "pedestrian", 14, 0, 1.5, 0],
+    ["e11", "pedestrian", 40, 0, 6.0, 0], ["e12", "pedestrian", 11, 0, 8.5, 0],
+    ["e13", "pedestrian", 30, 1, 4.5, 0], ["e14", "pedestrian", 19, 0, 2.4, 0],
+    ["e15", "cyclist", 13, 1, 1.6, 0], ["e16", "cyclist", 24, 1, 2.9, 0],
+    ["e17", "cyclist", 35, 0, 5.0, 0], ["e18", "vehicle", 20, 1, 1.8, 0],
+    ["e19", "vehicle", 45, 0, 3.0, 0], ["e20", "vehicle", 8, 0, 0.9, 0],
+    ["e21", "vehicle", 60, 1, 7.0, 0], ["e22", "vehicle", 27, 0, 2.1, 0],
+    ["e23", "vehicle", 33, 1, 3.8, 0], ["e24", "vehicle", 50, 0, 9.5, 0]
+  ];
+  var actor = document.getElementById("lhp3-actor");
+  var occ = document.getElementById("lhp3-occ");
+  var dist = document.getElementById("lhp3-dist");
+  var ttc = document.getElementById("lhp3-ttc");
+  var out = document.getElementById("lhp3-out");
+  var verdict = document.getElementById("lhp3-verdict");
+  if (!actor || !out) return;
+  var TOTAL = LOG.filter(function (r) { return r[5] === 1; }).length;
+  function render() {
+    var a = actor.value, o = occ.value, d = Number(dist.value), t = Number(ttc.value);
+    var mined = LOG.filter(function (r) {
+      return (a === "any" || r[1] === a) && (o === "any" || r[3] === 1) && r[2] <= d && r[4] <= t;
+    });
+    var hits = mined.filter(function (r) { return r[5] === 1; }).length;
+    var missed = LOG.filter(function (r) { return r[5] === 1 && mined.indexOf(r) < 0; });
+    var html = '<table class="sql-table"><thead><tr><th>Event</th><th>Actor</th><th>Distance</th><th>Occluded</th><th>TTC</th><th>Reviewer</th></tr></thead><tbody>';
+    if (!mined.length) html += '<tr><td colspan="6">No events match these filters.</td></tr>';
+    mined.forEach(function (r) {
+      html += '<tr' + (r[5] ? ' class="lhp3-real"' : "") + "><td>" + r[0] + "</td><td>" + r[1] + "</td><td>" + r[2] + " m</td><td>" + (r[3] ? "yes" : "no") + "</td><td>" + r[4].toFixed(1) + " s</td><td>" + (r[5] ? "<b>real</b>" : "look-alike") + "</td></tr>";
+    });
+    html += "</tbody></table>";
+    out.innerHTML = html;
+    var prec = mined.length ? Math.round(100 * hits / mined.length) + "%" : "undefined (nothing returned)";
+    verdict.textContent = "Mined set: " + mined.length + " of " + LOG.length + " events, " + hits + " real. Precision " + prec + ", recall " + hits + " of " + TOTAL + "." +
+      (missed.length ? " Real scenarios never returned: " + missed.map(function (r) { return r[0]; }).join(", ") + ". On a real log this list does not exist until someone audits the skipped clips." : " Every real scenario came back.");
+  }
+  [actor, occ, dist, ttc].forEach(function (el) { el.addEventListener("change", render); });
+  render();
+})();
+</script>
+<style>
+  #lhp3-query .sql-code { border: 1px solid var(--hairline); border-radius: 8px; max-width: 24rem; }
+  #lhp3-query table.sql-table { margin: .6rem 0 .2rem; font-size: .85rem; }
+  #lhp3-query tr.lhp3-real td { background: var(--amber-50); }
+</style>
+</body>
+</html>

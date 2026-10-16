@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- social:start -->
+<meta name="description" content="Practitioner session 5 of 10. One headline recall is a weighted average that the nearest, easiest pedestrians dominate. Slice it by distance band and scenario and a candidate model that lifts the headline from 90.0% to 91.3% turns out to miss far and partly hidden pedestrians far more often. Lanehart and its evaluation set are constructed.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Learn with Phoebe">
+<meta property="og:title" content="Perception metrics that hide failures - learn autonomous driving with phoebe">
+<meta property="og:description" content="Practitioner session 5 of 10. Recall by distance band and scenario, and how a better headline can hide a worse car.">
+<meta property="og:url" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/courses/p5-perception-metrics-that-hide-failures.html">
+<meta property="og:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Perception metrics that hide failures - learn autonomous driving with phoebe">
+<meta name="twitter:description" content="Headline recall up 1.3 points. Recall beyond 80 m down 12.6. Slice before you ship.">
+<meta name="twitter:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<!-- social:end -->
+<title>Practitioner session 5 · Perception metrics that hide failures - learn autonomous driving with phoebe</title>
+<link rel="stylesheet" href="../assets/style.css?v=2">
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="wrap">
+    <span class="crumb"><a href="../index.html">learn-autonomous-driving-with-phoebe</a> / Practitioner session 5 of 10</span>
+    <button class="btn" id="toggle-all" type="button">Expand all</button>
+    <button class="btn primary" id="zoom-toggle" type="button">Projector zoom: off</button>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Learn Autonomous Driving with Phoebe · Practitioner session 5 of 10</div>
+    <h1>Perception metrics that <span class="accent">hide failures</span></h1>
+    <p class="sub">A perception team reports one recall number for pedestrians, and the number goes up. That number is an average over every labelled pedestrian in the evaluation set, and most of them are close, in daylight and fully visible. The pedestrians the car most needs to see early are a small share of the set, so they barely move the average. Slice recall by distance band and by scenario and the same release can be better at the easy cases and worse at the hard ones. Lanehart, a constructed robotaxi pilot fleet in a fictional city, supplies the evaluation set; every count on the page is constructed.</p>
+    <div class="chip-row">
+      <span class="chip level">🟡 Working depth</span>
+      <span class="chip audience">Data scientists and ML engineers who evaluate models</span>
+      <span class="chip audience">Analysts who build the release dashboard</span>
+      <span class="chip time">45 min</span>
+    </div>
+    <div class="agenda">
+      <span class="a1" style="flex:1">0-3 · Welcome</span>
+      <span class="a2" style="flex:3">3-18 · One number, four bands</span>
+      <span class="a3" style="flex:2">18-28 · A better headline</span>
+      <span class="a4" style="flex:4">28-45 · Build-along and Q&amp;A</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ INTRO ============ -->
+  <section class="section" id="intro">
+    <div class="section-kicker">
+      <span class="klabel">Part 0</span>
+      <h2>Lanehart's release note said "recall up"</h2>
+    </div>
+    <p class="lede">Lanehart is a constructed robotaxi pilot. Its perception team has a candidate pedestrian detector, and the release note says headline recall on the evaluation set rose from 90.0% to 91.3%. The evaluation set is constructed too: 10,000 labelled pedestrians, each tagged with how far away it was and what the scene was like. Nobody has lied. The question for tonight is what that one number is an average of, and what it is hiding.</p>
+
+    <div class="legend">
+      <span class="pill">Live = worked through in the 45 minutes</span>
+      <span class="pill">Self-study = the full depth, after class</span>
+      <span class="pill">🔍 Every diagram zooms</span>
+    </div>
+
+    <div class="callout win">
+      <p><strong>★ What you walk out with tonight.</strong> The headline recall written as a weighted average of slice recalls, with the weights showing whose pedestrians count. Distance bands whose edges come from the sensor, using the lidar range a public multi-sensor research dataset reports (typically 50 to 150 m). A constructed comparison where the candidate gains 1.3 points of headline and loses 12.6 points beyond 80 m and 11.7 points on partly hidden pedestrians. A rule for slices too small to judge. And a pandas script that prints the whole slice table from labelled rows.</p>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Recall, said plainly<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p><strong>Recall</strong> is the share of real objects the detector found. Take every labelled pedestrian in the evaluation set, ask whether a detection was matched to it, and divide the matches by the pedestrians. A missed pedestrian lowers recall; a false alarm does not touch it (that is precision, the other half).</p>
+        <p>For a car, a missed pedestrian is the failure that matters first, which is why recall is the headline. The trap is the word "every": the answer depends entirely on which pedestrians happen to be in the set.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>Ground truth only exists where somebody labelled it. The public multi-sensor research dataset from session 1 labels keyframes at 2 Hz, 40,000 of them, and the authors report that those labels interpolate well to 10 or 20 Hz. So an evaluation set is a sample of labelled moments, and its mix of near and far, clear and hidden, was decided by what was driven and what was labelled, not by what the car will meet.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>The words that keep coming back<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Headline metric.</strong> One number over the whole evaluation set.</li>
+          <li><strong>Slice.</strong> A subset defined by a condition (distance band, light, weather, occlusion) and scored on its own.</li>
+          <li><strong>Distance band.</strong> A slice by range from the car, with edges chosen in metres.</li>
+          <li><strong>Occluded.</strong> Partly hidden behind something, here a parked vehicle; the label still exists, the pixels and points are fewer.</li>
+          <li><strong>Match.</strong> The rule that pairs a detection with a labelled object. Its threshold is a choice, and recall moves when it moves.</li>
+          <li><strong>Constructed.</strong> The 10,000 pedestrians and both models' hits are invented for teaching; your numbers will differ.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="section" id="part-1">
+    <div class="section-kicker">
+      <span class="klabel">Part 1 · covers the headline as a weighted average, distance bands</span>
+      <h2>One number, four distance bands</h2>
+      <span class="tag concept">15 min live</span>
+    </div>
+    <p class="lede">Put the 10,000 constructed pedestrians on the road in front of the car and group them by distance. Sixty percent stand within 30 m, five percent stand beyond 80 m. The current model finds 94.8% of the near ones and 54.2% of the far ones. The headline, 90.0%, sits almost on top of the near band, because the near band is most of the set.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 418" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn road ahead of a car, split into four distance bands: 0 to 30 metres, 30 to 50, 50 to 80 and 80 to 150. Marks show found and missed pedestrians in each band. Below, bars of the current model's recall per band on the constructed evaluation set: 94.8% for 0 to 30 metres with 60% of the set, 90.9% for 30 to 50 with 25%, 77.3% for 50 to 80 with 10%, and 54.2% for 80 to 150 metres with 5%, highlighted. A dashed line marks the headline recall of 90.0%, close to the near bands.">
+        <defs>
+          <filter id="lhp5aSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="51" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp5aHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp5aAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp5aH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp5aL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp5aS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp5aB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lhp5aV { font: 800 16px Inter, sans-serif; fill: #1C2328; }
+          .lhp5aA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp5aN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp5aH" x="30" y="26">10,000 LABELLED PEDESTRIANS, GROUPED BY DISTANCE FROM THE CAR (CONSTRUCTED)</text>
+        <text class="lhp5aB" x="600" y="54" text-anchor="middle">lidar range typically 50-150 m (paper's own description)</text>
+
+        <g filter="url(#lhp5aSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M350 68 L350 62 L850 62 L850 68" stroke="#6B5200"/>
+          <rect x="100" y="80" width="750" height="80" rx="6" transform="rotate(-0.3 475 120)" fill="#F1F3F4"/>
+          <path d="M110 120 L140 120 M170 120 L200 120 M230 120 L260 120 M290 120 L320 120 M350 120 L380 120 M410 120 L440 120 M470 120 L500 120 M530 120 L560 120 M590 120 L620 120 M650 120 L680 120 M710 120 L740 120 M770 120 L800 120" stroke="#CED4D9" stroke-width="3"/>
+          <path d="M250 74 L250 166 M350 74 L350 166 M500 74 L500 166" stroke="#8C979F" stroke-dasharray="5 5"/>
+          <rect x="34" y="104" width="54" height="32" rx="7" transform="rotate(-2 61 120)" fill="#FFFFFF"/>
+          <circle cx="46" cy="138" r="5" fill="#FFFFFF"/>
+          <circle cx="76" cy="138" r="5" fill="#FFFFFF"/>
+          <path d="M88 112 L96 108 M88 128 L96 132" stroke="#2F3A42"/>
+          <circle cx="118" cy="100" r="6" fill="#1C2328"/><circle cx="146" cy="100" r="6" fill="#1C2328"/><circle cx="174" cy="100" r="6" fill="#1C2328"/><circle cx="202" cy="100" r="6" fill="#1C2328"/><circle cx="230" cy="100" r="6" fill="#1C2328"/>
+          <circle cx="118" cy="140" r="6" fill="#1C2328"/><circle cx="146" cy="140" r="6" fill="#1C2328"/><circle cx="174" cy="140" r="6" fill="#1C2328"/><circle cx="202" cy="140" r="6" fill="#1C2328"/><circle cx="230" cy="140" r="6" fill="#FFFFFF"/>
+          <circle cx="263" cy="100" r="5" fill="#1C2328"/><circle cx="281" cy="100" r="5" fill="#1C2328"/><circle cx="299" cy="100" r="5" fill="#1C2328"/><circle cx="317" cy="100" r="5" fill="#1C2328"/><circle cx="335" cy="100" r="5" fill="#1C2328"/>
+          <circle cx="263" cy="140" r="5" fill="#1C2328"/><circle cx="281" cy="140" r="5" fill="#1C2328"/><circle cx="299" cy="140" r="5" fill="#1C2328"/><circle cx="317" cy="140" r="5" fill="#1C2328"/><circle cx="335" cy="140" r="5" fill="#FFFFFF"/>
+          <circle cx="368" cy="100" r="6" fill="#1C2328"/><circle cx="396" cy="100" r="6" fill="#1C2328"/><circle cx="424" cy="100" r="6" fill="#1C2328"/><circle cx="452" cy="100" r="6" fill="#1C2328"/><circle cx="480" cy="100" r="6" fill="#1C2328"/>
+          <circle cx="368" cy="140" r="6" fill="#1C2328"/><circle cx="396" cy="140" r="6" fill="#1C2328"/><circle cx="424" cy="140" r="6" fill="#1C2328"/><circle cx="452" cy="140" r="6" fill="#FFFFFF"/><circle cx="480" cy="140" r="6" fill="#FFFFFF"/>
+          <circle cx="540" cy="100" r="6" fill="#1C2328"/><circle cx="610" cy="100" r="6" fill="#1C2328"/><circle cx="680" cy="100" r="6" fill="#1C2328"/><circle cx="750" cy="100" r="6" fill="#1C2328"/><circle cx="820" cy="100" r="6" fill="#1C2328"/>
+          <circle cx="540" cy="140" r="6" fill="#FFFFFF"/><circle cx="610" cy="140" r="6" fill="#FFFFFF"/><circle cx="680" cy="140" r="6" fill="#FFFFFF"/><circle cx="750" cy="140" r="6" fill="#FFFFFF"/><circle cx="820" cy="140" r="6" fill="#FFFFFF"/>
+          <path d="M100 172 L100 178 M250 172 L250 178 M350 172 L350 178 M500 172 L500 178 M850 172 L850 178" stroke="#2F3A42"/>
+          <path d="M120 320 L850 320"/>
+          <rect x="145" y="225.2" width="60" height="94.8" rx="3" transform="rotate(-0.6 175 272)" fill="url(#lhp5aHc)"/>
+          <rect x="270" y="229.1" width="60" height="90.9" rx="3" transform="rotate(0.6 300 274)" fill="url(#lhp5aHc)"/>
+          <rect x="395" y="242.7" width="60" height="77.3" rx="3" transform="rotate(-0.5 425 281)" fill="url(#lhp5aHc)"/>
+          <rect x="645" y="265.8" width="60" height="54.2" rx="3" transform="rotate(0.7 675 293)" fill="#F2C230"/>
+          <path d="M120 230 L850 230" stroke="#2F3A42" stroke-dasharray="7 6"/>
+        </g>
+
+        <text class="lhp5aA" x="100" y="194" text-anchor="middle">0 m</text>
+        <text class="lhp5aA" x="250" y="194" text-anchor="middle">30</text>
+        <text class="lhp5aA" x="350" y="194" text-anchor="middle">50</text>
+        <text class="lhp5aA" x="500" y="194" text-anchor="middle">80</text>
+        <text class="lhp5aA" x="850" y="194" text-anchor="end">150 m</text>
+
+        <text class="lhp5aL" x="24" y="228">headline</text>
+        <text class="lhp5aV" x="24" y="250">90.0%</text>
+
+        <text class="lhp5aL" x="175" y="340" text-anchor="middle">0-30 m</text>
+        <text class="lhp5aL" x="300" y="340" text-anchor="middle">30-50 m</text>
+        <text class="lhp5aL" x="425" y="340" text-anchor="middle">50-80 m</text>
+        <text class="lhp5aL" x="675" y="340" text-anchor="middle">80-150 m</text>
+        <text class="lhp5aV" x="175" y="361" text-anchor="middle">94.8%</text>
+        <text class="lhp5aV" x="300" y="361" text-anchor="middle">90.9%</text>
+        <text class="lhp5aV" x="425" y="361" text-anchor="middle">77.3%</text>
+        <text class="lhp5aV" x="675" y="361" text-anchor="middle">54.2%</text>
+        <text class="lhp5aS" x="175" y="378" text-anchor="middle">60% of the set</text>
+        <text class="lhp5aS" x="300" y="378" text-anchor="middle">25%</text>
+        <text class="lhp5aS" x="425" y="378" text-anchor="middle">10%</text>
+        <text class="lhp5aS" x="675" y="378" text-anchor="middle">5% of the set</text>
+
+        <text class="lhp5aN" x="30" y="402">Ten marks per band, hollow = missed, rounded from the band's recall. Current model, constructed set; your numbers will differ.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the headline line runs through the near bars; the yellow band, where the car has the most time to react, barely moves it.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>The headline is a weighted average<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Write the headline out and the hiding place is visible. Overall recall is each band's recall times that band's share of the set, added up:</p>
+        <p class="mono">0.60 x 94.8 + 0.25 x 90.9 + 0.10 x 77.3 + 0.05 x 54.2 = 90.0</p>
+        <p>The far band carries a weight of 0.05. If its recall fell by 10 points, the headline would fall by half a point, which is inside the wobble a team expects between two training runs. The near band carries 0.60: a 1 point gain there lifts the headline by 0.6. Any change that trades far pedestrians for near ones looks like progress.</p>
+        <p>The weights are not a law of nature. They are the mix of the evaluation set, which came from what was driven and what was labelled. Change the set and the same model gets a different headline.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Why distance is the first slice<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>A pedestrian twice as far away covers far fewer camera pixels and returns far fewer lidar points. The paper behind the public multi-sensor research dataset describes its lidar range as typically 50 to 150 m and radar to about 200 m. So the far band is where the sensors are thinnest, and it is also where a moving car still has room to slow down gently. A miss at 120 m is a lost head start; a miss at 20 m is a miss that never gets a second look.</p>
+        <p>Slicing by distance is not a statistical refinement. It asks the question the planner asks: at what range can I rely on this detector?</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>ISO 21448 (safety of the intended functionality, reported, concepts only) names hazards that arise with no fault at all, from performance limits of a system working as designed. A detector that misses half the pedestrians beyond 80 m has no broken part. Only a slice shows that limit; the headline averages it away.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Choosing band edges<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Lanehart's edges (30, 50, 80, 150 m) are constructed. Pick yours from two facts you can defend: where the sensors change character (the reported 50 to 150 m lidar range is one such edge) and the distances the planner cares about at the speeds your car drives. Write the reason beside each edge.</p>
+        <p>Keep the edges fixed between releases. A band that moves every time someone retrains is a slice nobody can compare. And keep the last band bounded: pedestrians labelled beyond the sensor's range belong in their own row, not quietly averaged into the far band.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="section" id="part-2">
+    <div class="section-kicker">
+      <span class="klabel">Part 2 · covers scenario slices, comparing two models, small slices</span>
+      <h2>A better headline, a worse car</h2>
+      <span class="tag concept">10 min live</span>
+    </div>
+    <p class="lede">Now score the candidate on the same 10,000 constructed pedestrians and draw each slice as a pair of dots. The headline rises 1.3 points. Every near slice rises. Beyond 80 m the candidate drops from 54.2% to 41.6%, and on partly hidden pedestrians from 51.3% to 39.7%. The release note was true and would have shipped a regression where it matters most.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn dumbbell chart comparing the current and candidate models on the constructed evaluation set. Headline recall 90.0% to 91.3%, up 1.3 points. By distance band: 0 to 30 metres 94.8% to 96.1%; 30 to 50, 90.9% to 94.2%; 50 to 80, 77.3% to 80.2%; 80 to 150 metres 54.2% to 41.6%, down 12.6 points, highlighted. By scenario: clear 93.1% to 94.5%; night 83.8% to 87.9%; rain 79.2% to 79.4%; occluded 51.3% to 39.7%, down 11.7 points, highlighted.">
+        <defs>
+          <filter id="lhp5bSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="53" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp5bHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp5bAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp5bH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp5bL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp5bS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp5bB { font: 800 11px Inter, sans-serif; fill: #6B5200; }
+          .lhp5bA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp5bN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp5bH" x="30" y="28">SAME 10,000 PEDESTRIANS, TWO MODELS (CONSTRUCTED)</text>
+        <text class="lhp5bS" x="560" y="28">hollow = current</text>
+        <text class="lhp5bS" x="680" y="28">filled = candidate</text>
+        <text class="lhp5bA" x="866" y="64" text-anchor="end">change</text>
+
+        <g filter="url(#lhp5bSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="548" cy="24" r="5" fill="#FFFFFF"/>
+          <circle cx="668" cy="24" r="5" fill="#2F3A42"/>
+          <rect x="24" y="86" width="840" height="30" rx="6" transform="rotate(-0.2 444 101)" fill="url(#lhp5bHc)" stroke="#8C979F"/>
+          <path d="M300 80 L300 412 M448.6 80 L448.6 412 M597.1 80 L597.1 412 M745.7 80 L745.7 412" stroke="#E2E6E9" stroke-width="1.5"/>
+          <path d="M745.9 101 L755.4 101"/><circle cx="745.9" cy="101" r="6" fill="#FFFFFF"/><circle cx="755.4" cy="101" r="6" fill="#2F3A42"/>
+          <path d="M781.4 162 L791.0 162"/><circle cx="781.4" cy="162" r="6" fill="#FFFFFF"/><circle cx="791.0" cy="162" r="6" fill="#2F3A42"/>
+          <path d="M752.4 192 L776.9 192"/><circle cx="752.4" cy="192" r="6" fill="#FFFFFF"/><circle cx="776.9" cy="192" r="6" fill="#2F3A42"/>
+          <path d="M651.4 222 L672.9 222"/><circle cx="651.4" cy="222" r="6" fill="#FFFFFF"/><circle cx="672.9" cy="222" r="6" fill="#2F3A42"/>
+          <path d="M479.8 252 L386.2 252" stroke-width="3"/><circle cx="479.8" cy="252" r="6" fill="#FFFFFF"/><circle cx="386.2" cy="252" r="8" fill="#F2C230"/>
+          <path d="M768.7 310 L779.1 310"/><circle cx="768.7" cy="310" r="6" fill="#FFFFFF"/><circle cx="779.1" cy="310" r="6" fill="#2F3A42"/>
+          <path d="M699.6 340 L730.1 340"/><circle cx="699.6" cy="340" r="6" fill="#FFFFFF"/><circle cx="730.1" cy="340" r="6" fill="#2F3A42"/>
+          <path d="M665.5 370 L667.0 370"/><circle cx="665.5" cy="370" r="6" fill="#FFFFFF"/><circle cx="667.0" cy="370" r="6" fill="#2F3A42"/>
+          <path d="M458.2 400 L372.1 400" stroke-width="3"/><circle cx="458.2" cy="400" r="6" fill="#FFFFFF"/><circle cx="372.1" cy="400" r="8" fill="#F2C230"/>
+          <path d="M300 420 L820 420"/>
+          <path d="M300 420 L300 426 M448.6 420 L448.6 426 M597.1 420 L597.1 426 M745.7 420 L745.7 426 M820 420 L820 426" stroke="#2F3A42"/>
+        </g>
+
+        <text class="lhp5bL" x="36" y="105">Headline, all 10,000</text>
+        <text class="lhp5bL" x="860" y="105" text-anchor="end">+1.3</text>
+
+        <text class="lhp5bA" x="30" y="140">BY DISTANCE BAND</text>
+        <text class="lhp5bL" x="36" y="166">0-30 m (n 6,000)</text>
+        <text class="lhp5bL" x="36" y="196">30-50 m (n 2,500)</text>
+        <text class="lhp5bL" x="36" y="226">50-80 m (n 1,000)</text>
+        <text class="lhp5bL" x="36" y="256">80-150 m (n 500)</text>
+        <text class="lhp5bS" x="866" y="166" text-anchor="end">+1.4</text>
+        <text class="lhp5bS" x="866" y="196" text-anchor="end">+3.3</text>
+        <text class="lhp5bS" x="866" y="226" text-anchor="end">+2.9</text>
+        <text class="lhp5bB" x="866" y="256" text-anchor="end">-12.6</text>
+
+        <text class="lhp5bA" x="30" y="288">BY SCENARIO</text>
+        <text class="lhp5bL" x="36" y="314">clear daylight (n 8,000)</text>
+        <text class="lhp5bL" x="36" y="344">night (n 1,200)</text>
+        <text class="lhp5bL" x="36" y="374">rain (n 500)</text>
+        <text class="lhp5bL" x="36" y="404">partly occluded (n 300)</text>
+        <text class="lhp5bS" x="866" y="314" text-anchor="end">+1.4</text>
+        <text class="lhp5bS" x="866" y="344" text-anchor="end">+4.1</text>
+        <text class="lhp5bS" x="866" y="374" text-anchor="end">+0.2</text>
+        <text class="lhp5bB" x="866" y="404" text-anchor="end">-11.7</text>
+
+        <text class="lhp5bA" x="300" y="440" text-anchor="middle">30%</text>
+        <text class="lhp5bA" x="448.6" y="440" text-anchor="middle">50%</text>
+        <text class="lhp5bA" x="597.1" y="440" text-anchor="middle">70%</text>
+        <text class="lhp5bA" x="745.7" y="440" text-anchor="middle">90%</text>
+        <text class="lhp5bA" x="820" y="440" text-anchor="middle">100%</text>
+
+        <text class="lhp5bN" x="30" y="468">Change in recall points, candidate minus current. Constructed set and models; your numbers will differ.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - seven rows move right, the headline among them; the two yellow dots moved left, and they are the pedestrians the car most needs.</figcaption>
+    </figure>
+
+    <div class="wk" id="lhp5-slice">
+      <div class="wk-head">
+        <b>Live</b>
+        <span class="wk-hint">Constructed evaluation set: 10,000 labelled pedestrians from Lanehart's log, each tagged with a distance band and a scenario, scored by the current and the candidate model. Pick how to group them. The read column compares 95% Wilson intervals, computed in this page.</span>
+      </div>
+      <div class="wk-body">
+        <label class="sql-label" for="lhp5-by">Group recall by</label>
+        <select class="sql-code" id="lhp5-by">
+          <option value="all" selected>nothing (the headline)</option>
+          <option value="band">distance band</option>
+          <option value="scen">scenario</option>
+          <option value="small">band x scenario cells under 50 pedestrians</option>
+        </select>
+        <div id="lhp5-out"></div>
+        <p class="sql-note" id="lhp5-verdict">...</p>
+      </div>
+      <div class="wk-foot" id="lhp5-foot">Every count here is constructed for teaching. Your numbers will differ on your own evaluation set.</div>
+    </div>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Read the candidate off the table<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Headline:</strong> 90.0% to 91.3%. The intervals do not overlap, so the rise is real. It is also the least useful row.</li>
+          <li><strong>Near bands:</strong> 0-30 m and 30-50 m both rise clearly. The candidate has got better at the pedestrians the old model already found.</li>
+          <li><strong>Beyond 80 m:</strong> 54.2% to 41.6% on 500 pedestrians; intervals 49.8 to 58.5% against 37.4 to 46.0%. Real, and in the wrong direction.</li>
+          <li><strong>Partly occluded:</strong> 51.3% to 39.7% on 300; also clear of noise.</li>
+          <li><strong>Rain:</strong> 79.2% to 79.4%. No change you can claim either way.</li>
+        </ul>
+        <p>The pattern is common enough to name: tuning that sharpens confident detections can drop the faint ones. The headline rewards it, because faint pedestrians are a small share of the set.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>When a slice is too small to judge<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Slice far enough and the cells empty out. Only 15 of the constructed pedestrians are both beyond 80 m and partly occluded. The current model found 5 (33.3%), the candidate 3 (20.0%). That looks like a 13 point fall, but the 95% intervals are 15.2 to 58.3% and 7.0 to 45.2%: 15 pedestrians cannot tell 20% from 45%.</p>
+        <p>So print the interval beside every slice, and treat a small cell as a request for more labelled examples of that kind, not as a verdict. That request is how a slice table feeds practitioner session 3 (mining the fleet for those moments) and session 4 (keeping them in evaluation).</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>A sharper comparison, and where general metrics live<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Both models were scored on the same pedestrians, so the comparison is paired: count the pedestrians the current model found and the candidate missed, and the reverse. A paired test is sharper than checking whether two intervals overlap; overlap is the cautious first pass, and it errs towards "within noise".</p>
+        <p>Precision, average precision, calibration and the general case against a single score are owned by <a href="https://phoebefu6.github.io/learn-model-evaluation-with-phoebe/courses/a1-why-one-number-lies.html">learn model evaluation</a>. The side taken here is narrower: for a perception model, the slices are distance bands and driving scenarios, and their edges come from the sensor and the road.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 3 ============ -->
+  <section class="section" id="part-3">
+    <div class="section-kicker">
+      <span class="klabel">Part 3 · build-along</span>
+      <h2>Build the slice table in pandas</h2>
+      <span class="tag build">17 min hands on</span>
+    </div>
+    <p class="lede">Rebuild the widget from labelled rows and print the same table. The counts below are the constructed set; in real work the rows come from matching detections to labels, one row per labelled object. The figure is the plan: one row per pedestrian, two tags, one group-by, an interval and a flag.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 270" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn plan. Labelled pedestrians and detections are matched into one row per pedestrian with hit flags for each model. Each row is tagged with a distance band and a scenario. A group-by produces recall per slice for both models. A yellow chip says print a 95% interval beside every slice; a second chip says flag slices under 50 pedestrians as too small to call. The output is the slice table.">
+        <defs>
+          <filter id="lhp5cSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="55" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp5cHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp5cAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp5cH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp5cL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp5cS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp5cK { font: 700 11px Inter, sans-serif; fill: #1A1F23; }
+          .lhp5cN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <g filter="url(#lhp5cSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="40" width="180" height="96" rx="8" transform="rotate(-0.8 120 88)" fill="url(#lhp5cHc)"/>
+          <path d="M214 88 L238 88" marker-end="url(#lhp5cAr)"/>
+          <rect x="244" y="40" width="180" height="96" rx="8" transform="rotate(0.6 334 88)" fill="#F1F3F4"/>
+          <path d="M428 88 L452 88" marker-end="url(#lhp5cAr)"/>
+          <rect x="458" y="40" width="180" height="96" rx="8" transform="rotate(-0.5 548 88)" fill="#FFFFFF"/>
+          <path d="M642 88 L666 88" marker-end="url(#lhp5cAr)"/>
+          <rect x="672" y="40" width="180" height="96" rx="8" transform="rotate(0.7 762 88)" fill="#FFFFFF"/>
+          <rect x="250" y="164" width="290" height="30" rx="15" transform="rotate(-0.6 395 179)" fill="#F2C230"/>
+          <rect x="560" y="164" width="292" height="30" rx="15" transform="rotate(0.5 706 179)" fill="#FDF6DA"/>
+          <path d="M40 220 L80 220 M110 220 L150 220 M180 220 L220 220" stroke="#CED4D9" stroke-width="3"/>
+        </g>
+
+        <text class="lhp5cL" x="44" y="68">labels + detections</text>
+        <text class="lhp5cS" x="44" y="88">matched, one row per</text>
+        <text class="lhp5cS" x="44" y="104">labelled pedestrian</text>
+        <text class="lhp5cS" x="44" y="120">10,000 rows</text>
+
+        <text class="lhp5cL" x="258" y="68">two tags</text>
+        <text class="lhp5cS" x="258" y="88">band: from range, m</text>
+        <text class="lhp5cS" x="258" y="104">scenario: light,</text>
+        <text class="lhp5cS" x="258" y="120">weather, occlusion</text>
+
+        <text class="lhp5cL" x="472" y="68">groupby</text>
+        <text class="lhp5cS" x="472" y="88">n = size</text>
+        <text class="lhp5cS" x="472" y="104">recall = mean(hit)</text>
+        <text class="lhp5cS" x="472" y="120">per model</text>
+
+        <text class="lhp5cL" x="686" y="68">slice table</text>
+        <text class="lhp5cS" x="686" y="88">change per slice</text>
+        <text class="lhp5cS" x="686" y="104">read: rose, fell,</text>
+        <text class="lhp5cS" x="686" y="120">or within noise</text>
+
+        <text class="lhp5cK" x="395" y="183" text-anchor="middle">a 95% interval beside every slice</text>
+        <text class="lhp5cK" x="706" y="183" text-anchor="middle">n under 50: too small to call</text>
+
+        <text class="lhp5cN" x="30" y="252">The yellow chip is the habit: a slice recall without its interval invites a verdict the data cannot support.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the group-by is one line; the yellow interval is what stops a 15-pedestrian cell from deciding a release.</figcaption>
+    </figure>
+
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Build the constructed evaluation set</h4>
+        <p>Four distance bands by four scenarios, the number of labelled pedestrians in each cell, and how many each model found. Expand it to one row per pedestrian, which is the shape your real matched table will have.</p>
+        <div class="prompt-box good"><span class="label">python</span>import math
+import pandas as pd
+
+bands = ["0-30 m", "30-50 m", "50-80 m", "80-150 m"]
+scen = ["clear", "night", "rain", "occluded"]
+n = [[4800, 720, 300, 180], [2000, 300, 125, 75], [800, 120, 50, 30], [400, 60, 25, 15]]
+hit_a = [[4704, 635, 250, 97], [1880, 254, 100, 39], [640, 86, 34, 13], [224, 30, 12, 5]]
+hit_b = [[4776, 666, 251, 75], [1950, 272, 102, 31], [664, 93, 35, 10], [172, 24, 9, 3]]
+
+rows = []
+for i, b in enumerate(bands):
+    for j, s in enumerate(scen):
+        for k in range(n[i][j]):
+            rows.append((b, s, k &lt; hit_a[i][j], k &lt; hit_b[i][j]))
+gt = pd.DataFrame(rows, columns=["band", "scenario", "hit_a", "hit_b"])
+len(gt)</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Print the headline first</h4>
+        <p>You should see 0.9003 for the current model and 0.9133 for the candidate: the release note's numbers.</p>
+        <div class="prompt-box good"><span class="label">python</span>gt[["hit_a", "hit_b"]].mean().round(4)</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Slice by band, then by scenario</h4>
+        <p>One function, two calls. Keep <code>sort=False</code> so the bands stay in distance order. The 80-150 m row should read 0.542, 0.416, -0.126 and the occluded row 0.513, 0.397, -0.117.</p>
+        <div class="prompt-box good"><span class="label">python</span>def slices(df, by):
+    t = df.groupby(by, sort=False).agg(n=("hit_a", "size"),
+                                       recall_a=("hit_a", "mean"),
+                                       recall_b=("hit_b", "mean"))
+    t["change"] = t.recall_b - t.recall_a
+    return t.round(3)
+
+slices(gt, "band")
+slices(gt, "scenario")</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Add the interval and the read</h4>
+        <p>A Wilson interval behaves well near 0% and 100% and on small slices. Mark a slice "fell" only when the candidate's whole interval sits below the current one. On the constructed set, 80-150 m and occluded fall; rain and 50-80 m stay within noise.</p>
+        <div class="prompt-box good"><span class="label">python</span>def wilson(k, m, z=1.96):
+    p = k / m
+    d = 1 + z * z / m
+    c = (p + z * z / (2 * m)) / d
+    h = z * math.sqrt(p * (1 - p) / m + z * z / (4 * m * m)) / d
+    return c - h, c + h
+
+def read(df, by):
+    g = df.groupby(by, sort=False).agg(n=("hit_a", "size"), a=("hit_a", "sum"), b=("hit_b", "sum"))
+    out = []
+    for key, r in g.iterrows():
+        la, ha = wilson(r.a, r.n)
+        lb, hb = wilson(r.b, r.n)
+        verdict = "rose" if lb &gt; ha else "fell" if hb &lt; la else "within noise"
+        out.append((key, r.n, round(r.a / r.n, 3), round(r.b / r.n, 3), verdict))
+    return pd.DataFrame(out, columns=["slice", "n", "recall_a", "recall_b", "read"])
+
+read(gt, "band")</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Cross the slices and flag the small cells</h4>
+        <p>Group by band and scenario together. Three cells hold fewer than 50 pedestrians; the smallest, far and occluded, has 15. Every one of them reads "within noise", which is the honest answer and a to-do for the data team.</p>
+        <div class="prompt-box good"><span class="label">python</span>cells = read(gt, ["band", "scenario"])
+cells[cells.n &lt; 50]</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Write the release rule down</h4>
+        <p>One line your team agrees before the next candidate arrives: which slices are gates, what counts as "fell", and what happens when a gate slice is too small to call. A rule written after seeing the numbers tends to bend towards the release.</p>
+      </div></div>
+    </div>
+
+    <div class="callout tip">
+      <p><strong>The habit to keep.</strong> Never report a perception headline alone. Report it beside the slice table, distance bands first, each slice with its count and its interval, and decide in advance which slices can block a release. If the headline went up, look first for the slice that went down.</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="section" id="quiz">
+    <div class="section-kicker">
+      <span class="klabel">Check yourself</span>
+      <h2>Three questions</h2>
+    </div>
+
+    <div class="quiz-q" data-answer="1">
+      <p class="qtext">On the constructed set, recall beyond 80 m falls by 12.6 points, yet headline recall rises. How can both be true?</p>
+      <button class="qopt" type="button">A · The headline was computed on a different evaluation set</button>
+      <button class="qopt" type="button">B · The headline is a weighted average; the far band is 5% of the set, so its fall moves the headline by about 0.6 points while gains in the near bands, 85% of the set, lift it by more</button>
+      <button class="qopt" type="button">C · Recall beyond 80 m does not count, because it is outside the sensor range</button>
+      <p class="qwhy">Same 10,000 pedestrians, same matching. The weights are the set's mix: 0.05 x 12.6 is about 0.6, which the near-band gains outweigh. The far band sits inside the reported 50 to 150 m lidar range.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="2">
+      <p class="qtext">Only 15 pedestrians are both beyond 80 m and partly occluded. The current model found 5, the candidate 3. What should the slice table say?</p>
+      <button class="qopt" type="button">A · The candidate is 13 points worse on far occluded pedestrians; block the release</button>
+      <button class="qopt" type="button">B · Drop the cell; small slices are noise and clutter the table</button>
+      <button class="qopt" type="button">C · Within noise: the 95% intervals (15.2 to 58.3% and 7.0 to 45.2%) overlap widely, so the cell is a request for more labelled examples of that kind</button>
+      <p class="qwhy">Fifteen examples cannot tell 20% from 45%. Dropping the cell hides that the set has almost none of the hardest case; keeping it with its interval turns it into a mining task.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="0">
+      <p class="qtext">Where should distance band edges come from?</p>
+      <button class="qopt" type="button">A · From the sensors and the planner: where sensing changes character, such as the reported 50 to 150 m lidar range, and the ranges the car needs at its speeds, kept fixed between releases</button>
+      <button class="qopt" type="button">B · From quantiles of the evaluation set, recomputed for each release so every band has the same count</button>
+      <button class="qopt" type="button">C · Wherever the candidate model looks best</button>
+      <p class="qwhy">Equal-count bands put most edges inside the near range and move every time the set changes, so no two releases are comparable. Edges chosen after seeing results are tuning, not measurement.</p>
+    </div>
+
+    <div class="quiz-score"></div>
+  </section>
+
+  <!-- ============ HOMEWORK ============ -->
+  <section class="section" id="homework">
+    <div class="section-kicker">
+      <span class="klabel">Before session 6</span>
+      <h2>Homework</h2>
+    </div>
+    <p class="lede">Thirty minutes, in your own notebook.</p>
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Change the mix, not the model</h4>
+        <p>Keep both models' slice recalls and reweight the bands to a mix you choose, for example equal shares. Recompute both headlines. Does the candidate still win? Your numbers will differ with your mix; write the mix down before you compute.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Add a third slice dimension</h4>
+        <p>Add a column of your own (pedestrian size, or whether the car was turning) to the constructed rows and slice by it. Count how many cells fall under 50 and say what you would mine for first.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Find one headline you report today</h4>
+        <p>In any model or dashboard you own, pick one single-number metric. Write down the two slices that matter most to the people who act on it, and check whether anyone has ever looked at them.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ OFFICIAL ============ -->
+  <section class="section" id="official">
+    <div class="section-kicker">
+      <span class="klabel">Covered tonight</span>
+      <h2>What this session covers</h2>
+    </div>
+    <div class="covered">
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Headline recall as a weighted average</span><span class="note">Slice recall times slice share, added up. Constructed set: 90.0% current, 91.3% candidate.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Distance bands from the sensor</span><span class="note">Lidar range typically 50 to 150 m, radar to about 200 m. Caesar et al. (2020), a public multi-sensor research dataset paper, read at source.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Scenario slices</span><span class="note">Clear, night, rain, partly occluded. Constructed: occluded falls from 51.3% to 39.7%.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Comparing two models by slice</span><span class="note">Headline +1.3 points, beyond 80 m -12.6 points. Constructed; your numbers will differ.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Small slices and intervals</span><span class="note">95% Wilson intervals; a 15-pedestrian cell reads "within noise". Run on pandas 2.1.4.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Performance limits with no fault</span><span class="note">ISO 21448 safety of the intended functionality. Reported, concepts only.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Matching rule and paired tests</span><span class="note">Named only: the match threshold moves recall; a paired comparison is sharper than interval overlap.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Precision, average precision, calibration</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-model-evaluation-with-phoebe/courses/a1-why-one-number-lies.html">learn model evaluation</a>.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Noise in the ground-truth labels</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-data-centric-ai-with-phoebe/courses/02-when-labellers-disagree.html">learn data-centric AI</a>.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Detector architectures and real model results</span><span class="note">Out of scope by design. Both models and the evaluation set are constructed.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section class="section" id="cheatsheet">
+    <div class="section-kicker">
+      <span class="klabel">Take this with you</span>
+      <h2>Cheat sheet</h2>
+    </div>
+    <div class="cheat">
+      <div class="cheat-item"><strong>The one sentence.</strong> A headline recall is an average weighted by the evaluation set's mix, so it speaks for the common cases.</div>
+      <div class="cheat-item"><strong>Recall.</strong> Labelled objects found divided by labelled objects. Misses lower it; false alarms do not.</div>
+      <div class="cheat-item"><strong>The formula.</strong> Headline = sum of slice share x slice recall. A 5% slice moves it by 0.05 per point.</div>
+      <div class="cheat-item"><strong>Distance first.</strong> Band edges from the sensor (lidar typically 50 to 150 m, reported by the paper) and the planner. Keep them fixed.</div>
+      <div class="cheat-item"><strong>Then scenario.</strong> Light, weather, occlusion. Constructed: occluded 51.3% to 39.7% while the headline rose.</div>
+      <div class="cheat-item"><strong>Up means look down.</strong> Headline +1.3, beyond 80 m -12.6 on the constructed set.</div>
+      <div class="cheat-item"><strong>Intervals.</strong> Wilson 95% beside every slice; "fell" only when the intervals separate. 15 examples cannot tell 20% from 45%.</div>
+      <div class="cheat-item"><strong>Gates before numbers.</strong> Agree which slices can block a release before the candidate arrives.</div>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    <div class="wrap">
+      <p>Practitioner session 5 of 10 · learn-autonomous-driving-with-phoebe · by Phoebe Fu</p>
+      <nav class="pagenav">
+        <a href="p4-curating-for-the-tail.html">← Practitioner session 4 · Curating for the tail</a>
+        <a href="p6-simulation-against-real-miles.html">Practitioner session 6 · Simulation against real miles →</a>
+      </nav>
+    </div>
+  </footer>
+
+</main>
+
+<script src="../assets/app.js?v=1"></script>
+<script>
+(function () {
+  var by = document.getElementById("lhp5-by");
+  var out = document.getElementById("lhp5-out");
+  var verdict = document.getElementById("lhp5-verdict");
+  if (!by || !out) return;
+  var BANDS = ["0-30 m", "30-50 m", "50-80 m", "80-150 m"];
+  var SCEN = ["clear daylight", "night", "rain", "partly occluded"];
+  var N = [[4800, 720, 300, 180], [2000, 300, 125, 75], [800, 120, 50, 30], [400, 60, 25, 15]];
+  var A = [[4704, 635, 250, 97], [1880, 254, 100, 39], [640, 86, 34, 13], [224, 30, 12, 5]];
+  var B = [[4776, 666, 251, 75], [1950, 272, 102, 31], [664, 93, 35, 10], [172, 24, 9, 3]];
+  function wilson(k, m) {
+    var z = 1.96, p = k / m, d = 1 + z * z / m;
+    var c = (p + z * z / (2 * m)) / d;
+    var h = z * Math.sqrt(p * (1 - p) / m + z * z / (4 * m * m)) / d;
+    return [c - h, c + h];
+  }
+  function pct(x) { return (100 * x).toFixed(1) + "%"; }
+  function sum(cells) {
+    var n = 0, a = 0, b = 0;
+    cells.forEach(function (c) { n += N[c[0]][c[1]]; a += A[c[0]][c[1]]; b += B[c[0]][c[1]]; });
+    return { n: n, a: a, b: b };
+  }
+  function rowsFor(mode) {
+    var r = [], i, j, all = [];
+    for (i = 0; i < 4; i++) for (j = 0; j < 4; j++) all.push([i, j]);
+    if (mode === "all") r.push(["All pedestrians", sum(all)]);
+    if (mode === "band") for (i = 0; i < 4; i++) r.push([BANDS[i], sum(all.filter(function (c) { return c[0] === i; }))]);
+    if (mode === "scen") for (j = 0; j < 4; j++) r.push([SCEN[j], sum(all.filter(function (c) { return c[1] === j; }))]);
+    if (mode === "small") all.forEach(function (c) { if (N[c[0]][c[1]] < 50) r.push([BANDS[c[0]] + ", " + SCEN[c[1]], sum([c])]); });
+    return r;
+  }
+  function render() {
+    var rows = rowsFor(by.value), fell = [], html;
+    html = '<div class="tablescroll"><table class="sql-table"><thead><tr><th>Slice</th><th>n</th><th>Current</th><th>Candidate</th><th>Change</th><th>Read</th></tr></thead><tbody>';
+    rows.forEach(function (row) {
+      var s = row[1], ia = wilson(s.a, s.n), ib = wilson(s.b, s.n);
+      var read = ib[0] > ia[1] ? "rose" : ib[1] < ia[0] ? "fell" : "within noise";
+      if (read === "fell") fell.push(row[0]);
+      var ch = 100 * (s.b - s.a) / s.n;
+      html += '<tr' + (read === "fell" ? ' class="lhp5-fell"' : "") + "><td>" + row[0] + "</td><td>" + s.n.toLocaleString("en-US") + "</td><td>" + pct(s.a / s.n) +
+        ' <span class="lhp5-ci">(' + pct(ia[0]) + " to " + pct(ia[1]) + ")</span></td><td>" + pct(s.b / s.n) +
+        ' <span class="lhp5-ci">(' + pct(ib[0]) + " to " + pct(ib[1]) + ")</span></td><td>" + (ch >= 0 ? "+" : "-") + Math.abs(ch).toFixed(1) + "</td><td><b>" + read + "</b></td></tr>";
+    });
+    html += "</tbody></table></div>";
+    out.innerHTML = html;
+    if (by.value === "all") verdict.textContent = "One number, and it rose. Nothing here says which pedestrians the candidate now misses. Try grouping by distance band.";
+    else if (by.value === "small") verdict.textContent = "Every cell under 50 pedestrians reads within noise. That is the honest answer: these are the kinds of moment to mine for and label next.";
+    else verdict.textContent = fell.length ? "Fell, with the intervals clear of each other: " + fell.join(" and ") + ". The headline rose anyway." : "No slice fell beyond its interval in this grouping.";
+  }
+  by.addEventListener("change", render);
+  render();
+})();
+</script>
+<style>
+  #lhp5-slice .sql-code { border: 1px solid var(--hairline); border-radius: 8px; max-width: 24rem; }
+  #lhp5-slice table.sql-table { margin: .6rem 0 .2rem; font-size: .85rem; }
+  #lhp5-slice tr.lhp5-fell td { background: var(--amber-50); }
+  #lhp5-slice .lhp5-ci { color: var(--muted); font-size: .8em; white-space: nowrap; }
+</style>
+</body>
+</html>

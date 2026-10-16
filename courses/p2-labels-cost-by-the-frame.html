@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- social:start -->
+<meta name="description" content="Practitioner session 2 of 10. A label bill is a product: hours driven x seconds x keyframe rate x boxes per keyframe x cost per box. The keyframe rate is the biggest lever, auto-labelling turns drawing into reviewing, and label QA is a sampling problem with an exact bound. Lanehart is a constructed fleet.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Learn with Phoebe">
+<meta property="og:title" content="Labels cost by the frame - learn autonomous driving with phoebe">
+<meta property="og:description" content="Practitioner session 2 of 10. Annotation economics by the frame, auto-labelling as review, and label QA as sampling with an exact bound.">
+<meta property="og:url" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/courses/p2-labels-cost-by-the-frame.html">
+<meta property="og:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Labels cost by the frame - learn autonomous driving with phoebe">
+<meta name="twitter:description" content="2 Hz keyframes, not 20: the rate is the lever. Zero errors in 300 audited frames still allows about 1%.">
+<meta name="twitter:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
+<!-- social:end -->
+<title>Practitioner session 2 · Labels cost by the frame - learn autonomous driving with phoebe</title>
+<link rel="stylesheet" href="../assets/style.css?v=2">
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="wrap">
+    <span class="crumb"><a href="../index.html">learn-autonomous-driving-with-phoebe</a> / Practitioner session 2 of 10</span>
+    <button class="btn" id="toggle-all" type="button">Expand all</button>
+    <button class="btn primary" id="zoom-toggle" type="button">Projector zoom: off</button>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Learn Autonomous Driving with Phoebe · Practitioner session 2 of 10</div>
+    <h1>Labels cost by the <span class="accent">frame</span></h1>
+    <p class="sub">In a warehouse the label usually arrives with the row: the order was refunded or it was not. In a drive log, ground truth is bought. Somebody draws a box around every car, cyclist and cone on a chosen frame, and the bill grows with every frame you choose. This session prices that bill as a product of four numbers, shows which one is the lever, and treats checking the labels as what it is, a sample with a bound. Lanehart, a constructed robotaxi pilot fleet in a fictional city, supplies the budget; every cost is in constructed units and every count is computed in your browser.</p>
+    <div class="chip-row">
+      <span class="chip level">🟢 Foundations</span>
+      <span class="chip audience">Data engineers and analysts who plan labelling work</span>
+      <span class="chip audience">Leads who sign off a labelling budget</span>
+      <span class="chip time">45 min</span>
+    </div>
+    <div class="agenda">
+      <span class="a1" style="flex:1">0-3 · Welcome</span>
+      <span class="a2" style="flex:3">3-18 · The bill is a product</span>
+      <span class="a3" style="flex:3">18-28 · QA is sampling</span>
+      <span class="a4" style="flex:4">28-45 · Build-along and Q&amp;A</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ INTRO ============ -->
+  <section class="section" id="intro">
+    <div class="section-kicker">
+      <span class="klabel">Part 0</span>
+      <h2>Lanehart's first labelling quote</h2>
+    </div>
+    <p class="lede">Lanehart is a constructed robotaxi pilot. Its data lead was asked a warehouse-shaped question: "how much to label last month's driving?" She asked back four questions, and the answer fell out of them. How many hours. How many frames per second get labelled. How many objects sit on a typical frame. What one box costs, drawn or checked. Then a fifth question that nobody had budgeted for: how will we know the boxes are right?</p>
+
+    <div class="legend">
+      <span class="pill">Live = worked through in the 45 minutes</span>
+      <span class="pill">Self-study = the full depth, after class</span>
+      <span class="pill">🔍 Every diagram zooms</span>
+    </div>
+
+    <div class="callout win">
+      <p><strong>★ What you walk out with tonight.</strong> A label bill written as one multiplication you can defend line by line, with the keyframe rate as its biggest lever: the public multi-sensor research dataset from session 1 labels at 2 Hz, and labelling every lidar scan instead would be ten times the frames. A clear view of auto-labelling as moving cost from drawing to reviewing, not removing it. And the habit of treating label QA as a sample: zero errors in 300 audited frames still leaves an error rate as high as about 1% at 95% confidence, and says nothing about slices the audit barely touched.</p>
+    </div>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Why labels are bought, not logged<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>A sensor records what it saw. It does not record what the things were. "That cluster of lidar points is a cyclist, 1.7 m tall, heading north" is an annotation, and in the public dataset it is a 3D cuboid with position, size and yaw, one of 23 classes with 8 attributes, drawn on a keyframe.</p>
+        <p>So the unit of cost is a box on a frame. Everything a perception model later learns, and everything session 5 measures it against, rests on boxes somebody paid for. The question is never "do we label" but "which frames, how many, and how do we check them".</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>The words that keep coming back<span class="mini">3 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Keyframe.</strong> A frame chosen for human labelling; all sensors at that instant.</li>
+          <li><strong>Keyframe rate.</strong> Keyframes per second of driving; 2 Hz in the public dataset.</li>
+          <li><strong>Box.</strong> One annotated object on one keyframe (a cuboid in 3D).</li>
+          <li><strong>Interpolation.</strong> Filling labels between keyframes from the labels on either side.</li>
+          <li><strong>Auto-labelling.</strong> A model proposes boxes; a person accepts, fixes or rejects them.</li>
+          <li><strong>Audit.</strong> Re-checking a random sample of labelled frames to estimate the error rate.</li>
+          <li><strong>Constructed.</strong> Lanehart's hours, object counts and cost units are inputs you choose, not records.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="section" id="part-1">
+    <div class="section-kicker">
+      <span class="klabel">Part 1 · covers keyframes and annotation economics</span>
+      <h2>The bill is a product of four numbers</h2>
+      <span class="tag concept">15 min live</span>
+    </div>
+    <p class="lede">A camera at 12 Hz makes 12 frames a second. At 2 Hz keyframes, two of those get boxes and ten never do. Write the bill as a chain and every term is something you can look up or decide: hours driven, times 3,600 seconds, times the keyframe rate, times boxes per keyframe, times the cost of one box. Change any one and the bill moves in proportion. The keyframe rate is the one people forget is a choice.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 312" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn strip of one second of one camera: twelve frames, of which two, at 0 and 500 milliseconds, are yellow keyframes that get boxes; ten are never labelled. Below, a chain of five boxes: hours driven, times 3,600 seconds, times 2 Hz keyframes highlighted in yellow, times boxes per keyframe, times cost per box, equals the label bill. Check: 1,000 scenes of 20 seconds at 2 Hz gives 40,000 keyframes, the count the public dataset's paper reports; labelling every lidar scan at 20 Hz would need 400,000.">
+        <defs>
+          <filter id="lhp2aSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="23" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp2aHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp2aAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp2aH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp2aL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp2aS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp2aA { font: 700 11px Inter, sans-serif; fill: #2F3A42; }
+          .lhp2aV { font: 800 18px Inter, sans-serif; fill: #1C2328; }
+          .lhp2aN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <text class="lhp2aH" x="30" y="30">ONE SECOND OF ONE CAMERA, AND THE CHAIN A LABEL BUDGET MULTIPLIES</text>
+
+        <g filter="url(#lhp2aSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="60" y="56" width="44" height="34" rx="4" transform="rotate(-2 82 73)" fill="#F2C230"/>
+          <rect x="116" y="56" width="44" height="34" rx="4" transform="rotate(1 138 73)" fill="#FFFFFF"/>
+          <rect x="172" y="56" width="44" height="34" rx="4" transform="rotate(-1 194 73)" fill="#FFFFFF"/>
+          <rect x="228" y="56" width="44" height="34" rx="4" transform="rotate(2 250 73)" fill="#FFFFFF"/>
+          <rect x="284" y="56" width="44" height="34" rx="4" transform="rotate(-1 306 73)" fill="#FFFFFF"/>
+          <rect x="340" y="56" width="44" height="34" rx="4" transform="rotate(1 362 73)" fill="#FFFFFF"/>
+          <rect x="396" y="56" width="44" height="34" rx="4" transform="rotate(2 418 73)" fill="#F2C230"/>
+          <rect x="452" y="56" width="44" height="34" rx="4" transform="rotate(-2 474 73)" fill="#FFFFFF"/>
+          <rect x="508" y="56" width="44" height="34" rx="4" transform="rotate(1 530 73)" fill="#FFFFFF"/>
+          <rect x="564" y="56" width="44" height="34" rx="4" transform="rotate(-1 586 73)" fill="#FFFFFF"/>
+          <rect x="620" y="56" width="44" height="34" rx="4" transform="rotate(2 642 73)" fill="#FFFFFF"/>
+          <rect x="676" y="56" width="44" height="34" rx="4" transform="rotate(-1 698 73)" fill="#FFFFFF"/>
+          <rect x="70" y="64" width="22" height="16" rx="2" stroke-width="1.5"/>
+          <rect x="406" y="66" width="18" height="14" rx="2" stroke-width="1.5"/>
+          <path d="M60 116 L100 116 M130 116 L170 116 M200 116 L240 116 M270 116 L310 116 M340 116 L380 116 M410 116 L450 116 M480 116 L520 116 M550 116 L590 116 M620 116 L660 116 M690 116 L720 116" stroke="#C8CED3" stroke-width="3"/>
+          <rect x="30" y="172" width="140" height="62" rx="10" transform="rotate(-0.8 100 203)" fill="#FFFFFF"/>
+          <rect x="200" y="172" width="140" height="62" rx="10" transform="rotate(0.6 270 203)" fill="#F1F3F4"/>
+          <rect x="370" y="172" width="140" height="62" rx="10" transform="rotate(-0.6 440 203)" fill="#F2C230"/>
+          <rect x="540" y="172" width="140" height="62" rx="10" transform="rotate(0.7 610 203)" fill="#F1F3F4"/>
+          <rect x="710" y="172" width="140" height="62" rx="10" transform="rotate(-0.5 780 203)" fill="url(#lhp2aHc)"/>
+          <path d="M174 203 L196 203 M344 203 L366 203 M514 203 L536 203 M684 203 L706 203" marker-end="url(#lhp2aAr)"/>
+        </g>
+
+        <text class="lhp2aL" x="60" y="48">Camera frames, 12 per second, 0 to 1,000 ms</text>
+        <text class="lhp2aV" x="745" y="80">2 of 12</text>
+        <text class="lhp2aS" x="745" y="98">get boxes at 2 Hz</text>
+        <text class="lhp2aS" x="60" y="136">yellow = keyframes at 0 and 500 ms; the other ten frames are never labelled by a person</text>
+
+        <text class="lhp2aA" x="30" y="162">THE BILL IS A PRODUCT: CHANGE ONE TERM AND IT MOVES IN PROPORTION</text>
+        <text class="lhp2aL" x="100" y="198" text-anchor="middle">hours driven</text>
+        <text class="lhp2aS" x="100" y="216" text-anchor="middle">a choice of scope</text>
+        <text class="lhp2aL" x="270" y="198" text-anchor="middle">x 3,600</text>
+        <text class="lhp2aS" x="270" y="216" text-anchor="middle">seconds per hour</text>
+        <text class="lhp2aL" x="440" y="198" text-anchor="middle">x 2 Hz</text>
+        <text class="lhp2aS" x="440" y="216" text-anchor="middle">keyframe rate</text>
+        <text class="lhp2aL" x="610" y="198" text-anchor="middle">x objects</text>
+        <text class="lhp2aS" x="610" y="216" text-anchor="middle">boxes per keyframe</text>
+        <text class="lhp2aL" x="780" y="198" text-anchor="middle">x cost per box</text>
+        <text class="lhp2aS" x="780" y="216" text-anchor="middle">= the label bill</text>
+
+        <text class="lhp2aN" x="30" y="270">Check: 1,000 scenes x 20 s x 2 Hz = 40,000 keyframes, the count the public dataset's paper reports.</text>
+        <text class="lhp2aN" x="30" y="290">Label every lidar scan (20 Hz) instead and the same scenes need 400,000: the rate is the biggest lever.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow box in the chain is the term a team sets by habit; it multiplies everything else.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Why 2 Hz is affordable, and what it gives up<span class="mini">5 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>The public dataset labels keyframes at 2 Hz, and its authors report that 2 Hz annotations are robust to interpolation to 10 or 20 Hz. That finding is what makes sparse labelling a sound economic choice: an object that persists across keyframes can be filled in between them almost for free.</p>
+        <p>The cost of that choice lands in one place. Interpolation needs an object on both sides. Something that appears and is gone within half a second, a child stepping out from behind a van and back, may sit on no keyframe at all, and then no amount of interpolation labels it. A label budget set by the clock spends almost all of its money on ordinary frames, which is why sessions 3 and 4 go looking for the rare ones on purpose.</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>The public dataset's paper reports 1,000 scenes of about 20 seconds, six cameras at 12 Hz and 40,000 labelled keyframes against 1.4 million camera images. The arithmetic checks: 1,000 x 20 x 2 = 40,000 keyframes, and 1,000 x 20 x 12 x 6 = 1.44 million images. Each keyframe carries six camera images, so 240,000 of the 1.44 million images, about one in six, sit at a labelled instant. Derived from the paper's own numbers.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Which term to argue about first<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Hours driven.</strong> Scope. "All of last month" is rarely the question; "the hours that contain what we need" usually is, and that is a query (session 3).</li>
+          <li><strong>Keyframe rate.</strong> The lever. Going from 2 Hz to 20 Hz is ten times the bill for the same hours. It should be set from what interpolation can and cannot recover, not from what the sensor produces.</li>
+          <li><strong>Boxes per keyframe.</strong> Not under your control, and not constant: a dense junction carries many more objects than an empty highway, so the same hours cost different amounts in different places.</li>
+          <li><strong>Cost per box.</strong> Depends on how the box is made. Drawing from scratch, fixing a proposal and accepting a proposal are three different prices. That is Part 2.</li>
+        </ul>
+      </div>
+    </details>
+
+    <div class="wk" id="lhp2-calc">
+      <div class="wk-head">
+        <b>Live</b>
+        <span class="wk-hint">Constructed label-cost calculator for Lanehart. One unit is the cost of drawing one box by hand; every input is yours to choose and every output is computed in this page. Your numbers will differ: no real price is quoted anywhere.</span>
+      </div>
+      <div class="wk-body">
+        <label class="sql-label" for="lhp2-hours">Hours of driving to label</label>
+        <input class="sql-code" id="lhp2-hours" type="number" min="1" max="100000" step="1" value="100">
+        <label class="sql-label" for="lhp2-hz">Keyframe rate</label>
+        <select class="sql-code" id="lhp2-hz">
+          <option value="2" selected>2 Hz (the public dataset's rate)</option>
+          <option value="10">10 Hz</option>
+          <option value="20">20 Hz (every lidar scan)</option>
+        </select>
+        <label class="sql-label" for="lhp2-obj">Boxes per keyframe (constructed)</label>
+        <input class="sql-code" id="lhp2-obj" type="number" min="1" max="500" step="1" value="30">
+        <label class="sql-label" for="lhp2-auto">Share of boxes proposed by an auto-labeller</label>
+        <select class="sql-code" id="lhp2-auto">
+          <option value="0" selected>none, all drawn by hand</option>
+          <option value="0.5">half</option>
+          <option value="0.8">80%</option>
+        </select>
+        <label class="sql-label" for="lhp2-rev">Cost to review one proposed box, in units (constructed)</label>
+        <select class="sql-code" id="lhp2-rev">
+          <option value="0.2">0.2</option>
+          <option value="0.3" selected>0.3</option>
+          <option value="0.5">0.5</option>
+        </select>
+        <label class="sql-label" for="lhp2-qa">Share of keyframes re-checked in the audit</label>
+        <select class="sql-code" id="lhp2-qa">
+          <option value="0.02">2%</option>
+          <option value="0.05" selected>5%</option>
+          <option value="0.1">10%</option>
+        </select>
+        <div id="lhp2-out"></div>
+        <p class="sql-note" id="lhp2-verdict">...</p>
+      </div>
+      <div class="wk-foot" id="lhp2-calc-foot">Constructed inputs, plain arithmetic. The only real number on the widget is the 2 Hz rate, published for a public multi-sensor research dataset.</div>
+    </div>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Three things to try on the calculator<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <ul>
+          <li><strong>Move the rate from 2 Hz to 20 Hz.</strong> Every line scales by exactly ten. No other single choice moves the bill that far with the hours held still.</li>
+          <li><strong>Turn on the auto-labeller at 80%.</strong> The bill drops, but read the review line: the proposed boxes did not become free, they became cheaper to check. If reviewing costs half a drawn box, the saving is much smaller than "80% automated" sounds.</li>
+          <li><strong>Raise the audit share.</strong> The audit is a small line in the bill and the only line that tells you whether the rest was worth paying for. Part 2 shows how many frames it actually needs.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="section" id="part-2">
+    <div class="section-kicker">
+      <span class="klabel">Part 2 · covers auto-labelling and label QA as sampling</span>
+      <h2>Checking labels is a sample, so it has a bound</h2>
+      <span class="tag concept">10 min live</span>
+    </div>
+    <p class="lede">Nobody re-checks every box; that would double the bill. So a team audits a random sample of labelled keyframes, counts the ones with errors, and reports an error rate. A count from a sample is an estimate with uncertainty, and when the count is zero the uncertainty is the whole story. It is the same maths as the miles question in session 7: audited frames are the exposure, errors are the events.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 318" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two hand drawn panels. Left, a uniform audit: a pile of labelled keyframes with six drawn at random in yellow for re-checking; with 300 audited and 0 errors, the 95% upper bound on the error rate is about 1.0%, 2.996 divided by 300, close to the rule of three. Right, a stratified audit: common frames and a small tail slice audited separately, each with its own sample size, error count and bound, because a uniform draw can miss the tail entirely.">
+        <defs>
+          <filter id="lhp2bSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="29" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp2bHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp2bAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp2bH { font: 800 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp2bL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp2bS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp2bV { font: 800 18px Inter, sans-serif; fill: #1C2328; }
+          .lhp2bN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <g filter="url(#lhp2bSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="46" width="400" height="230" rx="12" transform="rotate(-0.4 230 161)" fill="#FFFFFF" stroke="#2F3A42"/>
+          <rect x="450" y="46" width="400" height="230" rx="12" transform="rotate(0.4 650 161)" fill="#FFFFFF" stroke="#2F3A42"/>
+
+          <rect x="56" y="110" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="88" y="110" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="120" y="110" width="24" height="24" rx="3" transform="rotate(-3 132 122)" fill="#F2C230"/>
+          <rect x="152" y="110" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="184" y="110" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="216" y="110" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="56" y="142" width="24" height="24" rx="3" transform="rotate(3 68 154)" fill="#F2C230"/>
+          <rect x="88" y="142" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="120" y="142" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="152" y="142" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="184" y="142" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="216" y="142" width="24" height="24" rx="3" transform="rotate(-2 228 154)" fill="#F2C230"/>
+          <rect x="56" y="174" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="88" y="174" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="120" y="174" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="152" y="174" width="24" height="24" rx="3" transform="rotate(2 164 186)" fill="#F2C230"/>
+          <rect x="184" y="174" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="216" y="174" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="56" y="206" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="88" y="206" width="24" height="24" rx="3" transform="rotate(-3 100 218)" fill="#F2C230"/>
+          <rect x="120" y="206" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="152" y="206" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="184" y="206" width="24" height="24" rx="3" transform="rotate(2 196 218)" fill="#F2C230"/>
+          <rect x="216" y="206" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+
+          <rect x="476" y="110" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="508" y="110" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="540" y="110" width="24" height="24" rx="3" transform="rotate(2 552 122)" fill="#F2C230"/>
+          <rect x="572" y="110" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="604" y="110" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="636" y="110" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="476" y="142" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="508" y="142" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="540" y="142" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="572" y="142" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="604" y="142" width="24" height="24" rx="3" transform="rotate(-3 616 154)" fill="#F2C230"/>
+          <rect x="636" y="142" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="476" y="174" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="508" y="174" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="540" y="174" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="572" y="174" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="604" y="174" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="636" y="174" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <path d="M694 104 L694 206" stroke="#8C979F" stroke-dasharray="5 6"/>
+          <rect x="720" y="110" width="24" height="24" rx="3" transform="rotate(-2 732 122)" fill="#F2C230"/>
+          <rect x="752" y="110" width="24" height="24" rx="3" transform="rotate(3 764 122)" fill="#F2C230"/>
+          <rect x="720" y="142" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <rect x="752" y="142" width="24" height="24" rx="3" transform="rotate(-2 764 154)" fill="#F2C230"/>
+          <rect x="720" y="174" width="24" height="24" rx="3" transform="rotate(2 732 186)" fill="#F2C230"/>
+          <rect x="752" y="174" width="24" height="24" rx="3" fill="url(#lhp2bHc)"/>
+          <path d="M800 196 L812 140 L824 196 Z M794 198 L830 198 M805 166 L819 166" fill="#FFFFFF"/>
+        </g>
+
+        <text class="lhp2bH" x="50" y="74">Uniform audit of the pile</text>
+        <text class="lhp2bS" x="50" y="92">yellow = drawn at random for re-check</text>
+        <text class="lhp2bL" x="262" y="128">audited n = 300</text>
+        <text class="lhp2bL" x="262" y="148">errors found k = 0</text>
+        <text class="lhp2bV" x="262" y="182">upper about 1.0%</text>
+        <text class="lhp2bS" x="262" y="202">at 95%: 2.996 / 300</text>
+        <text class="lhp2bS" x="262" y="220">rule of three: 3 / n</text>
+        <text class="lhp2bS" x="50" y="258">the bound shrinks as 1 / n, like miles in session 7</text>
+
+        <text class="lhp2bH" x="470" y="74">Stratified audit: the tail apart</text>
+        <text class="lhp2bS" x="470" y="92">a uniform draw can miss the tail entirely</text>
+        <text class="lhp2bL" x="476" y="226">common frames</text>
+        <text class="lhp2bL" x="720" y="226">tail slice</text>
+        <text class="lhp2bS" x="470" y="258">each stratum gets its own n, its own k, its own bound</text>
+
+        <text class="lhp2bN" x="30" y="302">Constructed picture. Bound = exact Poisson upper limit / n, close to exact when errors are rare.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow frames are the only ones anyone re-checked; zero errors among them is a bound, not a zero.</figcaption>
+    </figure>
+
+    <details class="card" open>
+      <summary><span class="mode live">Live</span>Auto-labelling moves the cost, it does not remove it<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>An auto-labeller is a model that proposes boxes on keyframes, often from many frames on either side, and a person reviews them. The bill changes shape: fewer boxes drawn, many boxes reviewed. Review is cheaper per box than drawing, and it is not free, which is why the calculator prices it as its own line.</p>
+        <p>The risk changes shape too. A proposal model is weakest exactly where it has seen least, which is the tail. And a reviewer's errors and a drawer's errors are different errors: a missed object that the model never proposed has nothing on screen to reject. So the audit has to be split by how a box was made, drawn by hand or proposed and accepted, and each group measured on its own.</p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="mode live">Live</span>Zero errors is a bound, not a zero<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>Audit n frames at random and find k with errors. The point estimate is k / n. The one-sided upper bound at confidence C is the exact Poisson upper limit for k events divided by n; for k = 0 that limit is -ln(1 - C), which is 2.996 at 95%. So zero errors in 300 audited frames gives an upper bound of 2.996 / 300, about 1.0%. To show an error rate below 0.1% with zero errors you need about 2,996 audited frames. (Poisson is the small-rate approximation to the binomial; for rates this low the two agree closely.)</p>
+        <div class="callout example">
+          <span class="ex-pill">Real world</span>
+          <p>Hanley and Lippman-Hand's 1983 paper in JAMA, "If nothing goes wrong, is everything all right?", is reported as giving the rule of three: with zero events in n trials, the 95% upper limit is about 3 / n. The 3 is -ln(0.05) = 2.996 rounded. The same rule sits under RAND's 275 million failure-free miles in session 7; here it says how many frames a clean audit must cover.</p>
+        </div>
+      </div>
+    </details>
+
+    <div class="wk" id="lhp2-audit">
+      <div class="wk-head">
+        <b>Live</b>
+        <span class="wk-hint">Audit bound calculator. Enter how many keyframes you re-checked and how many had an error; the exact Poisson bound is computed by the course engine in this page. Your numbers will differ.</span>
+      </div>
+      <div class="wk-body">
+        <label class="sql-label" for="lhp2-n">Keyframes audited, n</label>
+        <input class="sql-code" id="lhp2-n" type="number" min="1" max="1000000" step="1" value="300">
+        <label class="sql-label" for="lhp2-k">Keyframes with an error, k</label>
+        <input class="sql-code" id="lhp2-k" type="number" min="0" max="1000" step="1" value="0">
+        <label class="sql-label" for="lhp2-conf">Confidence</label>
+        <select class="sql-code" id="lhp2-conf">
+          <option value="0.9">90%</option>
+          <option value="0.95" selected>95%</option>
+          <option value="0.99">99%</option>
+        </select>
+        <label class="sql-label" for="lhp2-target">Error rate you want to show you are below</label>
+        <select class="sql-code" id="lhp2-target">
+          <option value="0.01" selected>1%</option>
+          <option value="0.005">0.5%</option>
+          <option value="0.001">0.1%</option>
+        </select>
+        <div id="lhp2-aout"></div>
+        <p class="sql-note" id="lhp2-averdict">...</p>
+      </div>
+      <div class="wk-foot" id="lhp2-self">...</div>
+    </div>
+
+    <details class="card">
+      <summary><span class="mode self">Self-study</span>Stratify the audit, and where cleaning lives<span class="mini">4 min</span><span class="caret">▶</span></summary>
+      <div class="body">
+        <p>A uniform audit of 300 keyframes, drawn from a pile that is mostly ordinary driving, may contain a handful of tail frames or none. Its bound is honest about the pile and silent about the tail. The fix is the one survey statisticians use: split the frames into strata (ordinary frames, each tail slice, auto-accepted boxes, hand-drawn boxes) and audit each with its own n. A clean result then reads "below about 1% in every stratum at 95%", which is a claim a reviewer can check.</p>
+        <p>What to do once errors are found, how labellers disagree, how to relabel and how noisy labels hurt training, is owned by <a href="https://phoebefu6.github.io/learn-data-centric-ai-with-phoebe/courses/02-when-labellers-disagree.html">learn data-centric AI</a>. The side picked here is narrower: what labels cost per frame, and how much checking a claim about them needs.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ PART 3 ============ -->
+  <section class="section" id="part-3">
+    <div class="section-kicker">
+      <span class="klabel">Part 3 · build-along</span>
+      <h2>Price a labelling job and audit it in pandas</h2>
+      <span class="tag build">17 min hands on</span>
+    </div>
+    <p class="lede">Build the calculator's bill from a scene table, then plant a known error rate in constructed labels and see what a random audit can and cannot tell you. Run it in a notebook or a scratch folder. The figure is the plan: one chain for the bill, one seeded draw for the audit.</p>
+
+    <figure class="zoomable">
+      <svg viewBox="0 0 880 252" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hand drawn plan of the build-along. Top row: a scenes table with scene id and seconds becomes a keyframes table with one row every half second, then boxes and cost from objects times cost, then the bill in constructed units. Bottom row: from the keyframes table, a seeded random audit sample, highlighted yellow, is re-checked to count k wrong frames, then the upper bound is the chi-square quantile at 0.95 with 2k plus 2 degrees of freedom, halved and divided by n.">
+        <defs>
+          <filter id="lhp2cSk" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="31" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <pattern id="lhp2cHc" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-38)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2F3A42" stroke-width="1" opacity=".5"/></pattern>
+          <marker id="lhp2cAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#1A1F23" stroke-width="1.6" stroke-linecap="round"/></marker>
+        </defs>
+        <style>
+          .lhp2cL { font: 600 12px Inter, sans-serif; fill: #1A1F23; }
+          .lhp2cS { font: 400 11px Inter, sans-serif; fill: #525C64; }
+          .lhp2cN { font: 400 12px Inter, sans-serif; fill: #525C64; }
+        </style>
+
+        <g filter="url(#lhp2cSk)" fill="none" stroke="#1A1F23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="36" width="180" height="64" rx="8" transform="rotate(-0.8 120 68)" fill="url(#lhp2cHc)"/>
+          <rect x="250" y="36" width="180" height="64" rx="8" transform="rotate(0.6 340 68)" fill="#F1F3F4"/>
+          <rect x="470" y="36" width="180" height="64" rx="8" transform="rotate(-0.5 560 68)" fill="#FFFFFF"/>
+          <rect x="690" y="36" width="160" height="64" rx="8" transform="rotate(0.7 770 68)" fill="#F1F3F4"/>
+          <path d="M214 68 L246 68 M434 68 L466 68 M654 68 L686 68" marker-end="url(#lhp2cAr)"/>
+          <path d="M340 104 L340 132" marker-end="url(#lhp2cAr)"/>
+          <rect x="250" y="138" width="180" height="64" rx="8" transform="rotate(-0.6 340 170)" fill="#F2C230"/>
+          <rect x="470" y="138" width="180" height="64" rx="8" transform="rotate(0.5 560 170)" fill="#FFFFFF"/>
+          <rect x="690" y="138" width="160" height="64" rx="8" transform="rotate(-0.7 770 170)" fill="#FFFFFF"/>
+          <path d="M434 170 L466 170 M654 170 L686 170" marker-end="url(#lhp2cAr)"/>
+          <path d="M60 150 L60 196 M48 196 L72 196 M92 150 L92 196 M80 196 L104 196" stroke="#C8CED3" stroke-width="3"/>
+        </g>
+
+        <text class="lhp2cL" x="120" y="64" text-anchor="middle">scenes</text>
+        <text class="lhp2cS" x="120" y="82" text-anchor="middle">scene_id, seconds</text>
+        <text class="lhp2cL" x="340" y="64" text-anchor="middle">keyframes</text>
+        <text class="lhp2cS" x="340" y="82" text-anchor="middle">one row every 0.5 s</text>
+        <text class="lhp2cL" x="560" y="64" text-anchor="middle">boxes and cost</text>
+        <text class="lhp2cS" x="560" y="82" text-anchor="middle">x objects x unit cost</text>
+        <text class="lhp2cL" x="770" y="64" text-anchor="middle">the bill</text>
+        <text class="lhp2cS" x="770" y="82" text-anchor="middle">constructed units</text>
+
+        <text class="lhp2cL" x="340" y="166" text-anchor="middle">audit sample</text>
+        <text class="lhp2cS" x="340" y="184" text-anchor="middle">sample(n, random_state=7)</text>
+        <text class="lhp2cL" x="560" y="166" text-anchor="middle">re-check</text>
+        <text class="lhp2cS" x="560" y="184" text-anchor="middle">k frames wrong</text>
+        <text class="lhp2cL" x="770" y="166" text-anchor="middle">upper bound</text>
+        <text class="lhp2cS" x="770" y="184" text-anchor="middle">chi2(.95, 2k+2) / 2n</text>
+
+        <text class="lhp2cN" x="30" y="236">Two tables, one seeded draw. Every count comes from your constructed inputs: your numbers will differ.</text>
+      </svg>
+      <figcaption>🔍 Click to zoom - the yellow draw is the whole audit; everything you claim about label quality comes through it.</figcaption>
+    </figure>
+
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Make a constructed scene table</h4>
+        <p>Two hundred scenes of 20 seconds, like the public dataset's scene length, with a constructed object count per scene. Dense scenes carry more boxes; that is the point of drawing the counts from a range.</p>
+        <div class="prompt-box good"><span class="label">python</span>import numpy as np, pandas as pd
+rng = np.random.default_rng(7)
+scenes = pd.DataFrame({"scene_id": range(200), "seconds": 20.0,
+                       "objects": rng.integers(5, 60, size=200)})
+scenes.describe()</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Expand to keyframes and price the bill</h4>
+        <p>One row per keyframe at 2 Hz. One unit is one hand-drawn box. Check the keyframe count by hand first: 200 x 20 x 2 = 8,000. Then change <code>HZ</code> to 20 and watch every total scale by ten.</p>
+        <div class="prompt-box good"><span class="label">python</span>HZ = 2
+kf = scenes.loc[scenes.index.repeat((scenes.seconds * HZ).astype(int))].copy()
+kf["t_s"] = kf.groupby("scene_id").cumcount() / HZ
+kf["boxes"] = kf["objects"]
+print(len(kf), "keyframes,", kf.boxes.sum(), "boxes,", kf.boxes.sum(), "units if all drawn")</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Price an auto-labeller honestly</h4>
+        <p>Say 80% of boxes are proposed and reviewed at 0.3 units each, both constructed. Print the saving as a share of the hand-drawn bill, then try a review cost of 0.5. The saving is never the 80% on the label.</p>
+        <div class="prompt-box good"><span class="label">python</span>AUTO, REVIEW = 0.8, 0.3
+b = kf.boxes.sum()
+bill = b * (1 - AUTO) * 1.0 + b * AUTO * REVIEW
+print(round(bill), "units;", round(1 - bill / b, 3), "saved vs all drawn")</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Plant an error rate, then audit</h4>
+        <p>Mark each keyframe wrong with a constructed probability of 0.5%. You know the truth; the audit does not. Draw 300 keyframes, count the wrong ones, and compute the exact Poisson upper bound divided by n.</p>
+        <div class="prompt-box good"><span class="label">python</span>from scipy.stats import chi2
+kf["wrong"] = rng.random(len(kf)) &lt; 0.005
+audit = kf.sample(300, random_state=7)
+k, n = int(audit.wrong.sum()), len(audit)
+upper = chi2.ppf(0.95, 2 * k + 2) / 2 / n
+print("true", kf.wrong.mean().round(4), "| audit k =", k, "| 95% upper", round(upper, 4))</div>
+      </div></div>
+      <div class="step"><div>
+        <h4>Re-run the audit with ten seeds</h4>
+        <p>Change <code>random_state</code> from 0 to 9. Count how many audits find k = 0 and still report an upper bound near 1%, and how often the bound sits above the true rate. That is what a 95% bound promises, and all it promises.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Write the audit rule down</h4>
+        <p>One line per stratum: what is in it (hand-drawn, auto-accepted, each tail slice), its n, and the rate it must be shown below. That line belongs next to the label schema, beside the bill that paid for it.</p>
+      </div></div>
+    </div>
+
+    <div class="callout tip">
+      <p><strong>The habit to keep.</strong> Before you quote a label budget, write it as hours x 3,600 x keyframe rate x boxes per keyframe x cost per box, and defend the rate out loud. Before you quote a label error rate, say how many frames were audited, how many were wrong, and the upper bound, per stratum. A clean audit is a bound, not a zero.</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="section" id="quiz">
+    <div class="section-kicker">
+      <span class="klabel">Check yourself</span>
+      <h2>Three questions</h2>
+    </div>
+
+    <div class="quiz-q" data-answer="1">
+      <p class="qtext">Lanehart moves its keyframe rate from 2 Hz to 20 Hz, labelling every lidar scan, for the same hours of driving. What happens to the label bill?</p>
+      <button class="qopt" type="button">A · It rises a little, because most extra frames are near-copies of the keyframes</button>
+      <button class="qopt" type="button">B · It rises tenfold: the rate multiplies every other term, which did not change</button>
+      <button class="qopt" type="button">C · It stays the same, because interpolation already covered those frames</button>
+      <p class="qwhy">Every extra frame still carries its boxes and each box still costs. The public dataset's authors report that 2 Hz labels interpolate well to 10 or 20 Hz, which is the argument for not paying the tenfold bill.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="2">
+      <p class="qtext">A team re-checks 300 randomly chosen keyframes and finds no errors. What can it claim?</p>
+      <button class="qopt" type="button">A · The labels have no errors</button>
+      <button class="qopt" type="button">B · The error rate is below 0.1%</button>
+      <button class="qopt" type="button">C · At 95% confidence the error rate is below about 1% (2.996 / 300), for the kind of frames the sample actually held</button>
+      <p class="qwhy">Zero events gives an upper bound of -ln(0.05) / n, the rule of three. Showing below 0.1% would need about 2,996 clean frames. And a uniform sample from ordinary driving says little about tail slices it barely drew.</p>
+    </div>
+
+    <div class="quiz-q" data-answer="0">
+      <p class="qtext">An auto-labeller now proposes 80% of Lanehart's boxes. Where should the audit go?</p>
+      <button class="qopt" type="button">A · Split it: audit auto-accepted boxes, hand-drawn boxes and each tail slice as separate strata, each with its own n and bound</button>
+      <button class="qopt" type="button">B · Only the hand-drawn boxes, because the model makes the same choice every time</button>
+      <button class="qopt" type="button">C · Nowhere, because the auto-labeller was already evaluated before it shipped</button>
+      <p class="qwhy">A proposal model is weakest where it has seen least, and a missed object it never proposed leaves a reviewer nothing to reject. Different ways of making a box make different errors, so each needs its own measurement.</p>
+    </div>
+
+    <div class="quiz-score"></div>
+  </section>
+
+  <!-- ============ HOMEWORK ============ -->
+  <section class="section" id="homework">
+    <div class="section-kicker">
+      <span class="klabel">Before session 3</span>
+      <h2>Homework</h2>
+    </div>
+    <p class="lede">Thirty minutes, in your own notebook.</p>
+    <div class="steps">
+      <div class="step"><div>
+        <h4>Write one bill as a chain</h4>
+        <p>Pick any labelling or annotation job you know, in any domain. Write its cost as a product of terms like the five in the chain above, and mark which term is a choice and which is a fact. Your numbers will differ; the shape should not.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Size a stratified audit</h4>
+        <p>For four strata (hand-drawn, auto-accepted, one tail slice, everything else), work out the n each needs to show an error rate below 1% at 95% if it comes back clean. Use the audit widget, then price the audit with the calculator and say whether it is worth it.</p>
+      </div></div>
+      <div class="step"><div>
+        <h4>Read how labellers disagree</h4>
+        <p>Read <a href="https://phoebefu6.github.io/learn-data-centric-ai-with-phoebe/courses/02-when-labellers-disagree.html">When labellers disagree</a> in learn data-centric AI, and note one disagreement that a single-reviewer audit would count as "correct".</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ OFFICIAL ============ -->
+  <section class="section" id="official">
+    <div class="section-kicker">
+      <span class="klabel">Covered tonight</span>
+      <h2>What this session covers</h2>
+    </div>
+    <div class="covered">
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Keyframes at 2 Hz and what they buy</span><span class="note">2 Hz keyframes, 40,000 keyframes, 1.4M camera images, interpolation to 10-20 Hz. Caesar et al. (2020), a public multi-sensor research dataset paper, read at source.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">The label bill as a product</span><span class="note">Hours x 3,600 x rate x boxes x cost per box. Constructed calculator; every cost in constructed units.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Auto-labelling as review</span><span class="note">Drawing becomes reviewing; review is priced as its own line. Concept only, no real rates.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Label QA as sampling</span><span class="note">Exact Poisson upper bound over audited frames; zero in 300 gives about 1.0% at 95%. Rule of three: Hanley and Lippman-Hand (1983), JAMA, reported.</span></div>
+      <div class="covered-row"><span class="status pill solid">✓</span><span class="name">Stratified audits</span><span class="note">One n, k and bound per stratum: hand-drawn, auto-accepted, each tail slice.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">Finding the frames worth labelling</span><span class="note">Named tonight. Scenario mining in practitioner session 3, curating for the tail in session 4.</span></div>
+      <div class="covered-row"><span class="status pill inkpill">◐</span><span class="name">The bound itself</span><span class="note">Used tonight; derived properly with miles as exposure in practitioner session 7.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Label noise, disagreement and cleaning</span><span class="note">Live in <a href="https://phoebefu6.github.io/learn-data-centric-ai-with-phoebe/courses/02-when-labellers-disagree.html">learn data-centric AI</a>.</span></div>
+      <div class="covered-row"><span class="status pill light">○</span><span class="name">Real labelling prices</span><span class="note">Out of scope by design. No real price is quoted; every cost on the page is a constructed unit.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section class="section" id="cheatsheet">
+    <div class="section-kicker">
+      <span class="klabel">Take this with you</span>
+      <h2>Cheat sheet</h2>
+    </div>
+    <div class="cheat">
+      <div class="cheat-item"><strong>The one sentence.</strong> Ground truth in a drive log is bought by the frame, and checking it is a sample with a bound.</div>
+      <div class="cheat-item"><strong>The chain.</strong> Hours x 3,600 x keyframe rate x boxes per keyframe x cost per box.</div>
+      <div class="cheat-item"><strong>The lever.</strong> Keyframe rate: 2 Hz to 20 Hz is ten times the bill for the same hours.</div>
+      <div class="cheat-item"><strong>Why 2 Hz works.</strong> The authors report 2 Hz labels interpolate well to 10-20 Hz for objects that persist.</div>
+      <div class="cheat-item"><strong>What 2 Hz misses.</strong> Anything on screen for under half a second may sit on no keyframe.</div>
+      <div class="cheat-item"><strong>Auto-labelling.</strong> Moves cost from drawing to reviewing; price review as its own line.</div>
+      <div class="cheat-item"><strong>Zero is a bound.</strong> 0 errors in n audited: upper -ln(0.05) / n, about 3 / n. 300 clean frames: about 1%.</div>
+      <div class="cheat-item"><strong>Stratify.</strong> Hand-drawn, auto-accepted, each tail slice: own n, own k, own bound.</div>
+    </div>
+  </section>
+
+  <footer class="pagefoot">
+    <div class="wrap">
+      <p>Practitioner session 2 of 10 · learn-autonomous-driving-with-phoebe · by Phoebe Fu</p>
+      <nav class="pagenav">
+        <a href="p1-anatomy-of-a-drive-log.html">← Practitioner session 1 · Anatomy of a drive log</a>
+        <a href="p3-scenario-mining.html">Practitioner session 3 · Scenario mining: querying the fleet for rare events →</a>
+      </nav>
+    </div>
+  </footer>
+
+</main>
+
+<script src="../assets/av-live.js?v=1"></script>
+<script src="../assets/app.js?v=1"></script>
+<script>
+(function () {
+  function num(id, lo, hi, dflt) {
+    var v = Number(document.getElementById(id).value);
+    if (!isFinite(v)) return dflt;
+    return Math.min(hi, Math.max(lo, v));
+  }
+  function fmt(x) { return Math.round(x).toLocaleString("en-US"); }
+  function pct(x) { return (x * 100).toFixed(x < 0.001 ? 3 : 2) + "%"; }
+
+  /* label-cost calculator: plain constructed arithmetic */
+  var cOut = document.getElementById("lhp2-out");
+  var cVerdict = document.getElementById("lhp2-verdict");
+  var cIds = ["lhp2-hours", "lhp2-hz", "lhp2-obj", "lhp2-auto", "lhp2-rev", "lhp2-qa"];
+  function renderCalc() {
+    var hours = num("lhp2-hours", 1, 100000, 100);
+    var hz = num("lhp2-hz", 1, 20, 2);
+    var obj = num("lhp2-obj", 1, 500, 30);
+    var auto = num("lhp2-auto", 0, 1, 0);
+    var rev = num("lhp2-rev", 0, 1, 0.3);
+    var qa = num("lhp2-qa", 0, 1, 0.05);
+    var kf = hours * 3600 * hz;
+    var boxes = kf * obj;
+    var drawn = boxes * (1 - auto), proposed = boxes * auto;
+    var drawCost = drawn * 1, revCost = proposed * rev;
+    var auditKf = kf * qa, auditCost = auditKf * obj * rev;
+    var total = drawCost + revCost + auditCost;
+    var allHand = boxes;
+    var rows = [
+      ["Keyframes", fmt(hours) + " h x 3,600 x " + hz + " Hz", fmt(kf), ""],
+      ["Boxes", "keyframes x " + fmt(obj), fmt(boxes), ""],
+      ["Drawn by hand", "1 unit each", fmt(drawn), fmt(drawCost)],
+      ["Proposed, then reviewed", rev + " units each", fmt(proposed), fmt(revCost)],
+      ["Audit re-check", pct(qa) + " of keyframes, reviewed", fmt(auditKf) + " keyframes", fmt(auditCost)]
+    ];
+    var html = '<table class="sql-table"><thead><tr><th>Line</th><th>Working</th><th>Count</th><th>Units</th></tr></thead><tbody>';
+    rows.forEach(function (r) { html += "<tr><td>" + r[0] + "</td><td>" + r[1] + "</td><td>" + r[2] + "</td><td>" + r[3] + "</td></tr>"; });
+    html += '<tr class="lhp2-tot"><td>Total bill</td><td>constructed units</td><td></td><td><b>' + fmt(total) + "</b></td></tr></tbody></table>";
+    cOut.innerHTML = html;
+    cVerdict.textContent = "At " + hz + " Hz, " + fmt(hours) + " hours is " + fmt(kf) + " keyframes and " + fmt(boxes) + " boxes. Total " + fmt(total) + " units, " +
+      (auto > 0 ? "a saving of " + Math.round((1 - (drawCost + revCost) / allHand) * 100) + "% on drawing and review against all-by-hand (not " + Math.round(auto * 100) + "%), " : "") +
+      "with the audit at " + Math.round(auditCost / total * 100) + "% of the bill. Constructed inputs: your numbers will differ.";
+  }
+  cIds.forEach(function (id) {
+    var el = document.getElementById(id);
+    el.addEventListener("change", renderCalc);
+    el.addEventListener("input", renderCalc);
+  });
+  renderCalc();
+
+  /* audit bound: exact Poisson upper limit from the engine */
+  var self = document.getElementById("lhp2-self");
+  if (typeof AV === "undefined" || !AV.poissonUpper) {
+    self.textContent = "The engine did not load in this browser, so the audit bound cannot be computed here.";
+    return;
+  }
+  var aOut = document.getElementById("lhp2-aout");
+  var aVerdict = document.getElementById("lhp2-averdict");
+  function renderAudit() {
+    var n = Math.round(num("lhp2-n", 1, 1000000, 300));
+    var k = Math.round(num("lhp2-k", 0, 1000, 0));
+    if (k > n) k = n;
+    var conf = num("lhp2-conf", 0.5, 0.999, 0.95);
+    var target = num("lhp2-target", 0.0001, 0.5, 0.01);
+    var upper = AV.poissonUpper(k, conf) / n;
+    var need0 = Math.ceil(AV.poissonUpper(0, conf) / target);
+    var html = '<table class="sql-table"><thead><tr><th>Quantity</th><th>Value</th></tr></thead><tbody>' +
+      "<tr><td>Point estimate, k / n</td><td>" + pct(k / n) + "</td></tr>" +
+      "<tr><td>Upper bound at " + Math.round(conf * 100) + "%</td><td><b>" + pct(upper) + "</b></td></tr>" +
+      "<tr><td>Clean frames needed to show below " + pct(target) + "</td><td>" + fmt(need0) + "</td></tr>" +
+      "</tbody></table>";
+    aOut.innerHTML = html;
+    aVerdict.textContent = k + " errors in " + fmt(n) + " audited keyframes: the error rate is plausibly as high as " + pct(upper) + " at " + Math.round(conf * 100) + "% confidence. " +
+      (upper < target ? "That is below " + pct(target) + ", for the kind of frames this sample held." : "That does not show below " + pct(target) + "; with zero errors it would take " + fmt(need0) + " audited keyframes.") +
+      (k === 0 ? " Zero found is a bound, not a zero." : "");
+  }
+  ["lhp2-n", "lhp2-k", "lhp2-conf", "lhp2-target"].forEach(function (id) {
+    var el = document.getElementById(id);
+    el.addEventListener("change", renderAudit);
+    el.addEventListener("input", renderAudit);
+  });
+  var st = AV.selfTestResult || AV.selfTest();
+  self.textContent = st.pass
+    ? "The engine's " + st.checks.length + " self-checks pass in this browser, including the zero-event bound -ln(1 - C). The audit counts are yours; the bound is exact Poisson."
+    : "The engine's self-check did not pass in this browser, so the bound above should not be believed.";
+  renderAudit();
+})();
+</script>
+<style>
+  #lhp2-calc .sql-code, #lhp2-audit .sql-code { border: 1px solid var(--hairline); border-radius: 8px; max-width: 24rem; }
+  #lhp2-calc table.sql-table, #lhp2-audit table.sql-table { margin: .6rem 0 .2rem; font-size: .85rem; }
+  #lhp2-calc tr.lhp2-tot td { background: var(--indigo-50); }
+</style>
+</body>
+</html>
