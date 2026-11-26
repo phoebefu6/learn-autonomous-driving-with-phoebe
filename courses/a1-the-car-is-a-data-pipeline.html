@@ -19,7 +19,7 @@
 <meta name="twitter:image" content="https://phoebefu6.github.io/learn-autonomous-driving-with-phoebe/assets/og-cover.png">
 <!-- social:end -->
 <title>Leader session 1 · The car is a data pipeline on wheels - learn autonomous driving with phoebe</title>
-<link rel="stylesheet" href="../assets/style.css?v=2">
+<link rel="stylesheet" href="../assets/style.css?v=3">
 </head>
 <body>
 
@@ -521,7 +521,7 @@
 
 </main>
 
-<script src="../assets/app.js?v=1"></script>
+<script src="../assets/app.js?v=2"></script>
 <script>
 (function () {
   var LEVELS = [{"level": 0, "does": "Warnings and momentary assistance, such as automatic emergency braking or blind spot warning.", "human": "You are driving, and must constantly supervise.", "data": "The driver's inputs and the warning or brief intervention, with timestamps.", "claim": "A claim is about warnings and interventions, never about automated driving."}, {"level": 1, "does": "Steering OR brake and acceleration support, such as adaptive cruise control.", "human": "You are driving, and must steer, brake or accelerate as needed.", "data": "Which axis the feature controlled, and every driver input on the other.", "claim": "Any safety number describes a person and a machine together."}, {"level": 2, "does": "Steering AND brake and acceleration support at the same time.", "human": "You are driving, even with feet off the pedals and hands not steering.", "data": "Whether the driver was attentive and when they intervened.", "claim": "Crash reporting covers this level only for serious outcomes; a person was supervising."}, {"level": 3, "does": "Drives the vehicle under limited conditions; will not operate unless they are met.", "human": "You are not driving while engaged, but when the feature requests, you must drive.", "data": "Who was in control at every instant, when the request came, and how long the handover took.", "claim": "The handover is part of the safety case; a rate must say what happened around each request."}, {"level": 4, "does": "Drives under limited conditions, such as a local driverless taxi; may have no pedals or steering wheel.", "human": "You are not driving and will not be asked to take over.", "data": "The operating domain at every moment, and every time the feature reached its edge.", "claim": "Every rate is a rate inside the domain; compare it only with driving in the same conditions."}, {"level": 5, "does": "Same as Level 4, but can drive everywhere in all conditions.", "human": "You are not driving and will not be asked to take over.", "data": "Exposure across every condition, including the rare ones.", "claim": "No domain to hide behind: the long tail is the whole claim."}];
